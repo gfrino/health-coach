@@ -28,7 +28,46 @@
   },
   "today": {
     "emptyTitle": "Ancora nessun dato",
-    "emptyBody": "Quando collegherai Apple Health o Health Connect, qui vedrai le metriche principali della giornata."
+    "emptyBody": "Quando collegherai Apple Health o Health Connect, qui vedrai le metriche principali della giornata.",
+    "connectedNoData": "{{source}} è collegato ma non ci sono ancora dati. Tira verso il basso per sincronizzare.",
+    "syncNow": "Sincronizza ora",
+    "syncing": "Sincronizzo i dati da {{source}}…",
+    "lastSync": "Aggiornato alle {{time}}",
+    "loadDemo": "Carica dati di esempio (sviluppo)",
+    "noData": "—",
+    "avg7": "media 7 gg {{value}}",
+    "chartLabel": "{{title}}, ultimi 7 giorni",
+    "steps": "Passi",
+    "sleep": "Sonno",
+    "sleepStages": "Profondo {{deep}} · REM {{rem}} · Leggero {{light}}",
+    "activeEnergy": "Calorie attive",
+    "floors": "{{count}} piani",
+    "restingHeartRate": "Frequenza a riposo",
+    "hrv": "Variabilità cardiaca (HRV)",
+    "weight": "Peso",
+    "delta30": "{{value}} in 30 giorni",
+    "vitals": "Parametri vitali",
+    "workoutsWeek": "Allenamenti (7 giorni)",
+    "workoutsCount": "{{count}} allenamenti",
+    "noWorkouts": "Nessun allenamento",
+    "activity": {
+      "running": "Corsa",
+      "walking": "Camminata",
+      "cycling": "Bici",
+      "swimming": "Nuoto",
+      "strength": "Forza",
+      "functionalStrength": "Allenamento funzionale",
+      "hiit": "HIIT",
+      "yoga": "Yoga",
+      "pilates": "Pilates",
+      "hiking": "Escursione",
+      "rowing": "Canottaggio",
+      "elliptical": "Ellittica",
+      "dance": "Danza",
+      "coreTraining": "Core",
+      "mixedCardio": "Cardio misto",
+      "other": "Altro"
+    }
   },
   "journal": {
     "emptyTitle": "Il diario è vuoto",
@@ -412,7 +451,6 @@
     "dataConnected": "Sorgente dei dati di salute collegata",
     "dataSkipped": "Dati di salute non collegati (puoi farlo in seguito)",
     "welcome": "{{name}} ti sta scrivendo un messaggio di benvenuto",
-    "phase3Note": "La lettura completa dello storico dei dati di salute arriva con il prossimo aggiornamento.",
     "openChat": "Apri la chat",
     "welcomeFailed": "Puoi comunque aprire la chat e scrivere al coach."
   },
@@ -466,7 +504,7 @@
     "requestBody": "Presto potrai richiedere nuove integrazioni e votare quelle proposte da altri.",
     "requestButton": "Richiedi un'integrazione",
     "requestSoon": "Questa funzione arriverà con un prossimo aggiornamento.",
-    "lastSyncNever": "Sincronizzazione dei dati in arrivo con il prossimo aggiornamento.",
+    "lastSyncNever": "Non ancora sincronizzato.",
     "items": {
       "withings": {
         "name": "Withings",
@@ -536,7 +574,8 @@
         "name": "ChatGPT con il tuo account",
         "data": "Usa il tuo abbonamento ChatGPT (anche Team/Business) al posto di un codice di accesso. In attesa dell'approvazione di OpenAI."
       }
-    }
+    },
+    "lastSync": "Ultima sincronizzazione: {{when}}"
   },
   "tabsShort": {
     "coach": "Coach",

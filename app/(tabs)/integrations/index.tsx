@@ -63,8 +63,8 @@ export default function IntegrationsScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: t('tabs.integrations') }} />
-      <Screen>
+      <Stack.Screen options={{ headerShown: false }} />
+      <Screen title={t('tabs.integrations')}>
         {section(t('integrations.healthTitle'))}
         <HealthSourceCard showCategories={false} />
 

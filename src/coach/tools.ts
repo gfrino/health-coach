@@ -1,16 +1,20 @@
 import type { ToolCall, ToolDefinition } from '@/ai/types';
-import { healthQueries, type Db } from '@/db';
+import { healthDataRepository, healthQueries, type Db } from '@/db';
 import { DAY_MS } from '@/lib/dates';
-import { HEALTH_DATA_TYPES } from '@/sources/healthDataTypes';
+import { METRIC_UNITS, SleepStage } from '@/sources/model';
+import { stageMinutes } from '@/sources/sleep';
 
 /**
  * Funzioni locali esposte al modello via tool calling: interrogano il DB cifrato sul
  * dispositivo e restituiscono SOLO il risultato aggregato richiesto.
  */
 
-const METRIC_TYPES = HEALTH_DATA_TYPES.map((t) => t.id).filter(
-  (id) => id !== 'workouts' && id !== 'sleep',
-);
+/** Metriche interrogabili + i due tipi "speciali" (notti di sonno e allenamenti). */
+const METRIC_TYPES = [
+  ...Object.keys(METRIC_UNITS).filter((k) => k !== 'sleepStage'),
+  'sleep',
+  'workouts',
+];
 const MAX_RANGE_DAYS = 400;
 const DATE = { type: 'string', description: 'Date in YYYY-MM-DD format (local time).' };
 
@@ -18,7 +22,7 @@ export const COACH_TOOLS: ToolDefinition[] = [
   {
     name: 'get_metric',
     description:
-      'Daily values of one health metric between two dates (sum per day for cumulative metrics such as steps, average for sampled ones such as heart rate).',
+      'Daily values of one health metric between two dates (sum per day for cumulative metrics such as steps, average for sampled ones such as heart rate). "sleep" returns one row per night (hours asleep and stage minutes); "workouts" returns the list of workouts.',
     parameters: {
       type: 'object',
       properties: {
@@ -94,6 +98,24 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
           throw new ToolInputError(`unknown metric type: ${String(type)}`);
         }
         const [from, to] = parseRange(args);
+        if (type === 'sleep') {
+          const nights = await healthDataRepository.nightsBetween(db, from, to);
+          const rows = nights.map((n) => ({
+            night_ending: n.day,
+            hours_asleep: Math.round((n.asleepMin / 60) * 10) / 10,
+            hours_in_bed: n.inBedMin != null ? Math.round((n.inBedMin / 60) * 10) / 10 : null,
+            ...sleepStageMinutes(n.stages),
+          }));
+          return ok(rows.length ? rows : { message: 'No sleep data recorded in the period.' });
+        }
+        if (type === 'workouts') {
+          const rows = await healthDataRepository.workoutsBetween(db, from, to, 100);
+          return ok(
+            rows.length
+              ? rows.map((w) => ({ ...w, date: new Date(w.startAt).toISOString().slice(0, 10) }))
+              : { message: 'No workouts recorded in the period.' },
+          );
+        }
         const res = await healthQueries.dailyMetric(db, type, from, to);
         return ok(
           res.days.length ? res : { message: 'No data recorded for this metric in the period.' },
@@ -118,6 +140,18 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
       e instanceof ToolInputError ? e.message : 'internal error while reading local data';
     return { content: JSON.stringify({ error: message }), isError: true };
   }
+}
+
+function sleepStageMinutes(stages: { stage: number; startAt: number; endAt: number }[]) {
+  const m = stageMinutes(stages);
+  return stages.length
+    ? {
+        deep_min: m[SleepStage.Deep] ?? 0,
+        rem_min: m[SleepStage.REM] ?? 0,
+        light_min: m[SleepStage.Light] ?? 0,
+        awake_min: m[SleepStage.Awake] ?? 0,
+      }
+    : {};
 }
 
 const ok = (value: unknown): ToolOutcome => ({ content: JSON.stringify(value), isError: false });

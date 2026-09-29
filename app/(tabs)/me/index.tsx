@@ -1,11 +1,13 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Stack } from 'expo-router/stack';
 import { useState } from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState, Icon, Screen, SegmentedControl } from '@/components';
 import { RecordsSection, useAddReport } from '@/features/RecordsSection';
+import { TodaySection } from '@/features/today/TodaySection';
+import { syncHealthData, useSyncStore } from '@/sources/syncService';
 import { useTheme } from '@/theme';
 
 type Section = 'today' | 'journal' | 'records';
@@ -17,6 +19,7 @@ export default function MeScreen() {
   const params = useLocalSearchParams<{ section?: Section }>();
   const [section, setSection] = useState<Section>(params.section ?? 'today');
   const [reloadKey, setReloadKey] = useState(0);
+  const syncing = useSyncStore((st) => st.syncing);
   const current = params.section && params.section !== section ? params.section : section;
 
   const add = useAddReport((ids) => {
@@ -32,26 +35,39 @@ export default function MeScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: t('tabs.me'),
-          headerRight:
-            current === 'records'
-              ? () => (
-                  <Pressable
-                    onPress={add}
-                    accessibilityRole="button"
-                    accessibilityLabel={t('records.addTitle')}
-                    hitSlop={10}
-                    style={{ paddingHorizontal: 8 }}
-                  >
-                    <Icon name="add" color={colors.primary} />
-                  </Pressable>
-                )
-              : undefined,
-        }}
-      />
-      <Screen>
+      <Stack.Screen options={{ headerShown: false }} />
+      <Screen
+        title={t('tabs.me')}
+        titleAction={
+          current === 'records' ? (
+            <Pressable
+              onPress={add}
+              accessibilityRole="button"
+              accessibilityLabel={t('records.addTitle')}
+              hitSlop={10}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.primarySoft,
+              }}
+            >
+              <Icon name="add" color={colors.primary} />
+            </Pressable>
+          ) : undefined
+        }
+        refreshControl={
+          current === 'today' ? (
+            <RefreshControl
+              refreshing={syncing}
+              onRefresh={() => void syncHealthData({ force: true })}
+              tintColor={colors.primary}
+            />
+          ) : undefined
+        }
+      >
         <SegmentedControl
           value={current}
           onChange={select}
@@ -62,7 +78,7 @@ export default function MeScreen() {
           ]}
         />
         {current === 'today' ? (
-          <EmptyState icon="today" title={t('today.emptyTitle')} body={t('today.emptyBody')} />
+          <TodaySection />
         ) : current === 'journal' ? (
           <EmptyState
             icon="journal"

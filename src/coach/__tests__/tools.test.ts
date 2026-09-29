@@ -5,6 +5,7 @@ import { executeTool } from '../tools';
 
 jest.mock('@/db', () => ({
   healthQueries: jest.requireActual('@/db/repositories/healthQueries'),
+  healthDataRepository: jest.requireActual('@/db/repositories/healthDataRepository'),
 }));
 
 async function setup() {
@@ -65,6 +66,37 @@ describe('executeTool', () => {
     const res = await executeTool(db, { id: '1', name: 'get_metric', arguments: args });
     expect(res.isError).toBe(true);
     expect(JSON.parse(res.content).error).toContain(message);
+  });
+
+  it('get_metric "sleep" restituisce una riga per notte con le fasi', async () => {
+    const db = await setup();
+    const start = new Date('2026-09-27T23:00:00').getTime();
+    await db.runAsync(
+      "INSERT INTO sleep_sessions (id, start_at, end_at, in_bed_s, asleep_s, stages, source, source_id) VALUES ('s', ?, ?, ?, ?, ?, 'demo', 's1')",
+      [
+        start,
+        start + 8 * 3600000,
+        8 * 3600,
+        7 * 3600,
+        JSON.stringify([{ stage: 4, startAt: start, endAt: start + 3600000 }]),
+      ],
+    );
+    const res = await executeTool(db, {
+      id: '1',
+      name: 'get_metric',
+      arguments: { type: 'sleep', from: '2026-09-27', to: '2026-09-28' },
+    });
+    expect(JSON.parse(res.content)).toEqual([
+      {
+        night_ending: '2026-09-28',
+        hours_asleep: 7,
+        hours_in_bed: 8,
+        deep_min: 60,
+        rem_min: 0,
+        light_min: 0,
+        awake_min: 0,
+      },
+    ]);
   });
 
   it('segnala uno strumento sconosciuto', async () => {

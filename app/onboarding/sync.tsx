@@ -4,7 +4,8 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { toAIError } from '@/ai/errors';
-import { AppText, Card, Icon, Markdown } from '@/components';
+import { AppText, Card, Icon, Markdown, ProgressBar } from '@/components';
+import { syncHealthData, useSyncStore } from '@/sources/syncService';
 import { ONBOARDING_FLOW_VERSION } from '@/config/settingsSchema';
 import { generateWelcome } from '@/coach/chatEngine';
 import { OnboardingStep } from '@/onboarding/OnboardingStep';
@@ -13,11 +14,7 @@ import { useTheme } from '@/theme';
 
 type Phase = 'profile' | 'data' | 'welcome' | 'done' | 'error';
 
-/**
- * Passo finale: prima sincronizzazione e messaggio di benvenuto del coach.
- * La sincronizzazione completa dei dati di salute arriva con la Fase 3: per ora il passo "dati"
- * conferma solo il collegamento della sorgente.
- */
+/** Passo finale: prima sincronizzazione dei dati di salute (con avanzamento) e benvenuto del coach. */
 export default function SyncStep() {
   const { t } = useTranslation();
   const { colors, spacing } = useTheme();
@@ -26,6 +23,7 @@ export default function SyncStep() {
   const [phase, setPhase] = useState<Phase>('profile');
   const [preview, setPreview] = useState('');
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  const progress = useSyncStore((st) => st.progress);
   const conversationId = useRef<string | null>(null);
   const started = useRef(false);
 
@@ -34,7 +32,7 @@ export default function SyncStep() {
     started.current = true;
     (async () => {
       setPhase('data');
-      await new Promise((r) => setTimeout(r, 400));
+      if (settings.healthSourceConnectedAt !== null) await syncHealthData({ force: true });
       setPhase('welcome');
       try {
         conversationId.current = await generateWelcome(settings, { onText: setPreview });
@@ -93,9 +91,9 @@ export default function SyncStep() {
             <AppText style={{ flex: 1 }}>{s.label}</AppText>
           </View>
         ))}
-        <AppText variant="caption" tone="textMuted">
-          {t('sync.phase3Note')}
-        </AppText>
+        {phase === 'data' && progress ? (
+          <ProgressBar value={progress.done / progress.total} label={t('sync.dataConnected')} />
+        ) : null}
       </Card>
 
       {preview ? (

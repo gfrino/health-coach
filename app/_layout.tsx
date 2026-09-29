@@ -11,6 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { StartupError } from '@/components/StartupError';
 import { ShareIntentImporter } from '@/records/ShareIntentImporter';
+import { HealthSyncManager } from '@/sources/HealthSyncManager';
 import { bootstrap } from '@/lib/bootstrap';
 import { useSettingsStore } from '@/store/settingsStore';
 import { AppThemeProvider, toNavigationTheme, useTheme } from '@/theme';
@@ -64,6 +65,7 @@ function RootNavigator() {
     <ThemeProvider value={toNavigationTheme(theme)}>
       <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
       <ShareIntentImporter />
+      <HealthSyncManager />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Protected guard={!onboardingCompleted}>

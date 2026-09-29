@@ -1,4 +1,5 @@
 import { localIsoDate } from '@/lib/dates';
+import { CUMULATIVE_METRICS, type MetricType } from '@/sources/model';
 
 import type { Db } from '../types';
 
@@ -9,25 +10,14 @@ export interface DailyValue {
   value: number;
 }
 
-/** Tipi cumulativi (somma giornaliera) vs campionati (media giornaliera). */
-const SUM_TYPES = new Set([
-  'steps',
-  'distance',
-  'floors',
-  'activeEnergy',
-  'restingEnergy',
-  'water',
-  'caffeine',
-  'mindfulness',
-]);
-
 export async function dailyMetric(
   db: Db,
   type: string,
   fromMs: number,
   toMs: number,
 ): Promise<{ unit: string | null; days: DailyValue[] }> {
-  const agg = SUM_TYPES.has(type) ? 'SUM' : 'AVG';
+  // Tipi cumulativi: somma del giorno; campionati (frequenza, peso…): media del giorno.
+  const agg = CUMULATIVE_METRICS.has(type as MetricType) ? 'SUM' : 'AVG';
   const rows = await db.getAllAsync<{ day: string; value: number; unit: string }>(
     `SELECT date(start_at / 1000, 'unixepoch', 'localtime') AS day, ${agg}(value) AS value, MAX(unit) AS unit
      FROM metrics WHERE type = ? AND start_at >= ? AND start_at < ?

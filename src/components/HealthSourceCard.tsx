@@ -10,6 +10,7 @@ import {
   requestHealthReadAccess,
 } from '@/sources/platformHealth';
 import type { HealthAvailability } from '@/sources/types';
+import { syncHealthData, useSyncStore } from '@/sources/syncService';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
 
@@ -21,12 +22,13 @@ import { Icon } from './Icon';
 
 /** Apple Health (iOS) / Health Connect (Android): stato, spiegazione dei dati, collegamento. */
 export function HealthSourceCard({ showCategories = true }: { showCategories?: boolean }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors, spacing } = useTheme();
   const connectedAt = useSettingsStore((s) => s.settings.healthSourceConnectedAt);
   const update = useSettingsStore((s) => s.update);
   const [availability, setAvailability] = useState<HealthAvailability | null>(null);
   const [busy, setBusy] = useState(false);
+  const { syncing, lastSyncAt } = useSyncStore();
 
   const isIOS = Platform.OS === 'ios';
   const sourceName = isIOS ? 'Apple Health' : 'Health Connect';
@@ -52,6 +54,9 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
       const res = await requestHealthReadAccess();
       if (res.completed && res.grantedCount !== 0) {
         await update({ healthSourceConnectedAt: connectedAt ?? Date.now() });
+        // Prima lettura subito dopo il consenso (nell'onboarding la fa il passo finale).
+        if (useSettingsStore.getState().settings.onboardingCompleted)
+          void syncHealthData({ force: true });
       } else if (res.grantedCount === 0) {
         Alert.alert(
           t('sources.noneGrantedTitle'),
@@ -104,8 +109,22 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
         <View style={{ gap: spacing.sm }}>
           <AppText tone="success">{t('sources.connected', { source: sourceName })}</AppText>
           <AppText variant="caption" tone="textMuted">
-            {t('integrations.lastSyncNever')}
+            {syncing
+              ? t('today.syncing', { source: sourceName })
+              : lastSyncAt
+                ? t('integrations.lastSync', {
+                    when: new Date(lastSyncAt).toLocaleString(i18n.language, {
+                      dateStyle: 'short',
+                      timeStyle: 'short',
+                    }),
+                  })
+                : t('integrations.lastSyncNever')}
           </AppText>
+          <Button
+            label={t('today.syncNow')}
+            onPress={() => void syncHealthData({ force: true })}
+            loading={syncing}
+          />
           <Button
             label={t('sources.reviewPermissions')}
             variant="secondary"

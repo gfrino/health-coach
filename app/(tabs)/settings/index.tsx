@@ -22,8 +22,8 @@ export default function SettingsScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: t('settings.title') }} />
-      <Screen>
+      <Stack.Screen options={{ headerShown: false }} />
+      <Screen title={t('settings.title')}>
         <AppText variant="headline">{t('settings.sections.coach')}</AppText>
         <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
           <NavRow

@@ -11,3 +11,9 @@ export async function bootstrap(): Promise<void> {
   await getDb();
   await useSettingsStore.getState().hydrate(deviceRegion());
 }
+
+/** Avvio senza interfaccia (task in background): stesso ordine, idempotente se l'app è già aperta. */
+export async function bootstrapHeadless(): Promise<void> {
+  if (useSettingsStore.getState().hydrated) return;
+  await bootstrap();
+}

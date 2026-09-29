@@ -8,9 +8,9 @@ export function TabStack() {
   return (
     <Stack
       screenOptions={{
-        headerLargeTitle: true,
+        // Titolo standard: il large title di iOS 27 non viene disegnato con lo ScrollView annidato nello schermo.
+        headerLargeTitle: false,
         headerShadowVisible: false,
-        headerLargeTitleShadowVisible: false,
         headerStyle: { backgroundColor: colors.background },
         headerTintColor: colors.primary,
         headerTitleStyle: { color: colors.text },

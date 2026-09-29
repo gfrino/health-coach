@@ -8,7 +8,7 @@ import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS } from '@/lib/dates';
 
 import { composeSystemPrompt, recentHistory } from './context';
-import { buildMetricsSnapshot } from './snapshot';
+import { buildHealthSnapshot } from './snapshot';
 import { COACH_TOOLS, executeTool } from './tools';
 
 const MAX_TOOL_ROUNDS = 5;
@@ -28,11 +28,11 @@ export interface TurnResult {
 }
 
 async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Promise<string> {
-  const [profile, memoryFacts, summaries, metrics, journal] = await Promise.all([
+  const [profile, memoryFacts, summaries, snapshot, journal] = await Promise.all([
     profileRepository.loadProfileContext(db),
     healthQueries.recentMemoryFacts(db),
     healthQueries.recentSummaries(db),
-    buildMetricsSnapshot(db, now),
+    buildHealthSnapshot(db, now),
     healthQueries.journalRange(db, now.getTime() - 7 * DAY_MS, now.getTime() + 1, 7),
   ]);
   return composeSystemPrompt({
@@ -41,7 +41,8 @@ async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Prom
     profile,
     memoryFacts,
     summaries,
-    metrics,
+    metrics: snapshot.metrics,
+    anomalies: snapshot.anomalies,
     journal,
     now,
     compact: settings.ai.provider === 'device',
