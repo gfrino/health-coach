@@ -45,6 +45,9 @@ const HEALTH_CONNECT_READ_PERMISSIONS = [
 const variant = (process.env.APP_VARIANT ?? 'development') as
   'development' | 'preview' | 'production';
 
+/** Progetto EAS @ticinoweb/health-coach (non è un segreto). */
+const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID ?? '90f2abc0-4279-4591-8482-ce14873179c8';
+
 const BASE_BUNDLE_ID = process.env.APP_BUNDLE_ID ?? 'ch.ticinoweb.healthcoach';
 const bundleId =
   variant === 'production'
@@ -59,7 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: appName,
   slug: 'health-coach',
-  owner: process.env.EAS_OWNER,
+  owner: process.env.EAS_OWNER ?? 'ticinoweb',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -67,9 +70,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   userInterfaceStyle: 'automatic',
   // fingerprint: ogni modifica nativa cambia il runtime, così un OTA non arriva mai a una build incompatibile.
   runtimeVersion: { policy: 'fingerprint' },
-  updates: process.env.EAS_PROJECT_ID
-    ? { url: `https://u.expo.dev/${process.env.EAS_PROJECT_ID}` }
-    : undefined,
+  updates: { url: `https://u.expo.dev/${EAS_PROJECT_ID}` },
   // Stringhe di sistema (permessi) localizzate per iOS.
   locales: {
     it: './locales/native/it.json',
@@ -193,6 +194,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     variant,
     backendUrl: process.env.EXPO_PUBLIC_BACKEND_URL ?? '',
-    eas: process.env.EAS_PROJECT_ID ? { projectId: process.env.EAS_PROJECT_ID } : undefined,
+    eas: { projectId: EAS_PROJECT_ID },
   },
 });
