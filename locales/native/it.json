@@ -1,0 +1,9 @@
+{
+  "CFBundleDisplayName": "Health Coach",
+  "NSHealthShareUsageDescription": "Health Coach legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.",
+  "NSFaceIDUsageDescription": "Usa Face ID per sbloccare Health Coach.",
+  "NSPhotoLibraryUsageDescription": "Health Coach accede alle foto solo per importare i referti che scegli tu.",
+  "NSCameraUsageDescription": "Health Coach usa la fotocamera solo per fotografare i tuoi referti.",
+  "NSMicrophoneUsageDescription": "Health Coach usa il microfono solo mentre parli con il coach.",
+  "NSSpeechRecognitionUsageDescription": "Health Coach trascrive la tua voce per parlare con il coach. Quando possibile, la trascrizione avviene sul telefono."
+}

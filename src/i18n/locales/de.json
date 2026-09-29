@@ -1,0 +1,561 @@
+{
+  "common": {
+    "appName": "Health Coach",
+    "continue": "Weiter",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "retry": "Erneut versuchen",
+    "save": "Speichern",
+    "done": "Fertig",
+    "comingSoon": "Demnächst verfügbar",
+    "selected": "ausgewählt",
+    "add": "Hinzufügen",
+    "delete": "Löschen",
+    "removeItem": "{{item}} entfernen"
+  },
+  "tabs": {
+    "coach": "Coach",
+    "today": "Heute",
+    "journal": "Tagebuch",
+    "records": "Akte",
+    "settings": "Einstellungen",
+    "integrations": "Integrationen",
+    "me": "Ich"
+  },
+  "coach": {
+    "emptyTitle": "Dein Coach wartet auf dich",
+    "emptyBody": "Verbinde einen KI-Anbieter und deine Gesundheitsquellen, um mit deinem Coach zu sprechen."
+  },
+  "today": {
+    "emptyTitle": "Noch keine Daten",
+    "emptyBody": "Sobald du Apple Health oder Health Connect verbindest, siehst du hier die wichtigsten Werte des Tages."
+  },
+  "journal": {
+    "emptyTitle": "Dein Tagebuch ist leer",
+    "emptyBody": "Notiere, wie du dich fühlst, deine Energie, Symptome und alles, was du dir merken möchtest. Dein Coach berücksichtigt es."
+  },
+  "records": {
+    "emptyTitle": "Noch keine Befunde",
+    "emptyBody": "Füge Blutwerte, Befunde und Untersuchungen hinzu: Sie bleiben verschlüsselt auf deinem Telefon.",
+    "addFirst": "Befund hinzufügen",
+    "addTitle": "Befund hinzufügen",
+    "addBody": "Woher möchtest du ihn importieren?",
+    "fromCamera": "Foto aufnehmen",
+    "fromPhotos": "Aus Fotos wählen",
+    "fromFiles": "Datei wählen (PDF)",
+    "defaultTitle": "Befund",
+    "importFailed": "Import nicht möglich",
+    "tooLarge": "Die Datei ist zu groß (max. 20 MB).",
+    "unsupported": "Nicht unterstütztes Format: Verwende PDF oder Bilder.",
+    "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen des Telefons.",
+    "shareHint": "Tipp: Aus Mail, Dateien, Fotos oder der App deines Labors „Teilen → Health Coach“ wählen, um einen Befund sofort hinzuzufügen.",
+    "sharedTitle": "Befund hinzugefügt",
+    "sharedBody": "{{count}} Datei(en) in der Gesundheitsakte gespeichert.",
+    "open": "Datei öffnen",
+    "title": "Titel",
+    "date": "Datum der Untersuchung",
+    "extractionTitle": "Werte mit KI auslesen",
+    "extractionBody": "Bald kann dein Coach die Werte der Untersuchung (mit deiner Zustimmung) auslesen und ihren Verlauf zeigen.",
+    "encryptedNote": "Die Datei ist nur auf diesem Telefon gespeichert, in der verschlüsselten Datenbank.",
+    "delete": "Befund löschen",
+    "deleteTitle": "Befund löschen?",
+    "deleteBody": "Die Datei wird endgültig von diesem Telefon gelöscht."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "sections": {
+      "appearance": "Darstellung",
+      "language": "Sprache",
+      "units": "Maßeinheiten",
+      "about": "Info",
+      "coach": "Coach und KI"
+    },
+    "languageSystem": "Systemsprache",
+    "theme": {
+      "title": "Design",
+      "system": "Automatisch",
+      "light": "Hell",
+      "dark": "Dunkel"
+    },
+    "units": {
+      "weight": "Gewicht",
+      "distance": "Distanz",
+      "temperature": "Temperatur",
+      "glucose": "Blutzucker",
+      "celsius": "°C",
+      "fahrenheit": "°F"
+    },
+    "about": {
+      "version": "Version",
+      "database": "Datenbank",
+      "encrypted": "Verschlüsselt (SQLCipher {{version}})",
+      "notEncrypted": "NICHT verschlüsselt",
+      "schema": "Schema v{{version}}",
+      "disclaimer": "Medizinischer Hinweis"
+    },
+    "aiTitle": "KI-Anbieter",
+    "aiIntro": "Du kannst jederzeit ohne Zusatzkosten wechseln. Mit der KI des Telefons verlassen deine Daten das Gerät nie.",
+    "notConfigured": "Nicht eingerichtet",
+    "usageTitle": "Geschätzter Verbrauch (letzte 30 Tage)",
+    "usageEmpty": "Noch kein Verbrauch erfasst.",
+    "usageValue": "{{input}} ein · {{output}} aus · {{messages}} Antworten",
+    "usageNote": "Vom Anbieter gezählte Tokens für die Antworten des Coachs. Die tatsächlichen Kosten hängen von der Preisliste des Anbieters und des Modells ab."
+  },
+  "languages": {
+    "it": "Italiano",
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français"
+  },
+  "onboarding": {
+    "welcomeTitle": "Willkommen bei Health Coach",
+    "welcomeBody": "Dein persönlicher Coach, der deine Gesundheitsdaten kennt und dich jeden Tag begleitet.",
+    "privacyTitle": "Deine Daten bleiben deine",
+    "privacyPoints": {
+      "local": "Alle Gesundheitsdaten werden nur auf diesem Telefon gespeichert, in einer verschlüsselten Datenbank.",
+      "ai": "Sie werden nur an den von dir gewählten KI-Anbieter gesendet, nur bei Bedarf und in zusammengefasster Form.",
+      "noServer": "Keiner unserer Server empfängt, speichert oder verarbeitet deine Gesundheitsdaten."
+    },
+    "disclaimerTitle": "Medizinischer Hinweis",
+    "disclaimer": "Health Coach ist ein Wellness- und Informationswerkzeug, kein Medizinprodukt. Es stellt keine Diagnosen und ersetzt nicht den Rat einer Ärztin oder eines Arztes.",
+    "acceptDisclaimer": "Ich habe den medizinischen Hinweis gelesen und akzeptiere ihn",
+    "start": "Los geht's",
+    "stepOf": "Schritt {{step}} von {{total}}"
+  },
+  "errors": {
+    "generic": "Ein unerwarteter Fehler ist aufgetreten.",
+    "dbUnlockTitle": "Deine Daten können nicht geöffnet werden",
+    "dbUnlockBody": "Die verschlüsselte Datenbank kann auf diesem Gerät nicht entsperrt werden. Du kannst es erneut versuchen oder die lokalen Daten zurücksetzen und neu beginnen.",
+    "resetData": "Lokale Daten zurücksetzen",
+    "resetConfirmTitle": "Alle Daten zurücksetzen?",
+    "resetConfirmBody": "Alle in der App gespeicherten Daten werden endgültig gelöscht. Daten in Apple Health / Health Connect bleiben unverändert."
+  },
+  "components": {
+    "dateInvalid": "Ungültiges Datum",
+    "dd": "TT",
+    "mm": "MM",
+    "yyyy": "JJJJ",
+    "day": "Tag",
+    "month": "Monat",
+    "year": "Jahr",
+    "earlier": "{{minutes}} Minuten früher",
+    "later": "{{minutes}} Minuten später",
+    "decrease": "Verringern",
+    "increase": "Erhöhen"
+  },
+  "ai": {
+    "title": "Wähle die Intelligenz deines Coachs",
+    "subtitle": "Am einfachsten nutzt du die KI, die schon in deinem Telefon steckt: kostenlos, privat, ohne Konto.",
+    "chooseProvider": "Anbieter",
+    "providers": {
+      "anthropic": "Claude-Modelle. Stark im logischen Denken, mit Fokus auf Sicherheit.",
+      "openai": "GPT-Modelle, dieselben wie bei ChatGPT.",
+      "gemini": "Die Gemini-Modelle von Google, mit einem kostenlosen Einstiegsangebot."
+    },
+    "guideTitle": "So erhältst du deinen {{provider}}-Schlüssel",
+    "guides": {
+      "anthropic": {
+        "1": "Öffne die Anthropic Console und melde dich an oder erstelle ein Konto.",
+        "2": "Füge unter Billing eine Zahlungsmethode oder Prepaid-Guthaben hinzu.",
+        "3": "Gehe zu API Keys und tippe auf „Create Key“; gib ihm einen Namen, z. B. Health Coach.",
+        "4": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Code wird automatisch eingefügt und geprüft."
+      },
+      "openai": {
+        "1": "Öffne die OpenAI-Plattform und melde dich an oder erstelle ein Konto.",
+        "2": "Füge unter Billing Guthaben hinzu: Ein ChatGPT-Abo gilt nicht für die API.",
+        "3": "Gehe zu API keys und tippe auf „Create new secret key“.",
+        "4": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Code wird automatisch eingefügt und geprüft."
+      },
+      "gemini": {
+        "1": "Öffne Google AI Studio und melde dich mit deinem Google-Konto an.",
+        "2": "Tippe auf „Create API key“ und wähle oder erstelle ein Projekt.",
+        "3": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Code wird automatisch eingefügt und geprüft."
+      }
+    },
+    "openKeysPage": "Seite öffnen und Code erstellen",
+    "billingNote": "Die KI-Nutzung rechnet der Anbieter nach Verbrauch über dein Konto ab. Health Coach erhält und sieht deinen Schlüssel nie.",
+    "apiKey": "Zugangscode (API-Schlüssel)",
+    "keyHint": "Er wird im sicheren Schlüsselbund deines Telefons gespeichert.",
+    "keySavedHint": "Ein Schlüssel ist bereits gespeichert. Füge nur einen neuen ein, wenn du ihn ersetzen möchtest.",
+    "verify": "Prüfen und verbinden",
+    "retest": "Erneut prüfen",
+    "loadingModels": "Verfügbare Modelle werden geladen…",
+    "testing": "Verbindung wird getestet…",
+    "connected": "Verbunden mit {{provider}} · {{model}}",
+    "model": "Modell",
+    "errors": {
+      "invalid_key": "Der API-Schlüssel ist ungültig oder hat nicht die nötigen Berechtigungen. Prüfe ihn und versuche es erneut.",
+      "insufficient_credit": "Das Guthaben deines Kontos beim Anbieter ist aufgebraucht. Lade es in der Konsole des Anbieters auf.",
+      "rate_limited": "Zu viele Anfragen in kurzer Zeit. Warte einige Sekunden und versuche es erneut.",
+      "network": "Keine oder instabile Verbindung. Prüfe dein Netzwerk und versuche es erneut.",
+      "server": "Der KI-Anbieter ist vorübergehend überlastet oder nicht erreichbar. Versuche es gleich noch einmal.",
+      "model_not_found": "Das gewählte Modell ist für diesen Schlüssel nicht verfügbar. Wähle ein anderes.",
+      "refused": "Das Modell konnte auf diese Anfrage nicht antworten. Formuliere sie anders.",
+      "aborted": "Anfrage abgebrochen.",
+      "unknown": "Beim KI-Anbieter ist ein unerwarteter Fehler aufgetreten.",
+      "device_unavailable": "Die KI des Telefons ist gerade nicht verfügbar. Prüfe, ob sie aktiviert ist, oder nutze einen Online-Dienst.",
+      "context_window": "Diese Unterhaltung ist zu lang für die KI des Telefons. Beginne eine neue Unterhaltung.",
+      "unsupported_language": "Die KI des Telefons unterstützt diese Sprache nicht. Ändere die Sprache oder nutze einen Online-Dienst."
+    },
+    "device": {
+      "title": "KI auf dem Telefon · {{engine}}",
+      "recommended": "EMPFOHLEN",
+      "pitch": "Läuft direkt auf deinem Telefon: kein Konto, keine Kosten, und deine Daten verlassen das Gerät nie.",
+      "checking": "Ich prüfe, ob dein Telefon sie unterstützt…",
+      "use": "{{engine}} verwenden",
+      "inUse": "Dein Coach nutzt {{engine}} auf deinem Telefon.",
+      "downloadNeeded": "Das Modell muss einmalig heruntergeladen werden (am besten per WLAN).",
+      "download": "Modell herunterladen",
+      "downloading": "Download läuft… {{mb}} MB",
+      "preparing": "{{engine}} bereitet das Modell auf deinem Telefon vor. Das kann einige Minuten dauern.",
+      "recheck": "Erneut prüfen",
+      "enableAppleIntelligence": "Aktiviere Apple Intelligence: Öffne Einstellungen › Apple Intelligence & Siri, schalte sie ein und kehre hierher zurück.",
+      "notSupportedIOS": "Dieses iPhone unterstützt Apple Intelligence nicht (nötig ist ein iPhone 15 Pro oder neuer). Du kannst unten einen Online-KI-Dienst nutzen.",
+      "notSupportedAndroid": "Dieses Telefon unterstützt Gemini Nano nicht. Du kannst unten einen Online-KI-Dienst nutzen."
+    },
+    "cloud": {
+      "toggle": "Einen Online-KI-Dienst nutzen (leistungsfähiger)",
+      "toggleHint": "Gemini, Claude oder ChatGPT mit deinem eigenen Konto: Du brauchst einen Zugangscode."
+    },
+    "paste": "Kopierten Code einfügen",
+    "pasted": "Code in der Zwischenablage gefunden: wird geprüft…",
+    "pasteNothing": "In der Zwischenablage ist kein {{provider}}-Code. Tippe auf der Seite des Anbieters neben dem Schlüssel auf „Copy“ und kehre hierher zurück."
+  },
+  "sources": {
+    "title": "Deine Daten verbinden",
+    "subtitle": "Der Coach liest deine Daten aus {{source}}. Du entscheidest für jeden Datentyp, was du teilst.",
+    "skip": "Vorerst überspringen",
+    "readOnly": "Nur Lesen: Health Coach schreibt und ändert nichts.",
+    "categories": {
+      "activity": {
+        "title": "Aktivität",
+        "why": "Schritte, Distanz, Stockwerke, Kalorien und Trainings, um Bewegung und Fortschritte zu verfolgen."
+      },
+      "heart": {
+        "title": "Herz",
+        "why": "Herzfrequenz, Ruhepuls, HRV und VO2max, für Erholung, Stress und Fitness."
+      },
+      "sleep": {
+        "title": "Schlaf",
+        "why": "Schlafdauer und -phasen, um zu verstehen, wie gut du dich wirklich erholst."
+      },
+      "body": {
+        "title": "Körper",
+        "why": "Gewicht, Größe, BMI, Körperfett und Magermasse, um die Körperzusammensetzung zu verfolgen."
+      },
+      "vitals": {
+        "title": "Vitalwerte",
+        "why": "Blutdruck, Blutzucker, Sauerstoffsättigung, Atmung und Temperatur, auch für Sicherheitswarnungen."
+      },
+      "nutrition": {
+        "title": "Ernährung",
+        "why": "Kalorien, Makronährstoffe, Wasser und Koffein aus deinen Ernährungs-Apps."
+      },
+      "cycle": {
+        "title": "Menstruationszyklus",
+        "why": "Um Energie, Schlaf und Symptome im Zusammenhang mit dem Zyklus zu verstehen."
+      },
+      "mindfulness": {
+        "title": "Achtsamkeit",
+        "why": "Minuten für Meditation und Atemübungen, für das mentale Wohlbefinden."
+      }
+    },
+    "connect": "{{source}} verbinden",
+    "connected": "{{source}} ist verbunden.",
+    "reviewPermissions": "Berechtigungen prüfen",
+    "installHealthConnect": "Auf dieser Android-Version brauchst du die App Health Connect von Google. Installiere sie aus dem Play Store und kehre dann hierher zurück.",
+    "installButton": "Health Connect installieren",
+    "unavailable": "{{source}} ist auf diesem Gerät nicht verfügbar.",
+    "androidHistoryNote": "Wir fragen auch nach Hintergrund- und Verlaufszugriff: Ohne diese erlaubt Health Connect nur das Lesen der letzten 30 Tage.",
+    "noneGrantedTitle": "Keine Berechtigungen erteilt",
+    "noneGrantedBody": "Du kannst die Berechtigungen jederzeit in den Einstellungen von {{source}} aktivieren.",
+    "otherAppsTitle": "Deine Apps funktionieren bereits",
+    "otherAppsBody": "Viele Apps schreiben bereits in {{source}}: MyFitnessPal, Cronometer, Yazio, Samsung Health, Waagen und Blutdruckmessgeräte, Schlaf- und Meditations-Apps. Ihre Daten erreichen den Coach ohne weitere Schritte.",
+    "otherAppsHowIOS": "So aktivierst du sie: Öffne die App (z. B. MyFitnessPal) → Einstellungen → Verbundene Apps und Geräte → Health und erlaube das Schreiben. Oder in der Health-App → Profil → Apps.",
+    "otherAppsHowAndroid": "So aktivierst du sie: Öffne die App (z. B. Samsung Health oder Yazio) → Einstellungen → Health Connect und erlaube das Schreiben von Daten.",
+    "comingSoonTitle": "Demnächst verfügbar",
+    "comingSoonBody": "Direkte Verbindungen mit weiteren Diensten und Geräten folgen mit den nächsten Updates."
+  },
+  "coachSetup": {
+    "title": "Dein Coach",
+    "subtitle": "Wähle den Ansatz und Stil, den du bevorzugst. Du kannst beides jederzeit ändern.",
+    "name": "Name des Coachs",
+    "nameHint": "Wie möchtest du deinen Coach nennen?",
+    "nameRequired": "Gib deinem Coach einen Namen.",
+    "medical": "Medizinischer Ansatz",
+    "medicalOptions": {
+      "conventional": {
+        "label": "Schulmedizin",
+        "description": "Basierend auf wissenschaftlicher Evidenz und klinischen Leitlinien."
+      },
+      "functional": {
+        "label": "Funktionelle Medizin",
+        "description": "Sucht nach Ursachen und Zusammenhängen zwischen Schlaf, Stress, Darm und Stoffwechsel."
+      },
+      "tcm": {
+        "label": "Traditionelle Chinesische Medizin",
+        "description": "Gleichgewicht, Energie und Jahreszeiten, als ergänzende Sichtweise."
+      },
+      "ayurveda": {
+        "label": "Ayurveda",
+        "description": "Konstitution, Tagesroutinen und Verdauung, als ergänzende Sichtweise."
+      },
+      "integrative": {
+        "label": "Integrativer Ansatz",
+        "description": "Verbindet Schulmedizin mit gut belegten komplementären Methoden."
+      },
+      "naturopathy": {
+        "label": "Naturheilkunde",
+        "description": "Lebensstil, Ernährung und natürliche Mittel, als ergänzende Sichtweise."
+      }
+    },
+    "nutrition": "Ernährungsansatz",
+    "nutritionOptions": {
+      "none": "Keine Präferenz",
+      "mediterranean": "Mediterran",
+      "keto": "Ketogen",
+      "lowCarb": "Low Carb",
+      "vegetarian": "Vegetarisch",
+      "vegan": "Vegan",
+      "paleo": "Paleo",
+      "intermittentFasting": "Intervallfasten",
+      "lowFodmap": "Low-FODMAP",
+      "carnivore": "Karnivor"
+    },
+    "tone": "Tonfall",
+    "toneOptions": {
+      "empathetic": {
+        "label": "Einfühlsam",
+        "description": "Warm und ermutigend."
+      },
+      "direct": {
+        "label": "Direkt",
+        "description": "Knapp und praktisch."
+      },
+      "motivational": {
+        "label": "Motivierend",
+        "description": "Energisch, feiert Fortschritte."
+      },
+      "scientific": {
+        "label": "Wissenschaftlich",
+        "description": "Präzise, erklärt die Mechanismen."
+      }
+    }
+  },
+  "profileSetup": {
+    "title": "Dein Profil",
+    "subtitle": "Je besser dein Coach dich kennt, desto passender die Tipps. Alle Felder sind optional.",
+    "prefilled": "Einige Felder wurden mit Daten aus deiner Gesundheits-App vorausgefüllt. Bitte prüfe sie.",
+    "sex": "Geschlecht",
+    "sexOptions": {
+      "female": "Weiblich",
+      "male": "Männlich",
+      "other": "Divers"
+    },
+    "birthDate": "Geburtsdatum",
+    "height": "Größe (cm)",
+    "weight": "Gewicht ({{unit}})",
+    "goalsLabel": "Ziele",
+    "goals": {
+      "loseWeight": "Abnehmen",
+      "gainMuscle": "Muskeln aufbauen",
+      "sleepBetter": "Besser schlafen",
+      "moreEnergy": "Mehr Energie haben",
+      "reduceStress": "Stress reduzieren",
+      "fitness": "Fitness verbessern",
+      "heartHealth": "Herzgesundheit",
+      "eatBetter": "Besser essen",
+      "manageCondition": "Eine chronische Erkrankung managen"
+    },
+    "conditions": "Chronische Erkrankungen",
+    "conditionsPlaceholder": "Z. B. Bluthochdruck, Typ-2-Diabetes",
+    "allergies": "Allergien und Unverträglichkeiten",
+    "allergiesPlaceholder": "Z. B. Penicillin, Laktose",
+    "medications": "Medikamente",
+    "medicationsPlaceholder": "Z. B. Ramipril 5 mg",
+    "supplements": "Nahrungsergänzungsmittel",
+    "supplementsPlaceholder": "Z. B. Vitamin D, Magnesium",
+    "optionalNote": "Tippe auf einen Eintrag, um ihn zu entfernen. Du kannst später alles in der Gesundheitsakte bearbeiten."
+  },
+  "preferences": {
+    "title": "Proaktivität",
+    "subtitle": "Lege fest, ob und wann sich dein Coach von sich aus meldet.",
+    "mode": "Modus",
+    "modes": {
+      "proactive": {
+        "label": "Proaktiv",
+        "description": "Abendzusammenfassung und Hinweise, wenn ihm etwas Wichtiges auffällt."
+      },
+      "passive": {
+        "label": "Passiv",
+        "description": "Antwortet nur, wenn du schreibst. Keine Benachrichtigungen."
+      }
+    },
+    "maxNotifications": "Benachrichtigungen pro Tag (maximal)",
+    "maxNotificationsHint": "Sicherheitswarnungen zu kritischen Werten werden immer angezeigt.",
+    "summaryTime": "Abendzusammenfassung",
+    "quietHours": "Ruhezeit",
+    "quietStart": "Von",
+    "quietEnd": "Bis",
+    "quietHint": "In dieser Zeit erhältst du keine Benachrichtigungen vom Coach.",
+    "reports": "Berichte",
+    "reportTypes": {
+      "daily": "Täglich",
+      "weekly": "Wöchentlich",
+      "monthly": "Monatlich"
+    }
+  },
+  "sync": {
+    "title": "Fast fertig",
+    "subtitle": "Ich richte deinen Coach mit deinen Angaben ein.",
+    "profile": "Profil und Einstellungen gespeichert",
+    "dataConnected": "Gesundheitsdatenquelle verbunden",
+    "dataSkipped": "Gesundheitsdaten nicht verbunden (du kannst das später tun)",
+    "welcome": "{{name}} schreibt dir eine Willkommensnachricht",
+    "phase3Note": "Das Einlesen deines gesamten Gesundheitsdatenverlaufs folgt mit dem nächsten Update.",
+    "openChat": "Chat öffnen",
+    "welcomeFailed": "Du kannst den Chat trotzdem öffnen und deinem Coach schreiben."
+  },
+  "chat": {
+    "you": "Du",
+    "placeholder": "Schreib deinem Coach…",
+    "send": "Senden",
+    "noProviderTitle": "Wähle die KI deines Coachs",
+    "noProviderBody": "Du kannst die KI deines Telefons (kostenlos, ohne Konto) oder einen Online-Dienst nutzen.",
+    "noProviderAction": "KI wählen",
+    "emptyTitle": "Hallo, ich bin {{name}}",
+    "emptyBody": "Frag mich zu deinem Schlaf, deiner Aktivität, deiner Ernährung oder wie es dir geht.",
+    "typing": "{{name}} schreibt…",
+    "readingData": "Ich schaue mir deine Daten an…",
+    "quickTitle": "Schnelle Fragen",
+    "quick": {
+      "1": "Wie läuft es diese Woche?",
+      "2": "Wie kann ich besser schlafen?",
+      "3": "Gib mir eine Idee für ein gesundes Abendessen",
+      "4": "Worauf sollte ich mich heute konzentrieren?"
+    },
+    "history": "Verlauf",
+    "new": "Neu",
+    "deleteTitle": "Unterhaltung löschen?",
+    "deleteBody": "Die Unterhaltung wird endgültig von diesem Telefon gelöscht.",
+    "historyEmptyTitle": "Keine Unterhaltungen",
+    "historyEmptyBody": "Deine Unterhaltungen mit dem Coach erscheinen hier.",
+    "historyItemHint": "Tippen zum Öffnen, gedrückt halten zum Löschen",
+    "welcomeTitle": "Willkommen",
+    "untitled": "Unterhaltung"
+  },
+  "integrations": {
+    "healthTitle": "Gesundheitsdaten des Telefons",
+    "aiTitle": "Künstliche Intelligenz",
+    "comingSoonTitle": "Demnächst verfügbar",
+    "comingSoonIntro": "Direkte Verbindungen mit Diensten und Geräten. Tippe auf „Benachrichtigen“, um zu erfahren, wann sie kommen.",
+    "categories": {
+      "scales": "Waagen und Blutdruck",
+      "wearables": "Ringe und Armbänder",
+      "glucose": "Glukosesensoren",
+      "nutrition": "Ernährung und Stoffwechsel",
+      "sports": "Sport",
+      "ai": "Weitere KI-Dienste",
+      "platform": "Gesundheitsdaten des Telefons"
+    },
+    "notifyMe": "Benachrichtigen, wenn verfügbar",
+    "notifyOn": "✓ Wir sagen dir Bescheid",
+    "notifyOffHint": "Tippen, um nicht mehr benachrichtigt zu werden",
+    "notifyNote": "Deine Auswahl wird nur auf diesem Telefon gespeichert: Die Integration wird hervorgehoben, sobald sie verfügbar ist.",
+    "requestTitle": "Dein Dienst fehlt?",
+    "requestBody": "Bald kannst du neue Integrationen anfragen und für Vorschläge anderer abstimmen.",
+    "requestButton": "Integration anfragen",
+    "requestSoon": "Diese Funktion kommt mit einem der nächsten Updates.",
+    "lastSyncNever": "Die Datensynchronisierung folgt mit dem nächsten Update.",
+    "items": {
+      "withings": {
+        "name": "Withings",
+        "data": "Smarte Waagen, Blutdruckmessgeräte und Schlafsensoren: Gewicht, Körperzusammensetzung, Blutdruck, Schlaf."
+      },
+      "oura": {
+        "name": "Oura",
+        "data": "Smarter Ring: Schlaf und Phasen, Readiness, HRV, Körpertemperatur, Aktivität."
+      },
+      "whoop": {
+        "name": "Whoop",
+        "data": "Armband: Erholung, Belastung, Schlaf, HRV, Ruhepuls."
+      },
+      "fitbit": {
+        "name": "Fitbit",
+        "data": "Armbänder und Uhren: Schritte, Schlaf, Herzfrequenz, SpO2, Aktivität."
+      },
+      "polar": {
+        "name": "Polar",
+        "data": "Sportuhren: Trainings, Herzfrequenz, Erholung, Schlaf."
+      },
+      "garmin": {
+        "name": "Garmin",
+        "data": "Sportuhren: Trainings, Body Battery, Stress, Schlaf, VO2max."
+      },
+      "dexcom": {
+        "name": "Dexcom",
+        "data": "Kontinuierliche Glukosemessung: Werte nahezu in Echtzeit und Verläufe."
+      },
+      "glucose_file_import": {
+        "name": "Glukose-Import aus Datei",
+        "data": "Importiere Dateien aus LibreView (FreeStyle Libre), Dexcom Clarity, Medtronic CareLink und Roche, mit automatischer Formaterkennung."
+      },
+      "freestyle_libre": {
+        "name": "FreeStyle Libre",
+        "data": "Kontinuierlicher Glukosesensor von Abbott (direkte Verbindung, falls Abbott ein Partnerprogramm öffnet)."
+      },
+      "accu_chek_smartguide": {
+        "name": "Accu-Chek SmartGuide",
+        "data": "Kontinuierlicher Glukosesensor von Roche."
+      },
+      "eversense": {
+        "name": "Eversense",
+        "data": "Implantierbarer Glukosesensor."
+      },
+      "sibionics": {
+        "name": "Sibionics",
+        "data": "Kontinuierlicher Glukosesensor."
+      },
+      "lumen": {
+        "name": "Lumen",
+        "data": "Stoffwechsel über den Atem: Verbrennung von Kohlenhydraten oder Fett."
+      },
+      "strava": {
+        "name": "Strava",
+        "data": "Trainings und Sportaktivitäten (erfordert die Genehmigung von Strava)."
+      },
+      "kimi": {
+        "name": "Kimi (Moonshot)",
+        "data": "KI-Modelle von Moonshot."
+      },
+      "openai_compatible": {
+        "name": "OpenAI-kompatibler Anbieter",
+        "data": "Jeder Dienst oder Server, der mit der OpenAI-API kompatibel ist (auch lokal)."
+      },
+      "chatgpt_account": {
+        "name": "ChatGPT mit deinem Konto",
+        "data": "Nutze dein ChatGPT-Abo (auch Team/Business) statt eines Zugangscodes. Wartet auf die Freigabe durch OpenAI."
+      }
+    }
+  },
+  "tabsShort": {
+    "coach": "Coach",
+    "integrations": "Dienste",
+    "settings": "Optionen",
+    "me": "Ich"
+  },
+  "voice": {
+    "talk": "Sprechen",
+    "talkHint": "Halte das Telefon nah und sprich: Die Antwort wird vorgelesen.",
+    "listening": "Ich höre zu…",
+    "stop": "Fertig",
+    "read": "Vorlesen",
+    "stopReading": "Stopp",
+    "errors": {
+      "permission": "Erlaube Mikrofon und Spracherkennung in den Einstellungen des Telefons.",
+      "unavailable": "Die Spracherkennung ist auf diesem Telefon nicht verfügbar.",
+      "no-speech": "Ich habe nichts gehört. Versuche es erneut.",
+      "other": "Ich habe dich nicht verstanden. Versuche es erneut."
+    }
+  }
+}

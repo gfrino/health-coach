@@ -1,0 +1,58 @@
+import { SymbolView, type SymbolViewProps } from 'expo-symbols';
+import type { ColorValue } from 'react-native';
+
+import { useTheme } from '@/theme';
+
+type IconName = Extract<SymbolViewProps['name'], { ios?: unknown }>;
+
+/**
+ * Icone di sistema: SF Symbols su iOS, Material Symbols su Android.
+ * Decorative di default (nascoste agli screen reader): l'etichetta va sull'elemento interattivo.
+ */
+export const icons = {
+  coach: { ios: 'bubble.left.and.bubble.right.fill', android: 'forum' },
+  today: { ios: 'heart.text.square.fill', android: 'monitor_heart' },
+  journal: { ios: 'book.closed.fill', android: 'menu_book' },
+  records: { ios: 'folder.fill', android: 'clinical_notes' },
+  settings: { ios: 'gearshape.fill', android: 'settings' },
+  me: { ios: 'person.crop.circle.fill', android: 'account_circle' },
+  mic: { ios: 'mic.fill', android: 'mic' },
+  stop: { ios: 'stop.fill', android: 'stop' },
+  speaker: { ios: 'speaker.wave.2.fill', android: 'volume_up' },
+  add: { ios: 'plus', android: 'add' },
+  pdf: { ios: 'doc.richtext', android: 'picture_as_pdf' },
+  photo: { ios: 'photo', android: 'image' },
+  camera: { ios: 'camera.fill', android: 'photo_camera' },
+  trash: { ios: 'trash', android: 'delete' },
+  integrations: { ios: 'puzzlepiece.extension.fill', android: 'extension' },
+  check: { ios: 'checkmark', android: 'check' },
+  checkCircle: { ios: 'checkmark.circle.fill', android: 'check_circle' },
+  lock: { ios: 'lock.fill', android: 'lock' },
+  shield: { ios: 'checkmark.shield.fill', android: 'health_and_safety' },
+  sparkles: { ios: 'sparkles', android: 'auto_awesome' },
+  warning: { ios: 'exclamationmark.triangle.fill', android: 'warning' },
+  info: { ios: 'info.circle', android: 'info' },
+  chevronRight: { ios: 'chevron.right', android: 'chevron_right' },
+  server: { ios: 'xmark.icloud', android: 'cloud_off' },
+} satisfies Record<string, IconName>;
+
+export type AppIconName = keyof typeof icons;
+
+interface Props {
+  name: AppIconName;
+  size?: number;
+  color?: ColorValue;
+}
+
+export function Icon({ name, size = 22, color }: Props) {
+  const { colors } = useTheme();
+  return (
+    <SymbolView
+      name={icons[name]}
+      size={size}
+      tintColor={color ?? colors.text}
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+    />
+  );
+}

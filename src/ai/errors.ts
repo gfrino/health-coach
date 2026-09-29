@@ -1,0 +1,61 @@
+export type AIErrorCode =
+  | 'invalid_key'
+  | 'insufficient_credit'
+  | 'rate_limited'
+  | 'network'
+  | 'server'
+  | 'model_not_found'
+  | 'refused'
+  | 'device_unavailable'
+  | 'context_window'
+  | 'unsupported_language'
+  | 'aborted'
+  | 'unknown';
+
+export class AIError extends Error {
+  constructor(
+    public readonly code: AIErrorCode,
+    message?: string,
+    public readonly status?: number,
+  ) {
+    super(message ?? code);
+    this.name = 'AIError';
+  }
+
+  /** Errori per cui ha senso il pulsante "Riprova". */
+  get retryable(): boolean {
+    return this.code === 'rate_limited' || this.code === 'network' || this.code === 'server';
+  }
+}
+
+const CREDIT_PATTERNS = [
+  /credit balance/i,
+  /insufficient_quota/i,
+  /exceeded your current quota/i,
+  /billing/i,
+  /payment/i,
+];
+const KEY_PATTERNS = [/api[_ ]?key/i, /invalid.*key/i, /API_KEY_INVALID/, /unauthori[sz]ed/i];
+
+/** Classificazione degli errori HTTP comune ai provider. */
+export function classifyHttpError(status: number, body: string): AIError {
+  const text = body.slice(0, 500);
+  if (status === 401 || status === 403) return new AIError('invalid_key', text, status);
+  if (status === 402 || CREDIT_PATTERNS.some((p) => p.test(text))) {
+    return new AIError('insufficient_credit', text, status);
+  }
+  if (status === 404) return new AIError('model_not_found', text, status);
+  if (status === 400 && KEY_PATTERNS.some((p) => p.test(text))) {
+    return new AIError('invalid_key', text, status);
+  }
+  if (status === 429) return new AIError('rate_limited', text, status);
+  if (status === 529 || status >= 500) return new AIError('server', text, status);
+  return new AIError('unknown', text, status);
+}
+
+export function toAIError(e: unknown): AIError {
+  if (e instanceof AIError) return e;
+  if (e instanceof Error && e.name === 'AbortError') return new AIError('aborted');
+  if (e instanceof TypeError) return new AIError('network', e.message);
+  return new AIError('unknown', e instanceof Error ? e.message : String(e));
+}

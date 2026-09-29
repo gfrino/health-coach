@@ -1,0 +1,132 @@
+import { getDefaultSettings } from '@/config/settingsSchema';
+
+import { ageFromBirthDate, composeSystemPrompt, recentHistory } from '../context';
+import { SAFETY_RULES } from '../prompts';
+
+const now = new Date(2026, 8, 29, 18, 30);
+const coach = {
+  ...getDefaultSettings().coach,
+  name: 'Aria',
+  medicalApproach: 'tcm' as const,
+  tone: 'direct' as const,
+};
+
+describe('composeSystemPrompt', () => {
+  it('include identità, lingua, approccio, tono e regole di sicurezza fisse', () => {
+    const p = composeSystemPrompt({ coach, language: 'de', now });
+    expect(p).toContain('You are Aria');
+    expect(p).toContain('Reply in the language the user writes in; if unclear, use German');
+    expect(p).toContain('Traditional Chinese Medicine');
+    expect(p).toContain('Tone: direct');
+    expect(p).toContain(SAFETY_RULES);
+    expect(p).toMatch(
+      /Never suggest stopping, reducing, changing or replacing prescribed medications/,
+    );
+    expect(p).toContain('144');
+  });
+
+  it('omette le sezioni vuote (minimizzazione)', () => {
+    const p = composeSystemPrompt({
+      coach,
+      language: 'it',
+      now,
+      profile: { goals: [] },
+      metrics: [],
+      journal: [],
+    });
+    expect(p).not.toContain('USER PROFILE');
+    expect(p).not.toContain('HEALTH DATA SNAPSHOT');
+    expect(p).not.toContain('JOURNAL');
+  });
+
+  it('riassume profilo, farmaci, integratori e allergie', () => {
+    const p = composeSystemPrompt({
+      coach,
+      language: 'it',
+      now,
+      profile: {
+        sex: 'female',
+        birthDate: '1980-10-15',
+        heightCm: 170,
+        weightKg: 65,
+        goals: ['Dormire meglio'],
+        conditions: [{ name: 'Ipertensione' }],
+        medications: [
+          { name: 'Ramipril', kind: 'medication', dosage: '5 mg' },
+          { name: 'Magnesio', kind: 'supplement' },
+        ],
+        allergies: [{ substance: 'Penicillina', reaction: 'orticaria' }],
+      },
+    });
+    expect(p).toContain('sex: female, age: 45, height: 170 cm, weight: 65 kg, BMI: 22.5');
+    expect(p).toContain('Prescribed medications: Ramipril 5 mg');
+    expect(p).toContain('Supplements: Magnesio');
+    expect(p).toContain('Allergies: Penicillina (orticaria)');
+    expect(p).toContain('Conditions: Ipertensione');
+  });
+
+  it('dichiara i dati mancanti e vieta di inventarli', () => {
+    const p = composeSystemPrompt({ coach, language: 'it', now });
+    expect(p).toContain(
+      'Not available: health measurements (activity, sleep, heart, body); lab results; journal entries.',
+    );
+    expect(p).toContain('Never guess or invent them.');
+    const withData = composeSystemPrompt({
+      coach,
+      language: 'it',
+      now,
+      metrics: [{ label: 'Steps', unit: 'count', avg7: 1 }],
+      journal: [{ date: '2026-09-28', mood: 3 }],
+    });
+    expect(withData).toContain('Not available: lab results.');
+  });
+
+  it('mette la data corrente in fondo (prefisso stabile per la cache)', () => {
+    const p = composeSystemPrompt({
+      coach,
+      language: 'it',
+      now,
+      memoryFacts: ['Corre la domenica'],
+    });
+    expect(p.trim().split('\n').at(-1)).toBe('CURRENT DATE: 2026-09-29 18:30');
+    expect(p.indexOf('WHAT YOU REMEMBER')).toBeLessThan(p.indexOf('CURRENT DATE'));
+  });
+
+  it('include metriche aggregate, esami fuori range e diario', () => {
+    const p = composeSystemPrompt({
+      coach,
+      language: 'it',
+      now,
+      metrics: [{ label: 'Steps per day', unit: 'count', avg7: 8123.4, avg30: 7000, trend: 'up' }],
+      labs: [{ name: 'LDL', value: 190, unit: 'mg/dL', refHigh: 130, date: '2026-09-01' }],
+      journal: [{ date: '2026-09-28', mood: 2, energy: 3, text: 'Stanca' }],
+    });
+    expect(p).toContain('- Steps per day (count): 7-day avg 8123.4, 30-day avg 7000, trend up');
+    expect(p).toContain('- 2026-09-01 LDL: 190 mg/dL (reference …–130)');
+    expect(p).toContain('- 2026-09-28: mood 2/5, energy 3/5 — "Stanca"');
+  });
+});
+
+describe('ageFromBirthDate', () => {
+  it("calcola l'età tenendo conto del compleanno", () => {
+    expect(ageFromBirthDate('1980-09-29', now)).toBe(46);
+    expect(ageFromBirthDate('1980-09-30', now)).toBe(45);
+    expect(ageFromBirthDate('non-una-data', now)).toBeNull();
+  });
+});
+
+describe('recentHistory', () => {
+  it('limita i messaggi e inizia sempre da un messaggio utente', () => {
+    const msgs = [
+      { role: 'assistant' as const, content: 'Benvenuto' },
+      { role: 'user' as const, content: 'Ciao' },
+      { role: 'assistant' as const, content: '' },
+      { role: 'assistant' as const, content: 'Come stai?' },
+    ];
+    expect(recentHistory(msgs)).toEqual([
+      { role: 'user', content: 'Ciao' },
+      { role: 'assistant', content: 'Come stai?' },
+    ]);
+    expect(recentHistory([{ role: 'assistant', content: 'solo io' }])).toEqual([]);
+  });
+});

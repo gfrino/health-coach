@@ -1,0 +1,7 @@
+{
+  "name": "on-device-ai",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "description": "Apple Foundation Models / Gemini Nano on-device LLM for Health Coach"
+}
