@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router/js-tabs';
 import { useTranslation } from 'react-i18next';
 
 import { Icon, type AppIconName } from '@/components';
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/theme';
 
 const TABS: {
@@ -21,6 +22,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      screenListeners={{ tabPress: () => haptic.select() }}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,

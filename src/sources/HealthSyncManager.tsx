@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { ensureNotificationPermission } from '@/proactive/notifier';
 import { useSettingsStore } from '@/store/settingsStore';
 
 import { enableHealthKitBackgroundDelivery, registerBackgroundSync } from './background';
@@ -14,6 +15,14 @@ export function HealthSyncManager() {
   const connected = useSettingsStore(
     (s) => s.settings.onboardingCompleted && s.settings.healthSourceConnectedAt !== null,
   );
+
+  const proactive = useSettingsStore(
+    (s) => s.settings.onboardingCompleted && s.settings.proactivity.mode === 'proactive',
+  );
+  // Coach proattivo: permesso per le notifiche (il sistema lo chiede una sola volta).
+  useEffect(() => {
+    if (proactive) void ensureNotificationPermission();
+  }, [proactive]);
 
   useEffect(() => {
     if (!connected) return;

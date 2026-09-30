@@ -37,6 +37,8 @@ const RECENT_DAYS = 3;
 const DEEP_REFRESH_DAYS = 30;
 const DEEP_REFRESH_EVERY_MS = 7 * DAY_MS;
 const PAGE = 5000;
+/** Versione del calcolo delle notti: se cambia, alla sync successiva si ricostruiscono tutte. */
+const SLEEP_ALGORITHM = '2';
 
 const startOfDay = (ms: number) => {
   const d = new Date(ms);
@@ -162,13 +164,24 @@ export async function syncAppleHealth(
       .filter((m): m is NormalizedMetric => m !== null);
     report.upserted += await healthDataRepository.upsertMetrics(db, rows);
     report.deleted += await healthDataRepository.deleteBySourceIds(db, SRC, res.deleted);
-    if (rows.length || res.deleted.length) {
-      const changedFrom = rows.length ? Math.min(...rows.map((r) => r.startAt)) : now - 2 * DAY_MS;
+    const algo = await healthDataRepository.getSyncState(db, SRC, 'sleep_algorithm');
+    const rebuildAll = algo?.anchor !== SLEEP_ALGORITHM;
+    if (rows.length || res.deleted.length || rebuildAll) {
+      const changedFrom = rebuildAll
+        ? now - INITIAL_DAYS * DAY_MS
+        : rows.length
+          ? Math.min(...rows.map((r) => r.startAt))
+          : now - 2 * DAY_MS;
       const from = changedFrom - DAY_MS;
       const samples = await healthDataRepository.stageSamplesSince(db, SRC, from - DAY_MS);
       const sessions = buildSleepSessions(samples, SRC).filter((s) => s.endAt >= from);
       await healthDataRepository.replaceSleepSessions(db, SRC, from, sessions);
       report.upserted += sessions.length;
+      if (rebuildAll) {
+        await healthDataRepository.setSyncState(db, SRC, 'sleep_algorithm', {
+          anchor: SLEEP_ALGORITHM,
+        });
+      }
     }
     await healthDataRepository.setSyncState(db, SRC, HK_SLEEP, { anchor: res.anchor ?? null });
   });

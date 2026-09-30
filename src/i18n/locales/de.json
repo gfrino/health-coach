@@ -653,5 +653,41 @@
     "privacy": "Datenschutzerklärung",
     "disclaimer": "Rechtlicher Hinweis",
     "impressum": "Impressum"
+  },
+  "proactive": {
+    "morning": {
+      "title": "Guten Morgen ☀️",
+      "body_usual": "Du hast letzte Nacht {{duration}} geschlafen, wie üblich.",
+      "body_more": "Du hast letzte Nacht {{duration}} geschlafen, {{diff}} mehr als sonst. Super!",
+      "body_less": "Du hast letzte Nacht {{duration}} geschlafen, {{diff}} weniger als sonst.",
+      "ask": "Wie war meine Nacht und worauf sollte ich mich heute konzentrieren?"
+    },
+    "sleepDebt": {
+      "title": "Du baust Müdigkeit auf",
+      "body": "{{count}} der letzten {{total}} Nächte unter 6 Stunden. Möchtest du einen Plan zum Aufholen?",
+      "ask": "Ich habe in den letzten Nächten wenig geschlafen: Wie kann ich mich erholen?"
+    },
+    "recovery": {
+      "title": "Dein Körper braucht Erholung",
+      "body_rhr": "Dein Ruhepuls liegt {{rhrUp}} bpm über deinem Durchschnitt.",
+      "body_hrv": "Deine HRV liegt {{hrvDown}} % unter deinem Durchschnitt.",
+      "body_both": "Höherer Ruhepuls und niedrigere HRV als sonst: Zeichen von Müdigkeit oder Stress.",
+      "ask": "Meine Erholungswerte sind schlechter geworden: Was bedeutet das und was kann ich heute tun?"
+    },
+    "activity": {
+      "title": "Zeit für einen Spaziergang?",
+      "body": "Heute {{steps}} Schritte, sonst machst du {{usual}}. Schon 20 Minuten helfen.",
+      "ask": "Ich habe mich heute wenig bewegt: Was kann ich heute Abend tun?"
+    },
+    "daily": {
+      "title": "Dein Tag im Überblick",
+      "body": "Heute {{steps}} Schritte. Tippe für den Kommentar deines Coachs.",
+      "ask": "Fasse meinen Tag zusammen und sag mir, was ich heute Abend für guten Schlaf tun kann."
+    },
+    "weekly": {
+      "title": "Deine Woche",
+      "body": "Schlaf im Schnitt {{sleep}}, {{steps}} Schritte pro Tag. Tippe für den Bericht.",
+      "ask": "Erstelle einen Bericht über meine Woche und nenne mir ein Ziel für nächste Woche."
+    }
   }
 }

@@ -653,5 +653,41 @@
     "privacy": "Informativa sulla privacy",
     "disclaimer": "Avvertenze legali",
     "impressum": "Impressum"
+  },
+  "proactive": {
+    "morning": {
+      "title": "Buongiorno ☀️",
+      "body_usual": "Stanotte hai dormito {{duration}}, in linea con il solito.",
+      "body_more": "Stanotte hai dormito {{duration}}, {{diff}} più del solito. Ottimo!",
+      "body_less": "Stanotte hai dormito {{duration}}, {{diff}} meno del solito.",
+      "ask": "Com'è andata la mia notte e su cosa dovrei concentrarmi oggi?"
+    },
+    "sleepDebt": {
+      "title": "Stai accumulando stanchezza",
+      "body": "{{count}} delle ultime {{total}} notti sotto le 6 ore. Vuoi un piano per recuperare?",
+      "ask": "Ho dormito poco nelle ultime notti: come posso recuperare?"
+    },
+    "recovery": {
+      "title": "Il tuo corpo chiede recupero",
+      "body_rhr": "La frequenza a riposo è salita di {{rhrUp}} bpm rispetto alla tua media.",
+      "body_hrv": "La tua HRV è del {{hrvDown}}% sotto la tua media.",
+      "body_both": "Frequenza a riposo più alta e HRV più bassa del solito: segnali di stanchezza o stress.",
+      "ask": "I miei dati di recupero sono peggiorati: cosa significa e cosa posso fare oggi?"
+    },
+    "activity": {
+      "title": "Una camminata?",
+      "body": "Oggi {{steps}} passi, di solito ne fai {{usual}}. Bastano 20 minuti per recuperare.",
+      "ask": "Oggi mi sono mosso poco: cosa posso fare stasera?"
+    },
+    "daily": {
+      "title": "Il riepilogo di oggi",
+      "body": "Oggi {{steps}} passi. Tocca per il commento del coach.",
+      "ask": "Fammi il riepilogo di oggi e dimmi cosa fare stasera per dormire bene."
+    },
+    "weekly": {
+      "title": "La tua settimana",
+      "body": "Sonno medio {{sleep}}, {{steps}} passi al giorno. Tocca per il resoconto.",
+      "ask": "Fammi il resoconto della mia settimana e dimmi un obiettivo per la prossima."
+    }
   }
 }

@@ -102,6 +102,8 @@ export interface StageInterval {
   stage: SleepStage;
   startAt: number;
   endAt: number;
+  /** App o dispositivo che ha registrato il campione (bundle id), se noto. */
+  origin?: string;
 }
 
 export interface NormalizedSleepSession {

@@ -29,9 +29,11 @@ type Row =
 interface Props {
   conversationId: string | null;
   onConversationCreated: (id: string) => void;
+  /** Domanda da inviare subito (es. dalla notifica toccata). */
+  initialPrompt?: string;
 }
 
-export function ChatView({ conversationId, onConversationCreated }: Props) {
+export function ChatView({ conversationId, onConversationCreated, initialPrompt }: Props) {
   const { t } = useTranslation();
   const toolLabel = (tool: string) =>
     tool === 'save_journal_entry' ? t('chat.savingJournal') : t('chat.readingData');
@@ -150,6 +152,15 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
     replyByVoice.current = true;
     void send(text);
   });
+  // Una sola volta: la domanda arrivata dalla notifica parte da sola.
+  const promptSent = useRef(false);
+  useEffect(() => {
+    if (!initialPrompt || promptSent.current || !settings.ai.provider) return;
+    promptSent.current = true;
+    void send(initialPrompt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPrompt]);
+
   const toggleSpeak = (m: StoredMessage) => {
     if (speakingId === m.id) {
       stopSpeaking();

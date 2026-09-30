@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
 import type { VoiceError } from '@/voice/useVoiceInput';
+import { haptic } from '@/lib/haptics';
 import { MAX_FONT_SCALE, useTheme } from '@/theme';
 
 import { AppText } from '../AppText';
@@ -45,6 +46,7 @@ export function Composer({
 
   const send = () => {
     if (!canSend) return;
+    haptic.tap();
     onSend(text.trim());
     setText('');
   };
@@ -88,7 +90,10 @@ export function Composer({
           <AppText numberOfLines={3}>{voice.transcript || '…'}</AppText>
         </View>
         <Pressable
-          onPress={voice.stop}
+          onPress={() => {
+            haptic.tap();
+            voice.stop();
+          }}
           accessibilityRole="button"
           accessibilityLabel={t('voice.stop')}
           style={({ pressed }) => round(pressed, colors.danger, true)}
@@ -144,7 +149,10 @@ export function Composer({
         }}
       >
         <Pressable
-          onPress={onAttach}
+          onPress={() => {
+            haptic.tap();
+            onAttach();
+          }}
           disabled={disabled}
           accessibilityRole="button"
           accessibilityLabel={t('chat.attach')}
@@ -187,7 +195,10 @@ export function Composer({
         />
         {showMic && onVoiceMode ? (
           <Pressable
-            onPress={onVoiceMode}
+            onPress={() => {
+              haptic.press();
+              onVoiceMode();
+            }}
             disabled={disabled}
             accessibilityRole="button"
             accessibilityLabel={t('voiceMode.open')}
@@ -205,7 +216,10 @@ export function Composer({
         ) : null}
         {showMic ? (
           <Pressable
-            onPress={voice.start}
+            onPress={() => {
+              haptic.tap();
+              voice.start();
+            }}
             disabled={disabled}
             accessibilityRole="button"
             accessibilityLabel={t('voice.talk')}

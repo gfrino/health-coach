@@ -2,6 +2,7 @@ import { AppState, Platform } from 'react-native';
 import { create } from 'zustand';
 
 import { getDb, healthDataRepository } from '@/db';
+import { runProactiveCheck } from '@/proactive/notifier';
 import { useSettingsStore } from '@/store/settingsStore';
 
 import { generateDemoData, SOURCE_DEMO } from './demo/demoData';
@@ -71,8 +72,13 @@ export function syncHealthData(
   const startedAt = Date.now();
   useSyncStore.setState({ syncing: true, manual: !!opts.manual, progress: null, error: null });
   running = runPlatformSync((progress) => useSyncStore.setState({ progress }))
-    .then((report) => {
+    .then(async (report) => {
+      // Arrivati i dati veri, i dati di esempio (sviluppo) non devono mescolarsi con loro.
+      if (report.upserted > 0) await clearDemoData().catch(() => undefined);
       useSyncStore.setState({ lastSyncAt: Date.now(), lastReport: report });
+      // Dati aggiornati: c'è qualcosa di utile da segnalare? (notifica locale, vedi proactive/)
+      // Atteso: in background iOS sospende l'app appena finisce il task.
+      await runProactiveCheck(await getDb());
       if (__DEV__) {
         console.warn(
           `[sync] ${Date.now() - startedAt} ms · ${report.upserted} scritti · ${report.deleted} eliminati · ${report.errors.length} tipi non disponibili`,

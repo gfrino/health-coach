@@ -15,3 +15,4 @@ export * as healthDataRepository from './repositories/healthDataRepository';
 export * as labReportRepository from './repositories/labReportRepository';
 export * as integrationInterestRepository from './repositories/integrationInterestRepository';
 export * as journalRepository from './repositories/journalRepository';
+export * as notificationRepository from './repositories/notificationRepository';

@@ -10,6 +10,30 @@ const iv = (stage: SleepStage, fromH: number, toH: number) => ({
 });
 
 describe('ricostruzione del sonno', () => {
+  it('più fonti nella stessa notte: si usa solo la migliore (Watch), come Apple Salute', () => {
+    const watch = 'com.apple.health.81A6C4F2';
+    const app = 'com.example.sleepapp';
+    const at = (stage: SleepStage, fromH: number, toH: number, origin: string) => ({
+      ...iv(stage, fromH, toH),
+      origin,
+    });
+    const sessions = buildSleepSessions(
+      [
+        // Watch: 6 h di sonno con fasi
+        at(SleepStage.Light, 1, 4, watch),
+        at(SleepStage.Deep, 4, 5, watch),
+        at(SleepStage.REM, 5, 7, watch),
+        // App del sonno: 8 h, con molte fasi "profonde"
+        at(SleepStage.Deep, 0, 3, app),
+        at(SleepStage.Light, 3, 8, app),
+      ],
+      'apple_health',
+    );
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0]?.asleepS).toBe(6 * 3600);
+    expect(stageMinutes(sessions[0]?.stages ?? [])[SleepStage.Deep]).toBe(60);
+  });
+
   it('unione degli intervalli: niente doppi conteggi', () => {
     expect(unionDuration([iv(1, 0, 2), iv(1, 1, 3), iv(1, 5, 6)])).toBe(4 * H);
   });

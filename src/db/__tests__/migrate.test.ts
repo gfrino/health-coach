@@ -18,6 +18,7 @@ const EXPECTED_TABLES = [
   'memory_facts',
   'messages',
   'metrics',
+  'notification_log',
   'nutrition_entries',
   'profile',
   'settings',

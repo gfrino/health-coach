@@ -653,5 +653,41 @@
     "privacy": "Privacy policy",
     "disclaimer": "Legal disclaimer",
     "impressum": "Imprint"
+  },
+  "proactive": {
+    "morning": {
+      "title": "Good morning ☀️",
+      "body_usual": "You slept {{duration}} last night, about as usual.",
+      "body_more": "You slept {{duration}} last night, {{diff}} more than usual. Great!",
+      "body_less": "You slept {{duration}} last night, {{diff}} less than usual.",
+      "ask": "How was my night and what should I focus on today?"
+    },
+    "sleepDebt": {
+      "title": "You're building up tiredness",
+      "body": "{{count}} of the last {{total}} nights under 6 hours. Want a plan to catch up?",
+      "ask": "I've slept little in recent nights: how can I recover?"
+    },
+    "recovery": {
+      "title": "Your body is asking for recovery",
+      "body_rhr": "Your resting heart rate is {{rhrUp}} bpm above your average.",
+      "body_hrv": "Your HRV is {{hrvDown}}% below your average.",
+      "body_both": "Higher resting heart rate and lower HRV than usual: signs of tiredness or stress.",
+      "ask": "My recovery data got worse: what does it mean and what can I do today?"
+    },
+    "activity": {
+      "title": "Time for a walk?",
+      "body": "{{steps}} steps today, you usually do {{usual}}. Just 20 minutes helps.",
+      "ask": "I've moved little today: what can I do this evening?"
+    },
+    "daily": {
+      "title": "Your day in review",
+      "body": "{{steps}} steps today. Tap for your coach's take.",
+      "ask": "Give me a summary of today and tell me what to do tonight to sleep well."
+    },
+    "weekly": {
+      "title": "Your week",
+      "body": "Average sleep {{sleep}}, {{steps}} steps a day. Tap for the report.",
+      "ask": "Give me a report of my week and one goal for next week."
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { migration001 } from './001_initial';
 import { migration002 } from './002_journal_source';
 import { migration003 } from './003_message_attachments';
+import { migration004 } from './004_notification_log';
 import type { Migration } from './types';
 
 /**
@@ -8,6 +9,11 @@ import type { Migration } from './types';
  * - non modificare mai una migrazione già rilasciata: aggiungine una nuova;
  * - versioni contigue a partire da 1 (verificato nei test).
  */
-export const migrations: readonly Migration[] = [migration001, migration002, migration003];
+export const migrations: readonly Migration[] = [
+  migration001,
+  migration002,
+  migration003,
+  migration004,
+];
 
 export type { Migration } from './types';

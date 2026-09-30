@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Icon } from '@/components';
+import { haptic } from '@/lib/haptics';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
 import { useVoiceConversation } from '@/voice/useVoiceConversation';
@@ -26,6 +27,7 @@ export default function VoiceScreen() {
   }, [v]);
 
   const close = () => {
+    haptic.press();
     v.stop();
     router.back();
   };
@@ -81,7 +83,14 @@ export default function VoiceScreen() {
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.xl }}>
         <Pressable
-          onPress={canTap ? v.tap : undefined}
+          onPress={
+            canTap
+              ? () => {
+                  haptic.tap();
+                  v.tap();
+                }
+              : undefined
+          }
           accessibilityRole={canTap ? 'button' : undefined}
           accessibilityLabel={status}
           accessibilityHint={canTap ? t('voiceMode.tapHint') : undefined}
@@ -151,7 +160,10 @@ export default function VoiceScreen() {
       >
         {v.engine === 'realtime' ? (
           <Pressable
-            onPress={v.toggleMute}
+            onPress={() => {
+              haptic.select();
+              v.toggleMute();
+            }}
             accessibilityRole="button"
             accessibilityLabel={v.muted ? t('voiceMode.unmute') : t('voiceMode.mute')}
             accessibilityState={{ selected: v.muted }}

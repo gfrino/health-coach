@@ -653,5 +653,41 @@
     "privacy": "Politique de confidentialité",
     "disclaimer": "Avertissement juridique",
     "impressum": "Mentions légales"
+  },
+  "proactive": {
+    "morning": {
+      "title": "Bonjour ☀️",
+      "body_usual": "Tu as dormi {{duration}} cette nuit, comme d'habitude.",
+      "body_more": "Tu as dormi {{duration}} cette nuit, {{diff}} de plus que d'habitude. Bravo !",
+      "body_less": "Tu as dormi {{duration}} cette nuit, {{diff}} de moins que d'habitude.",
+      "ask": "Comment s'est passée ma nuit et sur quoi me concentrer aujourd'hui ?"
+    },
+    "sleepDebt": {
+      "title": "La fatigue s'accumule",
+      "body": "{{count}} des {{total}} dernières nuits sous 6 heures. Tu veux un plan pour récupérer ?",
+      "ask": "J'ai peu dormi ces dernières nuits : comment récupérer ?"
+    },
+    "recovery": {
+      "title": "Ton corps demande du repos",
+      "body_rhr": "Ta fréquence cardiaque au repos est {{rhrUp}} bpm au-dessus de ta moyenne.",
+      "body_hrv": "Ta VFC est {{hrvDown}} % sous ta moyenne.",
+      "body_both": "Fréquence au repos plus haute et VFC plus basse que d'habitude : signes de fatigue ou de stress.",
+      "ask": "Mes données de récupération se sont dégradées : qu'est-ce que ça veut dire et que faire aujourd'hui ?"
+    },
+    "activity": {
+      "title": "Une petite marche ?",
+      "body": "{{steps}} pas aujourd'hui, d'habitude tu en fais {{usual}}. 20 minutes suffisent.",
+      "ask": "J'ai peu bougé aujourd'hui : que puis-je faire ce soir ?"
+    },
+    "daily": {
+      "title": "Le résumé du jour",
+      "body": "{{steps}} pas aujourd'hui. Touche pour l'avis de ton coach.",
+      "ask": "Fais-moi le résumé de ma journée et dis-moi quoi faire ce soir pour bien dormir."
+    },
+    "weekly": {
+      "title": "Ta semaine",
+      "body": "Sommeil moyen {{sleep}}, {{steps}} pas par jour. Touche pour le bilan.",
+      "ask": "Fais le bilan de ma semaine et donne-moi un objectif pour la suivante."
+    }
   }
 }

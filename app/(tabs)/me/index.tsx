@@ -9,6 +9,7 @@ import { JournalSection, newJournalEntry } from '@/features/journal/JournalSecti
 import { RecordsSection, useAddReport } from '@/features/RecordsSection';
 import { TodaySection } from '@/features/today/TodaySection';
 import { syncHealthData, useSyncStore } from '@/sources/syncService';
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/theme';
 
 type Section = 'today' | 'journal' | 'records';
@@ -43,7 +44,11 @@ export default function MeScreen() {
         titleAction={
           current !== 'today' ? (
             <Pressable
-              onPress={current === 'records' ? add : newJournalEntry}
+              onPress={() => {
+                haptic.tap();
+                if (current === 'records') add();
+                else newJournalEntry();
+              }}
               accessibilityRole="button"
               accessibilityLabel={
                 current === 'records' ? t('records.addTitle') : t('journal.newTitle')

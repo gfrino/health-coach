@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
+import { haptic } from '@/lib/haptics';
 
 import { useTheme } from '@/theme';
 
@@ -39,7 +40,11 @@ export function Button({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        if (variant === 'primary' || variant === 'danger') haptic.press();
+        else haptic.tap();
+        onPress();
+      }}
       disabled={inactive}
       accessibilityRole="button"
       accessibilityLabel={label}

@@ -150,11 +150,25 @@ export async function stageSamplesSince(
   source: string,
   fromMs: number,
 ): Promise<StageInterval[]> {
-  const rows = await db.getAllAsync<{ value: number; start_at: number; end_at: number }>(
-    "SELECT value, start_at, end_at FROM metrics WHERE source = ? AND type = 'sleepStage' AND end_at >= ? ORDER BY start_at",
+  const rows = await db.getAllAsync<{
+    value: number;
+    start_at: number;
+    end_at: number;
+    metadata: string | null;
+  }>(
+    "SELECT value, start_at, end_at, metadata FROM metrics WHERE source = ? AND type = 'sleepStage' AND end_at >= ? ORDER BY start_at",
     [source, fromMs],
   );
-  return rows.map((r) => ({ stage: r.value, startAt: r.start_at, endAt: r.end_at }));
+  return rows.map((r) => {
+    let origin: string | undefined;
+    try {
+      const meta = r.metadata ? (JSON.parse(r.metadata) as { origin?: unknown }) : null;
+      origin = typeof meta?.origin === 'string' ? meta.origin : undefined;
+    } catch {
+      origin = undefined;
+    }
+    return { stage: r.value, startAt: r.start_at, endAt: r.end_at, origin };
+  });
 }
 
 // ---- Stato della sincronizzazione (anchor HealthKit / changes token Health Connect) ----

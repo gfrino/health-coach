@@ -8,6 +8,7 @@ import { AppText } from '@/components';
 import { ChatView } from '@/components/chat/ChatView';
 import { conversationRepository, getDb } from '@/db';
 import { useSettingsStore } from '@/store/settingsStore';
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/theme';
 
 /** Chat principale: apre la conversazione indicata (?c=…) oppure la più recente. */
@@ -15,7 +16,7 @@ export default function CoachScreen() {
   const { t } = useTranslation();
   const { colors, spacing } = useTheme();
   const coachName = useSettingsStore((s) => s.settings.coach.name);
-  const params = useLocalSearchParams<{ c?: string; new?: string }>();
+  const params = useLocalSearchParams<{ c?: string; new?: string; ask?: string }>();
   const [conversationId, setConversationId] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
@@ -35,7 +36,10 @@ export default function CoachScreen() {
   // Pulsanti nell'header: testo più piccolo e margini laterali, dentro la "pillola" di sistema.
   const headerButton = (label: string, onPress: () => void) => (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        haptic.tap();
+        onPress();
+      }}
       accessibilityRole="button"
       accessibilityLabel={label}
       hitSlop={8}
@@ -63,9 +67,12 @@ export default function CoachScreen() {
       <View style={{ flex: 1, backgroundColor: colors.background, paddingBottom: spacing.xs }}>
         {conversationId === undefined ? null : (
           <ChatView
-            key={conversationId ?? params.new ?? 'new'}
+            // Chiave legata alla navigazione, non all'id: quando il primo messaggio crea la
+            // conversazione la chat non deve rimontarsi (annullerebbe la risposta in corso).
+            key={params.c ?? params.new ?? 'latest'}
             conversationId={conversationId}
             onConversationCreated={setConversationId}
+            initialPrompt={params.ask}
           />
         )}
       </View>

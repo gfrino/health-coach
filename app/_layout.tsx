@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { StartupError } from '@/components/StartupError';
+import { NotificationRouter } from '@/proactive/NotificationRouter';
 import { ShareIntentImporter } from '@/records/ShareIntentImporter';
 import { HealthSyncManager } from '@/sources/HealthSyncManager';
 import { bootstrap } from '@/lib/bootstrap';
@@ -66,6 +67,7 @@ function RootNavigator() {
       <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
       <ShareIntentImporter />
       <HealthSyncManager />
+      <NotificationRouter />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Protected guard={!onboardingCompleted}>

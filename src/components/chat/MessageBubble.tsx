@@ -56,7 +56,9 @@ export function MessageBubble({
   return (
     <View
       style={{
-        alignSelf: isUser ? 'flex-end' : 'flex-start',
+        // Risposte del coach a tutta larghezza: con liste e testo lungo la bolla "a misura di
+        // contenuto" calcola male l'altezza e il testo esce dal riquadro.
+        alignSelf: isUser ? 'flex-end' : 'stretch',
         maxWidth: isUser ? '85%' : '100%',
         backgroundColor: isUser ? colors.primary : colors.surface,
         borderColor: colors.border,
