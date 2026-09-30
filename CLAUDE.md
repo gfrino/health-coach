@@ -22,6 +22,7 @@ These rules apply to anyone working on the project, human or AI. Also read `AGEN
 - **Super simple onboarding for non-technical users.** The default AI needs no account and no key: Apple Intelligence / Gemini Nano on the device, and later Apple Private Cloud Compute. Cloud providers with an API key are an "advanced" option. Never ask end users for extra technical steps (API verification, developer settings…): handle provider quirks silently in the app.
 - **Integrations:** OAuth or file import only. Never ask for third-party usernames or passwords.
 - **Medical safety:** the coach never diagnoses and never tells users to change medications. The fixed rules in `src/coach/prompts.ts` (`SAFETY_RULES`) always apply. Non-conventional approaches and diets are presented as the user's choice, without stating unproven claims as facts.
+- **Legal texts follow the data flows:** whenever data starts leaving the phone in a new way (new provider, backend, push, analytics…), update the privacy policy in `src/legal/content/*.ts` (4 languages) and `LEGAL_UPDATED` in `src/legal/developer.ts` in the same change. Developer/company data lives only in `src/legal/developer.ts`. The legal texts are drafts to be reviewed by a lawyer before store submission.
 - **No invented data:** the prompt always says which data is missing. Numbers shown to the model are computed by the app (`src/coach/insights.ts`).
 
 ## Code conventions

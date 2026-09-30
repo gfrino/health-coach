@@ -125,7 +125,9 @@
       "language": "Sprache",
       "units": "Maßeinheiten",
       "about": "Info",
-      "coach": "Coach und KI"
+      "coach": "Coach und KI",
+      "developer": "Entwickler",
+      "legal": "Rechtliches"
     },
     "languageSystem": "Systemsprache",
     "theme": {
@@ -156,7 +158,11 @@
     "usageTitle": "Geschätzter Verbrauch (letzte 30 Tage)",
     "usageEmpty": "Noch kein Verbrauch erfasst.",
     "usageValue": "{{input}} ein · {{output}} aus · {{messages}} Antworten",
-    "usageNote": "Vom Anbieter gezählte Tokens für die Antworten des Coachs. Die tatsächlichen Kosten hängen von der Preisliste des Anbieters und des Modells ab."
+    "usageNote": "Vom Anbieter gezählte Tokens für die Antworten des Coachs. Die tatsächlichen Kosten hängen von der Preisliste des Anbieters und des Modells ab.",
+    "developer": {
+      "website": "Website",
+      "contact": "Kontakt"
+    }
   },
   "languages": {
     "it": "Italiano",
@@ -641,5 +647,11 @@
       "ended": "Gespräch beendet",
       "idle": "Tippen zum Sprechen"
     }
+  },
+  "legal": {
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzerklärung",
+    "disclaimer": "Rechtlicher Hinweis",
+    "impressum": "Impressum"
   }
 }

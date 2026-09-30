@@ -125,7 +125,9 @@
       "language": "Language",
       "units": "Units",
       "about": "About",
-      "coach": "Coach and AI"
+      "coach": "Coach and AI",
+      "developer": "Developer",
+      "legal": "Legal"
     },
     "languageSystem": "System language",
     "theme": {
@@ -156,7 +158,11 @@
     "usageTitle": "Estimated usage (last 30 days)",
     "usageEmpty": "No usage recorded yet.",
     "usageValue": "{{input}} in · {{output}} out · {{messages}} replies",
-    "usageNote": "Tokens counted by the provider for the coach's replies. The actual cost depends on the provider's and model's pricing."
+    "usageNote": "Tokens counted by the provider for the coach's replies. The actual cost depends on the provider's and model's pricing.",
+    "developer": {
+      "website": "Website",
+      "contact": "Contact"
+    }
   },
   "languages": {
     "it": "Italiano",
@@ -641,5 +647,11 @@
       "ended": "Conversation ended",
       "idle": "Tap to speak"
     }
+  },
+  "legal": {
+    "terms": "Terms and conditions",
+    "privacy": "Privacy policy",
+    "disclaimer": "Legal disclaimer",
+    "impressum": "Imprint"
   }
 }

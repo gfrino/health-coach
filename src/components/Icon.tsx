@@ -32,6 +32,8 @@ export const icons = {
   pdf: { ios: 'doc.richtext', android: 'picture_as_pdf' },
   document: { ios: 'doc.text', android: 'description' },
   close: { ios: 'xmark', android: 'close' },
+  globe: { ios: 'globe', android: 'public' },
+  mail: { ios: 'envelope', android: 'mail' },
   paperclip: { ios: 'paperclip', android: 'attach_file' },
   waveformCircle: { ios: 'waveform.circle.fill', android: 'graphic_eq' },
   photo: { ios: 'photo', android: 'image' },

@@ -125,7 +125,9 @@
       "language": "Lingua",
       "units": "Unità di misura",
       "about": "Informazioni",
-      "coach": "Coach e AI"
+      "coach": "Coach e AI",
+      "developer": "Sviluppatore",
+      "legal": "Note legali"
     },
     "languageSystem": "Lingua di sistema",
     "theme": {
@@ -156,7 +158,11 @@
     "usageTitle": "Consumo stimato (ultimi 30 giorni)",
     "usageEmpty": "Ancora nessun consumo registrato.",
     "usageValue": "{{input}} in · {{output}} out · {{messages}} risposte",
-    "usageNote": "Token conteggiati dal provider per le risposte del coach. Il costo effettivo dipende dal listino del provider e del modello."
+    "usageNote": "Token conteggiati dal provider per le risposte del coach. Il costo effettivo dipende dal listino del provider e del modello.",
+    "developer": {
+      "website": "Sito web",
+      "contact": "Contatto"
+    }
   },
   "languages": {
     "it": "Italiano",
@@ -641,5 +647,11 @@
       "ended": "Conversazione terminata",
       "idle": "Tocca per parlare"
     }
+  },
+  "legal": {
+    "terms": "Termini e condizioni",
+    "privacy": "Informativa sulla privacy",
+    "disclaimer": "Avvertenze legali",
+    "impressum": "Impressum"
   }
 }

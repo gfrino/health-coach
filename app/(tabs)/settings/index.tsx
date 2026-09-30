@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { Stack } from 'expo-router/stack';
-import { Alert } from 'react-native';
+import { Alert, Linking } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Card, InfoRow, NavRow, OptionGroup, Screen } from '@/components';
 import { SUPPORTED_LANGUAGES, type AppSettings, type Units } from '@/config/settingsSchema';
 import { appVersion } from '@/config/env';
 import { getDatabaseInfo } from '@/db';
+import { DEVELOPER, LEGAL_DOCS } from '@/legal';
 import { useSettingsStore } from '@/store/settingsStore';
 
 export default function SettingsScreen() {
@@ -117,9 +119,41 @@ export default function SettingsScreen() {
             </AppText>
           ) : null}
         </Card>
-        <Card tone="soft">
-          <AppText variant="headline">{t('settings.about.disclaimer')}</AppText>
-          <AppText variant="callout">{t('onboarding.disclaimer')}</AppText>
+
+        <AppText variant="headline">{t('settings.sections.developer')}</AppText>
+        <Card>
+          <AppText variant="headline">{DEVELOPER.name}</AppText>
+          <AppText variant="callout" tone="textMuted">
+            {`${DEVELOPER.street}\n${DEVELOPER.city}`}
+          </AppText>
+        </Card>
+        <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
+          <NavRow
+            first
+            icon="globe"
+            label={t('settings.developer.website')}
+            value={DEVELOPER.website.replace(/^https:\/\//, '')}
+            onPress={() => void WebBrowser.openBrowserAsync(DEVELOPER.website)}
+          />
+          <NavRow
+            icon="mail"
+            label={t('settings.developer.contact')}
+            value={DEVELOPER.email}
+            onPress={() => void Linking.openURL(`mailto:${DEVELOPER.email}`)}
+          />
+        </Card>
+
+        <AppText variant="headline">{t('settings.sections.legal')}</AppText>
+        <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
+          {LEGAL_DOCS.map((doc, i) => (
+            <NavRow
+              key={doc}
+              first={i === 0}
+              icon="document"
+              label={t(`legal.${doc}`)}
+              onPress={() => router.push({ pathname: '/settings/legal/[doc]', params: { doc } })}
+            />
+          ))}
         </Card>
       </Screen>
     </>
