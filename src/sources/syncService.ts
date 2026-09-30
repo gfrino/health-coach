@@ -16,6 +16,8 @@ const MIN_INTERVAL_MS = 10 * 60 * 1000;
 
 interface SyncState {
   syncing: boolean;
+  /** Avviata dall'utente (tira per aggiornare / "Sincronizza ora"): solo allora si mostra lo spinner. */
+  manual: boolean;
   progress: SyncProgress | null;
   lastSyncAt: number | null;
   lastReport: SyncReport | null;
@@ -24,6 +26,7 @@ interface SyncState {
 
 export const useSyncStore = create<SyncState>(() => ({
   syncing: false,
+  manual: false,
   progress: null,
   lastSyncAt: null,
   lastReport: null,
@@ -46,18 +49,35 @@ async function runPlatformSync(onProgress: (p: SyncProgress) => void): Promise<S
   /* eslint-enable @typescript-eslint/no-require-imports */
 }
 
-/** Avvia una sincronizzazione (una sola alla volta). `force` ignora il limite di frequenza. */
-export function syncHealthData(opts: { force?: boolean } = {}): Promise<SyncReport | null> {
-  if (running) return running;
+/**
+ * Avvia una sincronizzazione (una sola alla volta).
+ * - `force`: ignora il limite di frequenza;
+ * - `minIntervalMs`: limite personalizzato (es. aggiornamenti da HealthKit);
+ * - `manual`: richiesta dall'utente, mostra lo spinner.
+ */
+export function syncHealthData(
+  opts: { force?: boolean; manual?: boolean; minIntervalMs?: number } = {},
+): Promise<SyncReport | null> {
+  if (running) {
+    if (opts.manual) useSyncStore.setState({ manual: true });
+    return running;
+  }
   const { settings } = useSettingsStore.getState();
   if (settings.healthSourceConnectedAt === null) return Promise.resolve(null);
   const last = useSyncStore.getState().lastSyncAt;
-  if (!opts.force && last && Date.now() - last < MIN_INTERVAL_MS) return Promise.resolve(null);
+  const minInterval = opts.minIntervalMs ?? MIN_INTERVAL_MS;
+  if (!opts.force && last && Date.now() - last < minInterval) return Promise.resolve(null);
 
-  useSyncStore.setState({ syncing: true, progress: null, error: null });
+  const startedAt = Date.now();
+  useSyncStore.setState({ syncing: true, manual: !!opts.manual, progress: null, error: null });
   running = runPlatformSync((progress) => useSyncStore.setState({ progress }))
     .then((report) => {
       useSyncStore.setState({ lastSyncAt: Date.now(), lastReport: report });
+      if (__DEV__) {
+        console.warn(
+          `[sync] ${Date.now() - startedAt} ms · ${report.upserted} scritti · ${report.deleted} eliminati · ${report.errors.length} tipi non disponibili`,
+        );
+      }
       return report;
     })
     .catch((e: unknown) => {
@@ -65,7 +85,7 @@ export function syncHealthData(opts: { force?: boolean } = {}): Promise<SyncRepo
       return null;
     })
     .finally(() => {
-      useSyncStore.setState({ syncing: false, progress: null });
+      useSyncStore.setState({ syncing: false, manual: false, progress: null });
       running = null;
     });
   return running;

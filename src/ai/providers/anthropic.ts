@@ -67,13 +67,11 @@ export function toAnthropicMessages(messages: ChatMessage[], model: string): Mes
             data: img.base64,
           },
         })),
-        ...(m.documents ?? []).map(
-          (doc): ContentBlockParam => ({
-            type: 'document',
-            title: doc.name,
-            source: { type: 'base64', media_type: 'application/pdf', data: doc.base64 },
-          }),
-        ),
+        ...(m.documents ?? []).map((doc): ContentBlockParam => ({
+          type: 'document',
+          title: doc.name,
+          source: { type: 'base64', media_type: 'application/pdf', data: doc.base64 },
+        })),
         { type: 'text', text: m.content },
       ];
       out.push({ role: 'user', content });

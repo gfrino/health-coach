@@ -32,7 +32,8 @@ export default function SyncStep() {
     started.current = true;
     (async () => {
       setPhase('data');
-      if (settings.healthSourceConnectedAt !== null) await syncHealthData({ force: true });
+      if (settings.healthSourceConnectedAt !== null)
+        await syncHealthData({ force: true, manual: true });
       setPhase('welcome');
       try {
         conversationId.current = await generateWelcome(settings, { onText: setPreview });

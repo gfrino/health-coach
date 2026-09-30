@@ -16,16 +16,22 @@ import type { Db } from '../types';
 
 const CHUNK = 400;
 
+/** Righe per INSERT multiplo: 9 parametri × 100 = 900, sotto il limite di SQLite (999). */
+const ROWS_PER_INSERT = 100;
+
 export async function upsertMetrics(db: Db, rows: NormalizedMetric[]): Promise<number> {
   if (!rows.length) return 0;
+  // Nello stesso INSERT una riga non può aggiornarsi due volte: si tiene l'ultima per source_id.
+  const unique = [...new Map(rows.map((m) => [`${m.source}\u0000${m.sourceId}`, m])).values()];
   await db.withTransactionAsync(async () => {
-    for (const m of rows) {
+    for (let i = 0; i < unique.length; i += ROWS_PER_INSERT) {
+      const chunk = unique.slice(i, i + ROWS_PER_INSERT);
       await db.runAsync(
         `INSERT INTO metrics (id, type, value, unit, start_at, end_at, source, source_id, metadata)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         VALUES ${chunk.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ')}
          ON CONFLICT (source, source_id) DO UPDATE SET type = excluded.type, value = excluded.value,
            unit = excluded.unit, start_at = excluded.start_at, end_at = excluded.end_at, metadata = excluded.metadata`,
-        [
+        chunk.flatMap((m) => [
           newId(),
           m.type,
           m.value,
@@ -35,11 +41,11 @@ export async function upsertMetrics(db: Db, rows: NormalizedMetric[]): Promise<n
           m.source,
           m.sourceId,
           m.metadata ? JSON.stringify(m.metadata) : null,
-        ],
+        ]),
       );
     }
   });
-  return rows.length;
+  return unique.length;
 }
 
 export async function upsertWorkouts(db: Db, rows: NormalizedWorkout[]): Promise<number> {

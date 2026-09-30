@@ -56,7 +56,7 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
         await update({ healthSourceConnectedAt: connectedAt ?? Date.now() });
         // Prima lettura subito dopo il consenso (nell'onboarding la fa il passo finale).
         if (useSettingsStore.getState().settings.onboardingCompleted)
-          void syncHealthData({ force: true });
+          void syncHealthData({ force: true, manual: true });
       } else if (res.grantedCount === 0) {
         Alert.alert(
           t('sources.noneGrantedTitle'),
@@ -122,7 +122,7 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
           </AppText>
           <Button
             label={t('today.syncNow')}
-            onPress={() => void syncHealthData({ force: true })}
+            onPress={() => void syncHealthData({ force: true, manual: true })}
             loading={syncing}
           />
           <Button

@@ -52,7 +52,18 @@ export async function enableHealthKitBackgroundDelivery(onChange: () => void): P
   for (const t of types) {
     try {
       await hk.enableBackgroundDelivery(t, hk.UpdateFrequency.hourly);
-      subs.push(hk.subscribeToChanges(t, () => onChange()));
+      // HealthKit chiama l'observer anche subito dopo l'iscrizione: quel primo avviso si ignora
+      // (la sincronizzazione all'apertura c'è già).
+      let first = true;
+      subs.push(
+        hk.subscribeToChanges(t, () => {
+          if (first) {
+            first = false;
+            return;
+          }
+          onChange();
+        }),
+      );
     } catch {
       // tipo non autorizzato: ignorato
     }

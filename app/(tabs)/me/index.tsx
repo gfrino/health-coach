@@ -20,7 +20,8 @@ export default function MeScreen() {
   const params = useLocalSearchParams<{ section?: Section }>();
   const [section, setSection] = useState<Section>(params.section ?? 'today');
   const [reloadKey, setReloadKey] = useState(0);
-  const syncing = useSyncStore((st) => st.syncing);
+  // Spinner solo per l'aggiornamento chiesto dall'utente; quello automatico è silenzioso.
+  const refreshing = useSyncStore((st) => st.syncing && st.manual);
   const current = params.section && params.section !== section ? params.section : section;
 
   const add = useAddReport((ids) => {
@@ -64,8 +65,8 @@ export default function MeScreen() {
         refreshControl={
           current === 'today' ? (
             <RefreshControl
-              refreshing={syncing}
-              onRefresh={() => void syncHealthData({ force: true })}
+              refreshing={refreshing}
+              onRefresh={() => void syncHealthData({ force: true, manual: true })}
               tintColor={colors.primary}
             />
           ) : undefined

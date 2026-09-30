@@ -18,7 +18,7 @@ export function TodaySection() {
   const locale = i18n.language;
   const units = useSettingsStore((s) => s.settings.units);
   const connected = useSettingsStore((s) => s.settings.healthSourceConnectedAt !== null);
-  const { syncing, progress, lastSyncAt } = useSyncStore();
+  const { syncing, manual, progress, lastSyncAt } = useSyncStore();
   const [data, setData] = useState<TodayData | null>(null);
 
   const reload = useCallback(() => {
@@ -57,7 +57,10 @@ export function TodaySection() {
             body={connected ? t('today.connectedNoData', { source }) : t('today.emptyBody')}
             action={
               connected
-                ? { label: t('today.syncNow'), onPress: () => void syncHealthData({ force: true }) }
+                ? {
+                    label: t('today.syncNow'),
+                    onPress: () => void syncHealthData({ force: true, manual: true }),
+                  }
                 : {
                     label: t('sources.connect', { source }),
                     onPress: () => router.push('/integrations'),
@@ -109,7 +112,7 @@ export function TodaySection() {
               : ''}
         </AppText>
       </View>
-      {syncing && progress ? (
+      {syncing && manual && progress ? (
         <ProgressBar
           value={progress.done / progress.total}
           label={t('today.syncing', { source })}

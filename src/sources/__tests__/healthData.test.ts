@@ -16,6 +16,28 @@ async function setup() {
 }
 
 describe('dati di salute (repository)', () => {
+  it('scrive a blocchi (oltre 100 righe) e tiene l’ultima riga per source_id duplicato', async () => {
+    const db = await setup();
+    const rows = Array.from({ length: 250 }, (_, i) => ({
+      type: 'heartRate' as const,
+      value: 60 + (i % 10),
+      unit: 'bpm',
+      startAt: i * 1000,
+      endAt: i * 1000,
+      source: 'apple_health',
+      sourceId: `hr-${i}`,
+    }));
+    rows.push({ ...rows[0]!, value: 99 });
+    expect(await repo.upsertMetrics(db, rows)).toBe(250);
+    const count = await db.getFirstAsync<{ n: number }>('SELECT COUNT(*) AS n FROM metrics', []);
+    expect(count?.n).toBe(250);
+    const first = await db.getFirstAsync<{ value: number }>(
+      "SELECT value FROM metrics WHERE source_id = 'hr-0'",
+      [],
+    );
+    expect(first?.value).toBe(99);
+  });
+
   it('upsert idempotente: risincronizzare non crea duplicati', async () => {
     const db = await setup();
     const row = {
