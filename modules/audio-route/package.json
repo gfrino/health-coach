@@ -1,0 +1,7 @@
+{
+  "name": "audio-route",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "description": "Speaker routing for the Health Coach voice conversation (WebRTC)"
+}

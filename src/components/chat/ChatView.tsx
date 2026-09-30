@@ -1,12 +1,13 @@
-import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { toAIError } from '@/ai/errors';
 import { retryLastTurn, runCoachTurn } from '@/coach/chatEngine';
-import { conversationRepository, getDb } from '@/db';
-import type { StoredMessage } from '@/db/repositories/conversationRepository';
+import { conversationRepository, getDb, labReportRepository } from '@/db';
+import type { MessageAttachment, StoredMessage } from '@/db/repositories/conversationRepository';
+import { useAddReport } from '@/features/RecordsSection';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { useSettingsStore } from '@/store/settingsStore';
 import { speechLocale } from '@/voice/locale';
@@ -22,7 +23,7 @@ import { TypingIndicator } from './TypingIndicator';
 
 type Row =
   | { kind: 'message'; message: StoredMessage }
-  | { kind: 'pendingUser'; id: string; text: string }
+  | { kind: 'pendingUser'; id: string; text: string; attachments: MessageAttachment[] }
   | { kind: 'streaming'; text: string; tool: string | null };
 
 interface Props {
@@ -37,7 +38,11 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
   const { spacing } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const [messages, setMessages] = useState<StoredMessage[]>([]);
-  const [pendingUser, setPendingUser] = useState<string | null>(null);
+  const [pendingUser, setPendingUser] = useState<{
+    text: string;
+    attachments: MessageAttachment[];
+  } | null>(null);
+  const [attachments, setAttachments] = useState<MessageAttachment[]>([]);
   const [streaming, setStreaming] = useState<{ text: string; tool: string | null } | null>(null);
   const listRef = useRef<FlatList<Row>>(null);
   const locale = speechLocale(resolveLanguage(settings.language, deviceLanguageCodes()));
@@ -46,34 +51,43 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    getDb()
-      .then((db) => (conversationId ? conversationRepository.listMessages(db, conversationId) : []))
-      .then((list) => active && setMessages(list));
-    return () => {
-      active = false;
-    };
-  }, [conversationId]);
+  // Ricarica anche al ritorno dalla conversazione a voce (i messaggi parlati finiscono qui).
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      getDb()
+        .then((db) =>
+          conversationId ? conversationRepository.listMessages(db, conversationId) : [],
+        )
+        .then((list) => active && setMessages(list));
+      return () => {
+        active = false;
+      };
+    }, [conversationId]),
+  );
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
   const busy = streaming !== null;
 
+  const ensureConversation = async () => {
+    if (conversationId) return conversationId;
+    const db = await getDb();
+    const id = await conversationRepository.createConversation(db, {
+      provider: settings.ai.provider,
+      model: settings.ai.model,
+    });
+    onConversationCreated(id);
+    return id;
+  };
+
   const run = async (
     fn: (id: string, cb: Parameters<typeof runCoachTurn>[3]) => Promise<unknown>,
     userText?: string,
+    sentAttachments: MessageAttachment[] = [],
   ) => {
-    let id = conversationId;
-    if (!id) {
-      const db = await getDb();
-      id = await conversationRepository.createConversation(db, {
-        provider: settings.ai.provider,
-        model: settings.ai.model,
-      });
-      onConversationCreated(id);
-    }
-    if (userText) setPendingUser(userText);
+    const id = await ensureConversation();
+    if (userText !== undefined) setPendingUser({ text: userText, attachments: sentAttachments });
     setStreaming({ text: '', tool: null });
     const controller = new AbortController();
     abortRef.current = controller;
@@ -106,7 +120,32 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
     }
   };
 
-  const send = (text: string) => run((id, cb) => runCoachTurn(settings, id, text, cb), text);
+  const send = (text: string) => {
+    const sent = attachments;
+    setAttachments([]);
+    return run((id, cb) => runCoachTurn(settings, id, text, cb, sent), text, sent);
+  };
+
+  // Allegati: salvati subito nella Cartella salute (cifrati), poi inviati col messaggio.
+  const attach = useAddReport((ids) => {
+    void (async () => {
+      const db = await getDb();
+      const added: MessageAttachment[] = [];
+      for (const id of ids) {
+        const r = await labReportRepository.getReport(db, id);
+        if (r) added.push({ reportId: r.id, title: r.title, mimeType: r.mimeType ?? '' });
+      }
+      setAttachments((cur) => [...cur, ...added].slice(0, 5));
+    })();
+  });
+  const openAttachment = (a: MessageAttachment) =>
+    router.push({ pathname: '/me/report/[id]', params: { id: a.reportId } });
+
+  const openVoiceMode = async () => {
+    stopSpeaking();
+    const id = await ensureConversation();
+    router.push({ pathname: '/coach/voice', params: { c: id } });
+  };
   const voice = useVoiceInput(locale, (text) => {
     replyByVoice.current = true;
     void send(text);
@@ -140,7 +179,7 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
     ...messages
       .filter((m) => m.status !== 'streaming' || !busy)
       .map((m): Row => ({ kind: 'message', message: m })),
-    ...(pendingUser ? [{ kind: 'pendingUser' as const, id: 'pending', text: pendingUser }] : []),
+    ...(pendingUser ? [{ kind: 'pendingUser' as const, id: 'pending', ...pendingUser }] : []),
     ...(streaming ? [{ kind: 'streaming' as const, ...streaming }] : []),
   ];
   const hasUserMessages = messages.some((m) => m.role === 'user') || !!pendingUser;
@@ -170,7 +209,14 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
         }
         renderItem={({ item }) => {
           if (item.kind === 'pendingUser')
-            return <MessageBubble role="user" text={item.text} coachName="" />;
+            return (
+              <MessageBubble
+                role="user"
+                text={item.text}
+                coachName=""
+                attachments={item.attachments}
+              />
+            );
           if (item.kind === 'streaming') {
             return item.text ? (
               <View style={{ gap: spacing.xs }}>
@@ -196,11 +242,13 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
               />
             );
           }
-          if (!m.content) return null;
+          if (!m.content && !m.attachments.length) return null;
           return (
             <MessageBubble
               role={m.role}
               text={m.content}
+              attachments={m.attachments}
+              onOpenAttachment={openAttachment}
               coachName={settings.coach.name}
               speaking={speakingId === m.id}
               onSpeak={m.role === 'assistant' ? () => toggleSpeak(m) : undefined}
@@ -222,7 +270,15 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
           ) : null
         }
       />
-      <Composer onSend={send} disabled={busy} voice={voice} />
+      <Composer
+        onSend={send}
+        disabled={busy}
+        voice={voice}
+        attachments={attachments}
+        onAttach={attach}
+        onRemoveAttachment={(rid) => setAttachments((cur) => cur.filter((a) => a.reportId !== rid))}
+        onVoiceMode={() => void openVoiceMode()}
+      />
     </KeyboardAvoidingView>
   );
 }

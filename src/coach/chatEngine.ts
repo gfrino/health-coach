@@ -4,6 +4,8 @@ import { getProvider, PROVIDERS } from '@/ai/registry';
 import type { ChatMessage, SendResult, Usage } from '@/ai/types';
 import type { AppSettings } from '@/config/settingsSchema';
 import { conversationRepository, getDb, healthQueries, profileRepository, type Db } from '@/db';
+import type { MessageAttachment, StoredMessage } from '@/db/repositories/conversationRepository';
+import { loadAttachmentContent } from '@/records/attachmentContent';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS } from '@/lib/dates';
 
@@ -27,7 +29,7 @@ export interface TurnResult {
   usage: Usage;
 }
 
-async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Promise<string> {
+export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Promise<string> {
   const [profile, memoryFacts, summaries, snapshot, journal] = await Promise.all([
     profileRepository.loadProfileContext(db),
     healthQueries.recentMemoryFacts(db),
@@ -50,7 +52,7 @@ async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Prom
   });
 }
 
-async function resolveAI(settings: AppSettings) {
+export async function resolveAI(settings: AppSettings) {
   const { provider: providerId, model } = settings.ai;
   if (!providerId || !model) throw new AIError('invalid_key', 'Provider AI non configurato');
   const apiKey = PROVIDERS[providerId].requiresKey ? await getApiKey(providerId) : '';
@@ -119,6 +121,49 @@ async function runWithTools(
   return { text: text.trim(), usage };
 }
 
+/** Nota testuale sugli allegati: resta nella cronologia anche nei turni successivi. */
+export function attachmentNote(attachments: MessageAttachment[]): string {
+  return attachments.length
+    ? `[Attached: ${attachments.map((a) => a.title).join(', ')} — saved in the user's health records]`
+    : '';
+}
+
+/** Cronologia per il provider; l'ultimo messaggio utente porta il contenuto degli allegati. */
+async function buildHistory(
+  settings: AppSettings,
+  stored: StoredMessage[],
+): Promise<ChatMessage[]> {
+  const complete = stored.filter((m) => m.status === 'complete');
+  const withNotes = complete.map((m) => ({
+    role: m.role,
+    content: [m.content, attachmentNote(m.attachments)].filter(Boolean).join('\n\n'),
+  }));
+  const history = recentHistory(withNotes);
+  const lastStored = [...complete].reverse().find((m) => m.role === 'user');
+  const lastIdx = history.map((m) => m.role).lastIndexOf('user');
+  const last = history[lastIdx];
+  if (!lastStored?.attachments.length || !last || last.role !== 'user') return history;
+
+  const { provider, model } = await resolveAI(settings);
+  const content = await loadAttachmentContent(lastStored.attachments, {
+    vision: provider.supportsVision(model),
+    pdf: provider.id !== 'device',
+  });
+  const extra = [
+    ...content.texts.map((d) => `--- Document "${d.name}" ---\n${d.text}\n--- End of document ---`),
+    content.unreadable.length
+      ? `(You cannot read these attachments with the current AI model: ${content.unreadable.join(', ')}. Tell the user they are saved in their health records and that a cloud AI model in Settings can read them.)`
+      : '',
+  ].filter(Boolean);
+  history[lastIdx] = {
+    role: 'user',
+    content: [last.content, ...extra].join('\n\n'),
+    images: content.images.length ? content.images : undefined,
+    documents: content.documents.length ? content.documents : undefined,
+  };
+  return history;
+}
+
 /**
  * Un turno di chat: salva il messaggio utente (se nuovo), crea il messaggio dell'assistente
  * in stato "streaming", lo aggiorna alla fine (o in errore, con codice per l'UI e "Riprova").
@@ -128,26 +173,28 @@ export async function runCoachTurn(
   conversationId: string,
   userText: string | null,
   cb: TurnCallbacks = {},
+  attachments: MessageAttachment[] = [],
 ): Promise<TurnResult> {
   const db = await getDb();
   const now = new Date();
 
-  if (userText) {
+  if (userText !== null) {
     await conversationRepository.addMessage(db, {
       conversationId,
       role: 'user',
       content: userText.trim(),
+      attachments,
     });
     const conv = await conversationRepository.getConversation(db, conversationId);
-    if (conv && !conv.title) {
+    const title = userText.trim() || attachments[0]?.title;
+    if (conv && !conv.title && title) {
       await conversationRepository.setConversationMeta(db, conversationId, {
-        title: userText.trim().slice(0, 60),
+        title: title.slice(0, 60),
       });
     }
   }
 
   const stored = await conversationRepository.listMessages(db, conversationId);
-  const history = recentHistory(stored.filter((m) => m.status === 'complete'));
   const assistant = await conversationRepository.addMessage(db, {
     conversationId,
     role: 'assistant',
@@ -157,6 +204,7 @@ export async function runCoachTurn(
 
   try {
     const system = await buildSystemPrompt(db, settings, now);
+    const history = await buildHistory(settings, stored);
     const { text, usage } = await runWithTools(db, settings, system, history, cb);
     await conversationRepository.finishMessage(db, assistant.id, {
       content: text,

@@ -2,15 +2,22 @@ import { useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import type { MessageAttachment } from '@/db/repositories/conversationRepository';
 import type { VoiceError } from '@/voice/useVoiceInput';
 import { MAX_FONT_SCALE, useTheme } from '@/theme';
 
 import { AppText } from '../AppText';
 import { Icon } from '../Icon';
+import { AttachmentChip } from './AttachmentChip';
 
 interface Props {
   onSend: (text: string) => void;
   disabled: boolean;
+  attachments: MessageAttachment[];
+  onAttach: () => void;
+  onRemoveAttachment: (reportId: string) => void;
+  /** Conversazione a voce (tipo ChatGPT): se assente, il pulsante non compare. */
+  onVoiceMode?: () => void;
   voice: {
     listening: boolean;
     transcript: string;
@@ -21,12 +28,20 @@ interface Props {
 }
 
 /** Campo di scrittura con microfono: se il campo è vuoto, il pulsante principale è "Parla". */
-export function Composer({ onSend, disabled, voice }: Props) {
+export function Composer({
+  onSend,
+  disabled,
+  voice,
+  attachments,
+  onAttach,
+  onRemoveAttachment,
+  onVoiceMode,
+}: Props) {
   const { t } = useTranslation();
   const { colors, spacing, radius, typography } = useTheme();
   const [text, setText] = useState('');
-  const canSend = !disabled && text.trim().length > 0;
-  const showMic = !text.trim();
+  const canSend = !disabled && (text.trim().length > 0 || attachments.length > 0);
+  const showMic = !text.trim() && !attachments.length;
 
   const send = () => {
     if (!canSend) return;
@@ -101,6 +116,25 @@ export function Composer({ onSend, disabled, voice }: Props) {
           {t(`voice.errors.${voice.error}`)}
         </AppText>
       ) : null}
+      {attachments.length ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: spacing.xs,
+            paddingHorizontal: spacing.sm,
+            paddingTop: spacing.sm,
+          }}
+        >
+          {attachments.map((a) => (
+            <AttachmentChip
+              key={a.reportId}
+              attachment={a}
+              onRemove={() => onRemoveAttachment(a.reportId)}
+            />
+          ))}
+        </View>
+      ) : null}
       <View
         style={{
           flexDirection: 'row',
@@ -109,6 +143,23 @@ export function Composer({ onSend, disabled, voice }: Props) {
           padding: spacing.sm,
         }}
       >
+        <Pressable
+          onPress={onAttach}
+          disabled={disabled}
+          accessibilityRole="button"
+          accessibilityLabel={t('chat.attach')}
+          accessibilityHint={t('chat.attachHint')}
+          hitSlop={4}
+          style={({ pressed }) => ({
+            ...round(pressed, colors.surface, !disabled),
+            paddingHorizontal: 0,
+            width: 44,
+            borderWidth: 1,
+            borderColor: colors.border,
+          })}
+        >
+          <Icon name="add" color={colors.primary} />
+        </Pressable>
         <TextInput
           value={text}
           onChangeText={setText}
@@ -134,6 +185,24 @@ export function Composer({ onSend, disabled, voice }: Props) {
             },
           ]}
         />
+        {showMic && onVoiceMode ? (
+          <Pressable
+            onPress={onVoiceMode}
+            disabled={disabled}
+            accessibilityRole="button"
+            accessibilityLabel={t('voiceMode.open')}
+            accessibilityHint={t('voiceMode.openHint')}
+            style={({ pressed }) => ({
+              ...round(pressed, colors.surface, !disabled),
+              paddingHorizontal: 0,
+              width: 44,
+              borderWidth: 1,
+              borderColor: colors.border,
+            })}
+          >
+            <Icon name="waveform" color={colors.primary} />
+          </Pressable>
+        ) : null}
         {showMic ? (
           <Pressable
             onPress={voice.start}

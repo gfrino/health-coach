@@ -253,7 +253,8 @@
       "device_unavailable": "L'AI del telefono non è disponibile in questo momento. Controlla che sia attiva, oppure usa un servizio online.",
       "context_window": "La conversazione è troppo lunga per l'AI del telefono. Inizia una nuova conversazione.",
       "unsupported_language": "L'AI del telefono non supporta questa lingua. Cambia lingua o usa un servizio online.",
-      "org_verification": "OpenAI richiede la verifica della tua organizzazione per questo modello. Verificala su platform.openai.com (Impostazioni → Organizzazione) oppure scegli un altro modello."
+      "org_verification": "OpenAI richiede la verifica della tua organizzazione per questo modello. Verificala su platform.openai.com (Impostazioni → Organizzazione) oppure scegli un altro modello.",
+      "app_update_required": "Questa funzione richiede la versione più recente dell'app. Installa l'ultimo aggiornamento e riprova."
     },
     "device": {
       "title": "AI del telefono · {{engine}}",
@@ -502,7 +503,11 @@
     "historyItemHint": "Tocca per aprire, tieni premuto per eliminare",
     "welcomeTitle": "Benvenuto",
     "untitled": "Conversazione",
-    "savingJournal": "Annoto nel diario…"
+    "savingJournal": "Annoto nel diario…",
+    "attach": "Allega",
+    "attachHint": "Foto, fotocamera o documento",
+    "attachmentA11y": "Allegato: {{name}}",
+    "removeAttachment": "Rimuovi {{name}}"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",
@@ -617,6 +622,24 @@
       "unavailable": "Il riconoscimento vocale non è disponibile su questo telefono.",
       "no-speech": "Non ho sentito nulla. Riprova.",
       "other": "Non sono riuscito a capire. Riprova."
+    }
+  },
+  "voiceMode": {
+    "open": "Conversazione a voce",
+    "openHint": "Parla con il coach a voce, senza scrivere",
+    "engineRealtime": "Voce in tempo reale OpenAI · puoi interrompere quando vuoi",
+    "engineLoop": "Voce del telefono · per una conversazione più naturale usa OpenAI",
+    "tapHint": "Tocca per interrompere o per parlare",
+    "mute": "Disattiva microfono",
+    "unmute": "Riattiva microfono",
+    "end": "Termina conversazione",
+    "state": {
+      "connecting": "Mi collego…",
+      "listening": "Ti ascolto…",
+      "thinking": "Ci penso…",
+      "speaking": "Sto parlando",
+      "ended": "Conversazione terminata",
+      "idle": "Tocca per parlare"
     }
   }
 }

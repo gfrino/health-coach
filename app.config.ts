@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.1.0',
+  version: '1.2.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
@@ -175,6 +175,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         microphonePermission: 'Health Coach usa il microfono solo mentre parli con il coach.',
         speechRecognitionPermission:
           'Health Coach trascrive la tua voce per parlare con il coach. Quando possibile, la trascrizione avviene sul telefono.',
+      },
+    ],
+    [
+      // Conversazione a voce in tempo reale con OpenAI (audio diretto telefono ↔ OpenAI).
+      '@config-plugins/react-native-webrtc',
+      {
+        microphonePermission: 'Health Coach usa il microfono solo mentre parli con il coach.',
+        cameraPermission: 'Health Coach usa la fotocamera solo per fotografare i tuoi referti.',
       },
     ],
     [

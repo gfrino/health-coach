@@ -74,6 +74,11 @@ export function toOpenAIInput(messages: ChatMessage[]): InputItem[] {
             type: 'input_image',
             image_url: `data:${img.mimeType};base64,${img.base64}`,
           })),
+          ...(m.documents ?? []).map((doc) => ({
+            type: 'input_file',
+            filename: doc.name,
+            file_data: `data:${doc.mimeType};base64,${doc.base64}`,
+          })),
           { type: 'input_text', text: m.content },
         ],
       });

@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { Stack } from 'expo-router/stack';
 
 import { useTheme } from '@/theme';
 
-/** Stack con header nativo (large title su iOS) usato da ogni tab. */
-export function TabStack() {
+/** Stack con header nativo usato da ogni tab; `children` per opzioni di singole schermate. */
+export function TabStack({ children }: { children?: ReactNode }) {
   const { colors } = useTheme();
   return (
     <Stack
@@ -16,6 +17,8 @@ export function TabStack() {
         headerTitleStyle: { color: colors.text },
         contentStyle: { backgroundColor: colors.background },
       }}
-    />
+    >
+      {children}
+    </Stack>
   );
 }

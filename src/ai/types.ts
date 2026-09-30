@@ -11,6 +11,13 @@ export interface ImagePart {
   base64: string;
 }
 
+/** Documento allegato (PDF) inviato così com'è ai modelli che lo leggono nativamente. */
+export interface DocumentPart {
+  mimeType: 'application/pdf';
+  base64: string;
+  name: string;
+}
+
 export interface ToolCall {
   id: string;
   name: string;
@@ -19,7 +26,7 @@ export interface ToolCall {
 
 /** Formato neutro dei messaggi; ogni adapter lo traduce nel formato del proprio provider. */
 export type ChatMessage =
-  | { role: 'user'; content: string; images?: ImagePart[] }
+  | { role: 'user'; content: string; images?: ImagePart[]; documents?: DocumentPart[] }
   | {
       role: 'assistant';
       content: string;

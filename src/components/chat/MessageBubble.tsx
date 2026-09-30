@@ -1,9 +1,11 @@
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import type { MessageAttachment } from '@/db/repositories/conversationRepository';
 import { useTheme } from '@/theme';
 
 import { AppText } from '../AppText';
+import { AttachmentChip } from './AttachmentChip';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Markdown } from '../Markdown';
@@ -15,9 +17,20 @@ interface Props {
   error?: { code: string; onRetry: () => void } | null;
   onSpeak?: () => void;
   speaking?: boolean;
+  attachments?: MessageAttachment[];
+  onOpenAttachment?: (a: MessageAttachment) => void;
 }
 
-export function MessageBubble({ role, text, coachName, error, onSpeak, speaking }: Props) {
+export function MessageBubble({
+  role,
+  text,
+  coachName,
+  error,
+  onSpeak,
+  speaking,
+  attachments,
+  onOpenAttachment,
+}: Props) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const isUser = role === 'user';
@@ -55,10 +68,31 @@ export function MessageBubble({ role, text, coachName, error, onSpeak, speaking 
         paddingVertical: spacing.sm,
       }}
     >
+      {attachments?.length ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: spacing.xs,
+            marginBottom: text ? spacing.xs : 0,
+          }}
+        >
+          {attachments.map((a) => (
+            <AttachmentChip
+              key={a.reportId}
+              attachment={a}
+              onPrimary={isUser}
+              onPress={onOpenAttachment ? () => onOpenAttachment(a) : undefined}
+            />
+          ))}
+        </View>
+      ) : null}
       {/* Il testo è un unico elemento per VoiceOver/TalkBack; il pulsante "Leggi" resta raggiungibile. */}
-      <View accessible accessibilityLabel={`${isUser ? t('chat.you') : coachName}: ${text}`}>
-        {isUser ? <AppText tone="onPrimary">{text}</AppText> : <Markdown>{text}</Markdown>}
-      </View>
+      {text ? (
+        <View accessible accessibilityLabel={`${isUser ? t('chat.you') : coachName}: ${text}`}>
+          {isUser ? <AppText tone="onPrimary">{text}</AppText> : <Markdown>{text}</Markdown>}
+        </View>
+      ) : null}
       {onSpeak ? (
         <Pressable
           onPress={onSpeak}

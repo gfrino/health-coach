@@ -253,7 +253,8 @@
       "device_unavailable": "L'IA du téléphone n'est pas disponible pour le moment. Vérifiez qu'elle est activée, ou utilisez un service en ligne.",
       "context_window": "Cette conversation est trop longue pour l'IA du téléphone. Commencez une nouvelle conversation.",
       "unsupported_language": "L'IA du téléphone ne prend pas en charge cette langue. Changez de langue ou utilisez un service en ligne.",
-      "org_verification": "OpenAI exige la vérification de ton organisation pour ce modèle. Vérifie-la sur platform.openai.com (Paramètres → Organisation) ou choisis un autre modèle."
+      "org_verification": "OpenAI exige la vérification de ton organisation pour ce modèle. Vérifie-la sur platform.openai.com (Paramètres → Organisation) ou choisis un autre modèle.",
+      "app_update_required": "Cette fonction nécessite la dernière version de l'app. Installe la dernière mise à jour et réessaie."
     },
     "device": {
       "title": "IA du téléphone · {{engine}}",
@@ -502,7 +503,11 @@
     "historyItemHint": "Touchez pour ouvrir, appui long pour supprimer",
     "welcomeTitle": "Bienvenue",
     "untitled": "Conversation",
-    "savingJournal": "Je le note dans ton journal…"
+    "savingJournal": "Je le note dans ton journal…",
+    "attach": "Joindre",
+    "attachHint": "Photo, appareil photo ou document",
+    "attachmentA11y": "Pièce jointe : {{name}}",
+    "removeAttachment": "Retirer {{name}}"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",
@@ -617,6 +622,24 @@
       "unavailable": "La reconnaissance vocale n'est pas disponible sur ce téléphone.",
       "no-speech": "Je n'ai rien entendu. Réessayez.",
       "other": "Je n'ai pas compris. Réessayez."
+    }
+  },
+  "voiceMode": {
+    "open": "Conversation vocale",
+    "openHint": "Parle à ton coach à voix haute, sans écrire",
+    "engineRealtime": "Voix en temps réel OpenAI · tu peux interrompre à tout moment",
+    "engineLoop": "Voix du téléphone · pour une conversation plus naturelle, utilise OpenAI",
+    "tapHint": "Touche pour interrompre ou pour parler",
+    "mute": "Couper le micro",
+    "unmute": "Réactiver le micro",
+    "end": "Terminer la conversation",
+    "state": {
+      "connecting": "Connexion…",
+      "listening": "Je t'écoute…",
+      "thinking": "Je réfléchis…",
+      "speaking": "Je parle",
+      "ended": "Conversation terminée",
+      "idle": "Touche pour parler"
     }
   }
 }

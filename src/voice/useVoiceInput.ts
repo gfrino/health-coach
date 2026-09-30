@@ -16,14 +16,19 @@ export function useVoiceInput(locale: string, onFinal: (text: string) => void) {
   const [error, setError] = useState<VoiceError | null>(null);
   const latest = useRef('');
   const triedOnDevice = useRef(false);
+  // Gli eventi del riconoscimento sono globali: ogni istanza reagisce solo a quello che ha avviato.
+  const owner = useRef(false);
 
-  useSpeechRecognitionEvent('start', () => setListening(true));
+  useSpeechRecognitionEvent('start', () => owner.current && setListening(true));
   useSpeechRecognitionEvent('result', (e) => {
+    if (!owner.current) return;
     const text = e.results[0]?.transcript ?? '';
     latest.current = text;
     setTranscript(text);
   });
   useSpeechRecognitionEvent('end', () => {
+    if (!owner.current) return;
+    owner.current = false;
     setListening(false);
     const text = latest.current.trim();
     latest.current = '';
@@ -31,6 +36,7 @@ export function useVoiceInput(locale: string, onFinal: (text: string) => void) {
     if (text) onFinal(text);
   });
   useSpeechRecognitionEvent('error', (e) => {
+    if (!owner.current) return;
     setListening(false);
     // Lingua non installata per il riconoscimento offline: si riprova con quello di sistema.
     if (
@@ -45,6 +51,7 @@ export function useVoiceInput(locale: string, onFinal: (text: string) => void) {
       });
       return;
     }
+    owner.current = false;
     if (e.error === 'aborted') return;
     setError(
       e.error === 'not-allowed' ? 'permission' : e.error === 'no-speech' ? 'no-speech' : 'other',
@@ -65,6 +72,7 @@ export function useVoiceInput(locale: string, onFinal: (text: string) => void) {
     }
     const onDevice = ExpoSpeechRecognitionModule.supportsOnDeviceRecognition();
     triedOnDevice.current = onDevice;
+    owner.current = true;
     ExpoSpeechRecognitionModule.start({
       lang: locale,
       interimResults: true,

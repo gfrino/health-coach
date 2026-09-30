@@ -14,11 +14,19 @@ export interface Conversation {
 
 export type MessageStatus = 'complete' | 'streaming' | 'error';
 
+/** File allegato a un messaggio: vive nella Cartella salute (lab_reports). */
+export interface MessageAttachment {
+  reportId: string;
+  title: string;
+  mimeType: string;
+}
+
 export interface StoredMessage {
   id: string;
   conversationId: string;
   role: 'user' | 'assistant';
   content: string;
+  attachments: MessageAttachment[];
   status: MessageStatus;
   errorCode: string | null;
   inputTokens: number | null;
@@ -42,6 +50,7 @@ interface MessageRow {
   conversation_id: string;
   role: 'user' | 'assistant';
   content: string;
+  attachments: string | null;
   status: MessageStatus;
   error_code: string | null;
   input_tokens: number | null;
@@ -60,11 +69,21 @@ const toConversation = (r: ConversationRow): Conversation => ({
   lastMessage: r.last_message,
 });
 
+function parseAttachments(v: string | null): MessageAttachment[] {
+  try {
+    const a: unknown = v ? JSON.parse(v) : [];
+    return Array.isArray(a) ? (a as MessageAttachment[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 const toMessage = (r: MessageRow): StoredMessage => ({
   id: r.id,
   conversationId: r.conversation_id,
   role: r.role,
   content: r.content,
+  attachments: parseAttachments(r.attachments),
   status: r.status,
   errorCode: r.error_code,
   inputTokens: r.input_tokens,
@@ -121,7 +140,7 @@ export async function getConversation(db: Db, id: string): Promise<Conversation 
 
 export async function listMessages(db: Db, conversationId: string): Promise<StoredMessage[]> {
   const rows = await db.getAllAsync<MessageRow>(
-    `SELECT id, conversation_id, role, content, status, error_code, input_tokens, output_tokens, created_at
+    `SELECT id, conversation_id, role, content, attachments, status, error_code, input_tokens, output_tokens, created_at
      FROM messages WHERE conversation_id = ? AND role IN ('user', 'assistant') ORDER BY created_at, rowid`,
     [conversationId],
   );
@@ -135,14 +154,23 @@ export async function addMessage(
     role: 'user' | 'assistant';
     content: string;
     status?: MessageStatus;
+    attachments?: MessageAttachment[];
   },
 ): Promise<StoredMessage> {
   const id = newId();
   const now = Date.now();
   await db.withTransactionAsync(async () => {
     await db.runAsync(
-      'INSERT INTO messages (id, conversation_id, role, content, status, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-      [id, m.conversationId, m.role, m.content, m.status ?? 'complete', now],
+      'INSERT INTO messages (id, conversation_id, role, content, attachments, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [
+        id,
+        m.conversationId,
+        m.role,
+        m.content,
+        m.attachments?.length ? JSON.stringify(m.attachments) : null,
+        m.status ?? 'complete',
+        now,
+      ],
     );
     await db.runAsync('UPDATE conversations SET updated_at = ? WHERE id = ?', [
       now,
@@ -154,6 +182,7 @@ export async function addMessage(
     conversationId: m.conversationId,
     role: m.role,
     content: m.content,
+    attachments: m.attachments ?? [],
     status: m.status ?? 'complete',
     errorCode: null,
     inputTokens: null,

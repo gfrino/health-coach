@@ -77,8 +77,8 @@ export function toGeminiContents(messages: ChatMessage[], model: string): Gemini
       out.push({
         role: 'user',
         parts: [
-          ...(m.images ?? []).map((img) => ({
-            inlineData: { mimeType: img.mimeType, data: img.base64 },
+          ...[...(m.images ?? []), ...(m.documents ?? [])].map((f) => ({
+            inlineData: { mimeType: f.mimeType, data: f.base64 },
           })),
           { text: m.content },
         ],

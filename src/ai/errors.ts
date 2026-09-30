@@ -11,6 +11,7 @@ export type AIErrorCode =
   | 'unsupported_language'
   | 'aborted'
   | 'org_verification'
+  | 'app_update_required'
   | 'unknown';
 
 export class AIError extends Error {

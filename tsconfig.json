@@ -8,7 +8,8 @@
     "types": ["jest"],
     "paths": {
       "@/*": ["./src/*"],
-      "on-device-ai": ["./modules/on-device-ai"]
+      "on-device-ai": ["./modules/on-device-ai"],
+      "audio-route": ["./modules/audio-route"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],

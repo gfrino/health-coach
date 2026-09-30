@@ -253,7 +253,8 @@
       "device_unavailable": "Die KI des Telefons ist gerade nicht verfügbar. Prüfe, ob sie aktiviert ist, oder nutze einen Online-Dienst.",
       "context_window": "Diese Unterhaltung ist zu lang für die KI des Telefons. Beginne eine neue Unterhaltung.",
       "unsupported_language": "Die KI des Telefons unterstützt diese Sprache nicht. Ändere die Sprache oder nutze einen Online-Dienst.",
-      "org_verification": "OpenAI verlangt für dieses Modell eine Verifizierung deiner Organisation. Verifiziere sie auf platform.openai.com (Einstellungen → Organisation) oder wähle ein anderes Modell."
+      "org_verification": "OpenAI verlangt für dieses Modell eine Verifizierung deiner Organisation. Verifiziere sie auf platform.openai.com (Einstellungen → Organisation) oder wähle ein anderes Modell.",
+      "app_update_required": "Diese Funktion erfordert die neueste Version der App. Installiere das letzte Update und versuche es erneut."
     },
     "device": {
       "title": "KI auf dem Telefon · {{engine}}",
@@ -502,7 +503,11 @@
     "historyItemHint": "Tippen zum Öffnen, gedrückt halten zum Löschen",
     "welcomeTitle": "Willkommen",
     "untitled": "Unterhaltung",
-    "savingJournal": "Ich notiere es im Tagebuch…"
+    "savingJournal": "Ich notiere es im Tagebuch…",
+    "attach": "Anhängen",
+    "attachHint": "Foto, Kamera oder Dokument",
+    "attachmentA11y": "Anhang: {{name}}",
+    "removeAttachment": "{{name}} entfernen"
   },
   "integrations": {
     "healthTitle": "Gesundheitsdaten des Telefons",
@@ -617,6 +622,24 @@
       "unavailable": "Die Spracherkennung ist auf diesem Telefon nicht verfügbar.",
       "no-speech": "Ich habe nichts gehört. Versuche es erneut.",
       "other": "Ich habe dich nicht verstanden. Versuche es erneut."
+    }
+  },
+  "voiceMode": {
+    "open": "Sprachgespräch",
+    "openHint": "Sprich mit deinem Coach, ohne zu tippen",
+    "engineRealtime": "OpenAI-Echtzeitstimme · du kannst jederzeit unterbrechen",
+    "engineLoop": "Telefonstimme · für ein natürlicheres Gespräch nutze OpenAI",
+    "tapHint": "Tippen zum Unterbrechen oder Sprechen",
+    "mute": "Mikrofon stummschalten",
+    "unmute": "Mikrofon einschalten",
+    "end": "Gespräch beenden",
+    "state": {
+      "connecting": "Verbinde…",
+      "listening": "Ich höre zu…",
+      "thinking": "Ich denke nach…",
+      "speaking": "Ich spreche",
+      "ended": "Gespräch beendet",
+      "idle": "Tippen zum Sprechen"
     }
   }
 }

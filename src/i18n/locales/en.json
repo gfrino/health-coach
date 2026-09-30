@@ -253,7 +253,8 @@
       "device_unavailable": "The phone's AI isn't available right now. Check that it's turned on, or use an online service.",
       "context_window": "This conversation is too long for the phone's AI. Start a new conversation.",
       "unsupported_language": "The phone's AI doesn't support this language. Change language or use an online service.",
-      "org_verification": "OpenAI requires your organization to be verified for this model. Verify it on platform.openai.com (Settings → Organization) or choose another model."
+      "org_verification": "OpenAI requires your organization to be verified for this model. Verify it on platform.openai.com (Settings → Organization) or choose another model.",
+      "app_update_required": "This feature needs the latest version of the app. Install the latest update and try again."
     },
     "device": {
       "title": "Phone AI · {{engine}}",
@@ -502,7 +503,11 @@
     "historyItemHint": "Tap to open, long-press to delete",
     "welcomeTitle": "Welcome",
     "untitled": "Conversation",
-    "savingJournal": "Noting it in your journal…"
+    "savingJournal": "Noting it in your journal…",
+    "attach": "Attach",
+    "attachHint": "Photo, camera or document",
+    "attachmentA11y": "Attachment: {{name}}",
+    "removeAttachment": "Remove {{name}}"
   },
   "integrations": {
     "healthTitle": "Phone health data",
@@ -617,6 +622,24 @@
       "unavailable": "Speech recognition isn't available on this phone.",
       "no-speech": "I didn't hear anything. Try again.",
       "other": "I couldn't understand. Try again."
+    }
+  },
+  "voiceMode": {
+    "open": "Voice conversation",
+    "openHint": "Talk to your coach by voice, no typing",
+    "engineRealtime": "OpenAI real-time voice · interrupt any time",
+    "engineLoop": "Phone voice · for a more natural conversation use OpenAI",
+    "tapHint": "Tap to interrupt or to speak",
+    "mute": "Mute microphone",
+    "unmute": "Unmute microphone",
+    "end": "End conversation",
+    "state": {
+      "connecting": "Connecting…",
+      "listening": "Listening…",
+      "thinking": "Thinking…",
+      "speaking": "Speaking",
+      "ended": "Conversation ended",
+      "idle": "Tap to speak"
     }
   }
 }
