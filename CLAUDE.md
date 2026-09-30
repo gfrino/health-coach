@@ -40,5 +40,6 @@ These rules apply to anyone working on the project, human or AI. Also read `AGEN
 
 - Metro: `npx expo start --dev-client --port 8082` (8081 is taken by Docker; the owner may use 8083). Don't run Metro with `CI=true`: reloads and logs are disabled.
 - Local iOS builds: prefix with `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8` (CocoaPods). The iOS 27 SDK needs `plugins/withIosSceneLifecycle.js` (remove it with SDK 58).
+- **iOS permission texts:** never set a `*Permission: false` option on a plugin if another feature uses that permission, because it removes the key for everyone. Apple rejects uploads with a missing purpose string (e.g. `NSHealthUpdateUsageDescription` is required even though the app only reads). Before a store build, verify with `APP_VARIANT=production npx expo prebuild --platform ios --clean --no-install`, then delete `ios/`.
 - Bundle id `ch.ticinoweb.healthcoach` (`.dev` / `.preview` variants via `APP_VARIANT`). EAS project `@ticinoweb/health-coach`.
 - Never type passwords, API keys or 2FA codes on the owner's behalf: the owner enters them.

@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.4.1',
+  version: '1.4.2',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
@@ -157,14 +157,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         photosPermission:
           'Health Coach accede alle foto solo per importare i referti che scegli tu.',
         cameraPermission: 'Health Coach usa la fotocamera solo per fotografare i tuoi referti.',
-        microphonePermission: false,
+        microphonePermission: 'Health Coach usa il microfono solo mentre parli con il coach.',
       },
     ],
     [
       'expo-camera',
       {
         cameraPermission: 'Health Coach usa la fotocamera solo per fotografare i tuoi referti.',
-        microphonePermission: false,
+        microphonePermission: 'Health Coach usa il microfono solo mentre parli con il coach.',
         recordAudioAndroid: false,
       },
     ],
@@ -211,7 +211,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         NSHealthShareUsageDescription:
           'Health Coach legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.',
         // v1.0 legge soltanto: nessuna richiesta di scrittura.
-        NSHealthUpdateUsageDescription: false,
+        // Obbligatoria per l'App Store anche se l'app legge soltanto: la libreria HealthKit
+        // referenzia anche le API di scrittura. L'app non chiede mai il permesso di scrivere.
+        NSHealthUpdateUsageDescription:
+          'Health Coach non scrive né modifica i tuoi dati in Salute: li legge soltanto per darti consigli personalizzati.',
         background: true,
       },
     ],

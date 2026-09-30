@@ -5,5 +5,6 @@
   "NSPhotoLibraryUsageDescription": "Health Coach accesses your photos only to import the reports you choose.",
   "NSCameraUsageDescription": "Health Coach uses the camera only to photograph your medical reports.",
   "NSMicrophoneUsageDescription": "Health Coach uses the microphone only while you talk to your coach.",
-  "NSSpeechRecognitionUsageDescription": "Health Coach transcribes your voice so you can talk to your coach. When possible, transcription happens on your phone."
+  "NSSpeechRecognitionUsageDescription": "Health Coach transcribes your voice so you can talk to your coach. When possible, transcription happens on your phone.",
+  "NSHealthUpdateUsageDescription": "Health Coach never writes or changes your data in Health: it only reads it to give you personalised advice."
 }
