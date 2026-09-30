@@ -2,10 +2,13 @@ import type { ChatMessage } from '@/ai/types';
 import type { CoachConfig, SupportedLanguage } from '@/config/settingsSchema';
 import { localIsoDate } from '@/lib/dates';
 
+import { dietGuideText } from './diets';
+import type { Insights } from './insights';
 import {
+  ANSWER_GUIDE,
   coachIdentity,
+  JOURNAL_RULE,
   MEDICAL_PROMPTS,
-  NUTRITION_PROMPTS,
   SAFETY_RULES,
   TONE_PROMPTS,
 } from './prompts';
@@ -66,6 +69,8 @@ export interface CoachContextInput {
   summaries?: { date: string; text: string }[];
   metrics?: MetricSummary[];
   anomalies?: string[];
+  /** Osservazioni già calcolate dall'app (confronti, giudizi, focus). */
+  insights?: Insights;
   labs?: LabHighlight[];
   journal?: JournalContext[];
   /** Prompt ridotto per i modelli sul telefono (contesto ~4K token). */
@@ -133,6 +138,22 @@ function metricsSection(
   return lines.length ? `HEALTH DATA SNAPSHOT\n${lines.join('\n')}` : null;
 }
 
+function insightsSection(
+  insights: Insights | undefined,
+  anomalies: string[] | undefined,
+): string | null {
+  if (!insights?.lines.length && !anomalies?.length) return null;
+  const lines = [
+    ...(insights?.lines ?? []).map((l) => `- ${l}`),
+    ...(anomalies ?? []).map((a) => `- Notable: ${a}`),
+  ];
+  if (insights?.focus) lines.push(`- Suggested focus: ${insights.focus}`);
+  const recent = insights?.recent.length
+    ? `\n${insights.recent.map((r) => `- ${r}`).join('\n')}`
+    : '';
+  return `KEY FACTS (computed by the app from the user's data; trust these numbers)\n${lines.join('\n')}${recent}`;
+}
+
 function labsSection(labs: LabHighlight[] | undefined): string | null {
   if (!labs?.length) return null;
   const lines = labs.map((l) => {
@@ -165,7 +186,7 @@ function journalSection(journal: JournalContext[] | undefined): string | null {
  */
 export function dataAvailabilitySection(input: CoachContextInput): string {
   const missing: string[] = [];
-  if (!input.metrics?.length && !input.anomalies?.length)
+  if (!input.metrics?.length && !input.anomalies?.length && !input.insights?.lines.length)
     missing.push('health measurements (activity, sleep, heart, body)');
   if (!input.labs?.length) missing.push('lab results');
   if (!input.journal?.length) missing.push('journal entries');
@@ -187,13 +208,12 @@ export function composeSystemPrompt(full: CoachContextInput): string {
         summaries: full.summaries?.slice(0, 1),
         journal: full.journal?.slice(0, 3),
         labs: full.labs?.slice(0, 3),
-        metrics: full.metrics?.slice(0, 4),
       }
     : full;
   const { coach, language } = input;
   const sections: (string | null)[] = [
     coachIdentity(coach, language),
-    `APPROACH\n${MEDICAL_PROMPTS[coach.medicalApproach]}\n${NUTRITION_PROMPTS[coach.nutritionApproach]}\n${TONE_PROMPTS[coach.tone]}`,
+    `APPROACH\n${MEDICAL_PROMPTS[coach.medicalApproach]}\n${dietGuideText(coach.nutritionApproach, input.compact)}\n${TONE_PROMPTS[coach.tone]}`,
     SAFETY_RULES,
     profileSection(input.profile, input.now),
     input.memoryFacts?.length
@@ -202,10 +222,15 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     input.summaries?.length
       ? `SUMMARIES OF PREVIOUS CONVERSATIONS\n${input.summaries.map((s) => `- ${s.date}: ${s.text}`).join('\n')}`
       : null,
-    metricsSection(input.metrics, input.anomalies),
+    insightsSection(input.insights, input.anomalies),
+    // I modelli sul telefono hanno poco contesto: bastano le osservazioni già calcolate.
+    input.compact && input.insights?.lines.length ? null : metricsSection(input.metrics, []),
     labsSection(input.labs),
     journalSection(input.journal),
     dataAvailabilitySection(input),
+    ANSWER_GUIDE,
+    // Il modello sul telefono non ha tool: niente regole sul diario.
+    input.compact ? null : JOURNAL_RULE,
     `CURRENT DATE: ${localIsoDate(input.now)} ${input.now.toTimeString().slice(0, 5)}`,
   ];
   return sections.filter((s): s is string => !!s).join('\n\n');

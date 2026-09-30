@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Pressable, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { EmptyState, Icon, Screen, SegmentedControl } from '@/components';
+import { Icon, Screen, SegmentedControl } from '@/components';
+import { JournalSection, newJournalEntry } from '@/features/journal/JournalSection';
 import { RecordsSection, useAddReport } from '@/features/RecordsSection';
 import { TodaySection } from '@/features/today/TodaySection';
 import { syncHealthData, useSyncStore } from '@/sources/syncService';
@@ -35,15 +36,17 @@ export default function MeScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen options={{ headerShown: false, title: t('tabs.me') }} />
       <Screen
         title={t('tabs.me')}
         titleAction={
-          current === 'records' ? (
+          current !== 'today' ? (
             <Pressable
-              onPress={add}
+              onPress={current === 'records' ? add : newJournalEntry}
               accessibilityRole="button"
-              accessibilityLabel={t('records.addTitle')}
+              accessibilityLabel={
+                current === 'records' ? t('records.addTitle') : t('journal.newTitle')
+              }
               hitSlop={10}
               style={{
                 width: 44,
@@ -80,11 +83,7 @@ export default function MeScreen() {
         {current === 'today' ? (
           <TodaySection />
         ) : current === 'journal' ? (
-          <EmptyState
-            icon="journal"
-            title={t('journal.emptyTitle')}
-            body={t('journal.emptyBody')}
-          />
+          <JournalSection />
         ) : (
           <RecordsSection reloadKey={reloadKey} />
         )}

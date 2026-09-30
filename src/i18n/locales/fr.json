@@ -70,8 +70,26 @@
     }
   },
   "journal": {
-    "emptyTitle": "Votre journal est vide",
-    "emptyBody": "Notez comment vous vous sentez, votre énergie, vos symptômes et tout ce que vous voulez retenir. Votre coach en tiendra compte."
+    "emptyTitle": "Ton journal est vide",
+    "emptyBody": "Note comment tu te sens : humeur, énergie, symptômes et notes. Ton coach en tient compte.",
+    "addFirst": "Écris comment tu te sens",
+    "howTitle": "Comment ça marche",
+    "howBody": "Touche + pour écrire toi-même, ou dis-le simplement à ton coach dans le chat (« je me suis réveillé avec un mal de tête », « aujourd'hui je suis en forme ») : il le note ici pour toi. Tu peux modifier ou supprimer chaque entrée.",
+    "byCoach": "par le coach",
+    "newTitle": "Nouvelle entrée",
+    "editTitle": "Entrée du journal",
+    "date": "Jour",
+    "mood": "Humeur",
+    "energy": "Énergie",
+    "moodA11y": "Humeur {{value}} sur 5",
+    "energyA11y": "Énergie {{value}} sur 5",
+    "symptoms": "Symptômes",
+    "symptomsHint": "Séparés par des virgules",
+    "symptomsPlaceholder": "ex. mal de tête, ballonnements",
+    "note": "Notes",
+    "notePlaceholder": "Comment vas-tu ? Sommeil, alimentation, stress, événements…",
+    "deleteTitle": "Supprimer cette entrée ?",
+    "deleteBody": "L'entrée sera supprimée de ton journal."
   },
   "records": {
     "emptyTitle": "Aucun compte rendu",
@@ -85,7 +103,7 @@
     "defaultTitle": "Compte rendu",
     "importFailed": "Import impossible",
     "tooLarge": "Le fichier est trop volumineux (20 Mo max.).",
-    "unsupported": "Format non pris en charge : utilisez un PDF ou des images.",
+    "unsupported": "Format non pris en charge. Tu peux ajouter des PDF, photos, fichiers Word, RTF, ODT et texte.",
     "cameraDenied": "Autorisez l'accès à l'appareil photo dans les Réglages du téléphone.",
     "shareHint": "Astuce : depuis Mail, Fichiers, Photos ou l'app de votre laboratoire, utilisez « Partager → Health Coach » pour ajouter un compte rendu en un instant.",
     "sharedTitle": "Compte rendu ajouté",
@@ -234,7 +252,8 @@
       "unknown": "Une erreur inattendue s'est produite avec le fournisseur d'IA.",
       "device_unavailable": "L'IA du téléphone n'est pas disponible pour le moment. Vérifiez qu'elle est activée, ou utilisez un service en ligne.",
       "context_window": "Cette conversation est trop longue pour l'IA du téléphone. Commencez une nouvelle conversation.",
-      "unsupported_language": "L'IA du téléphone ne prend pas en charge cette langue. Changez de langue ou utilisez un service en ligne."
+      "unsupported_language": "L'IA du téléphone ne prend pas en charge cette langue. Changez de langue ou utilisez un service en ligne.",
+      "org_verification": "OpenAI exige la vérification de ton organisation pour ce modèle. Vérifie-la sur platform.openai.com (Paramètres → Organisation) ou choisis un autre modèle."
     },
     "device": {
       "title": "IA du téléphone · {{engine}}",
@@ -353,13 +372,15 @@
       "none": "Aucune préférence",
       "mediterranean": "Méditerranéenne",
       "keto": "Cétogène",
+      "healthyKeto": "Healthy Keto (Dr Berg)",
       "lowCarb": "Pauvre en glucides",
       "vegetarian": "Végétarienne",
       "vegan": "Végane",
       "paleo": "Paléo",
       "intermittentFasting": "Jeûne intermittent",
       "lowFodmap": "Pauvre en FODMAP",
-      "carnivore": "Carnivore"
+      "carnivore": "Carnivore",
+      "lectinFree": "Sans lectines (Plant Paradox)"
     },
     "tone": "Ton",
     "toneOptions": {
@@ -480,7 +501,8 @@
     "historyEmptyBody": "Vos conversations avec le coach apparaîtront ici.",
     "historyItemHint": "Touchez pour ouvrir, appui long pour supprimer",
     "welcomeTitle": "Bienvenue",
-    "untitled": "Conversation"
+    "untitled": "Conversation",
+    "savingJournal": "Je le note dans ton journal…"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",

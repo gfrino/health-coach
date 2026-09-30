@@ -10,6 +10,7 @@ export type AIErrorCode =
   | 'context_window'
   | 'unsupported_language'
   | 'aborted'
+  | 'org_verification'
   | 'unknown';
 
 export class AIError extends Error {
@@ -35,6 +36,8 @@ const CREDIT_PATTERNS = [
   /billing/i,
   /payment/i,
 ];
+/** OpenAI: alcuni modelli (streaming GPT-5, o3…) richiedono la verifica dell'organizzazione. */
+const VERIFICATION_PATTERNS = [/must be verified/i, /organization.*verif/i];
 const KEY_PATTERNS = [/api[_ ]?key/i, /invalid.*key/i, /API_KEY_INVALID/, /unauthori[sz]ed/i];
 
 /** Classificazione degli errori HTTP comune ai provider. */
@@ -47,6 +50,9 @@ export function classifyHttpError(status: number, body: string): AIError {
   if (status === 404) return new AIError('model_not_found', text, status);
   if (status === 400 && KEY_PATTERNS.some((p) => p.test(text))) {
     return new AIError('invalid_key', text, status);
+  }
+  if (status === 400 && VERIFICATION_PATTERNS.some((p) => p.test(text))) {
+    return new AIError('org_verification', text, status);
   }
   if (status === 429) return new AIError('rate_limited', text, status);
   if (status === 529 || status >= 500) return new AIError('server', text, status);

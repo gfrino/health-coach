@@ -131,7 +131,13 @@ export function RecordsSection({ reloadKey }: { reloadKey: number }) {
             }}
           >
             <Icon
-              name={r.mimeType === 'application/pdf' ? 'pdf' : 'photo'}
+              name={
+                r.mimeType === 'application/pdf'
+                  ? 'pdf'
+                  : r.mimeType?.startsWith('image/')
+                    ? 'photo'
+                    : 'document'
+              }
               color={colors.primary}
             />
           </View>

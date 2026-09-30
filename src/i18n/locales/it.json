@@ -71,7 +71,25 @@
   },
   "journal": {
     "emptyTitle": "Il diario è vuoto",
-    "emptyBody": "Annota come ti senti, energia, sintomi e tutto ciò che vuoi ricordare. Il coach ne terrà conto."
+    "emptyBody": "Annota come ti senti: umore, energia, sintomi e note. Il coach ne tiene conto nei consigli.",
+    "addFirst": "Scrivi come ti senti",
+    "howTitle": "Come funziona",
+    "howBody": "Tocca + per scrivere tu, oppure raccontalo al coach in chat (\"stamattina ho mal di testa\", \"oggi mi sento carico\"): lo annota lui qui. Puoi modificare o eliminare ogni voce.",
+    "byCoach": "dal coach",
+    "newTitle": "Nuova voce",
+    "editTitle": "Voce del diario",
+    "date": "Giorno",
+    "mood": "Umore",
+    "energy": "Energia",
+    "moodA11y": "Umore {{value}} su 5",
+    "energyA11y": "Energia {{value}} su 5",
+    "symptoms": "Sintomi",
+    "symptomsHint": "Separati da virgola",
+    "symptomsPlaceholder": "es. mal di testa, gonfiore",
+    "note": "Note",
+    "notePlaceholder": "Come stai? Sonno, alimentazione, stress, eventi…",
+    "deleteTitle": "Eliminare questa voce?",
+    "deleteBody": "La voce verrà eliminata dal diario."
   },
   "records": {
     "emptyTitle": "Nessun referto",
@@ -85,7 +103,7 @@
     "defaultTitle": "Referto",
     "importFailed": "Impossibile importare",
     "tooLarge": "Il file è troppo grande (massimo 20 MB).",
-    "unsupported": "Formato non supportato: usa PDF o immagini.",
+    "unsupported": "Formato non supportato. Puoi aggiungere PDF, foto, documenti Word, RTF, ODT e file di testo.",
     "cameraDenied": "Consenti l'accesso alla fotocamera nelle Impostazioni del telefono.",
     "shareHint": "Suggerimento: da Mail, File, Foto o dall'app del laboratorio usa \"Condividi → Health Coach\" per aggiungere un referto al volo.",
     "sharedTitle": "Referto aggiunto",
@@ -234,7 +252,8 @@
       "unknown": "Si è verificato un errore imprevisto con il provider AI.",
       "device_unavailable": "L'AI del telefono non è disponibile in questo momento. Controlla che sia attiva, oppure usa un servizio online.",
       "context_window": "La conversazione è troppo lunga per l'AI del telefono. Inizia una nuova conversazione.",
-      "unsupported_language": "L'AI del telefono non supporta questa lingua. Cambia lingua o usa un servizio online."
+      "unsupported_language": "L'AI del telefono non supporta questa lingua. Cambia lingua o usa un servizio online.",
+      "org_verification": "OpenAI richiede la verifica della tua organizzazione per questo modello. Verificala su platform.openai.com (Impostazioni → Organizzazione) oppure scegli un altro modello."
     },
     "device": {
       "title": "AI del telefono · {{engine}}",
@@ -353,13 +372,15 @@
       "none": "Nessuna preferenza",
       "mediterranean": "Mediterranea",
       "keto": "Chetogenica",
+      "healthyKeto": "Healthy Keto (Dr. Berg)",
       "lowCarb": "Low-carb",
       "vegetarian": "Vegetariana",
       "vegan": "Vegana",
       "paleo": "Paleo",
       "intermittentFasting": "Digiuno intermittente",
       "lowFodmap": "Low-FODMAP",
-      "carnivore": "Carnivora"
+      "carnivore": "Carnivora",
+      "lectinFree": "Senza lectine (Plant Paradox)"
     },
     "tone": "Tono",
     "toneOptions": {
@@ -480,7 +501,8 @@
     "historyEmptyBody": "Le tue conversazioni con il coach appariranno qui.",
     "historyItemHint": "Tocca per aprire, tieni premuto per eliminare",
     "welcomeTitle": "Benvenuto",
-    "untitled": "Conversazione"
+    "untitled": "Conversazione",
+    "savingJournal": "Annoto nel diario…"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",

@@ -1,42 +1,46 @@
-import { collectOpenAIStream, openaiProvider, toOpenAIMessages } from '../providers/openai';
+import {
+  collectOpenAIStream,
+  isReasoningModel,
+  openaiProvider,
+  toOpenAIInput,
+} from '../providers/openai';
 
 async function* events(chunks: unknown[]) {
   for (const c of chunks) yield { data: typeof c === 'string' ? c : JSON.stringify(c) };
 }
 
-describe('OpenAI adapter', () => {
-  it('accumula testo, tool call a pezzi e usage', async () => {
+describe('OpenAI adapter (Responses API)', () => {
+  it('accumula testo in streaming, tool call e usage', async () => {
     const tokens: string[] = [];
+    const reasoning = { type: 'reasoning', id: 'rs_1', encrypted_content: 'ENC', summary: [] };
+    const call = {
+      type: 'function_call',
+      id: 'fc_1',
+      call_id: 'call_1',
+      name: 'get_metric',
+      arguments: '{"type":"steps"}',
+      status: 'completed',
+    };
     const res = await collectOpenAIStream(
       events([
-        { choices: [{ delta: { content: 'Ciao' } }] },
-        { choices: [{ delta: { content: '!' } }] },
+        { type: 'response.output_text.delta', delta: 'Ciao' },
+        { type: 'response.output_text.delta', delta: '!' },
+        { type: 'response.output_item.done', item: reasoning },
+        { type: 'response.output_item.done', item: call },
         {
-          choices: [
-            {
-              delta: {
-                tool_calls: [
-                  {
-                    index: 0,
-                    id: 'call_1',
-                    function: { name: 'get_metric', arguments: '{"type":' },
-                  },
-                ],
-              },
-            },
-          ],
+          type: 'response.completed',
+          response: {
+            status: 'completed',
+            output: [
+              reasoning,
+              { type: 'message', content: [{ type: 'output_text', text: 'Ciao!' }] },
+              call,
+            ],
+            usage: { input_tokens: 120, output_tokens: 30 },
+          },
         },
-        {
-          choices: [
-            {
-              delta: { tool_calls: [{ index: 0, function: { arguments: '"steps"}' } }] },
-              finish_reason: 'tool_calls',
-            },
-          ],
-        },
-        { choices: [], usage: { prompt_tokens: 120, completion_tokens: 30 } },
-        '[DONE]',
       ]),
+      'gpt-6.1',
       (d) => tokens.push(d),
     );
     expect(tokens.join('')).toBe('Ciao!');
@@ -46,35 +50,80 @@ describe('OpenAI adapter', () => {
     ]);
     expect(res.stopReason).toBe('tool_use');
     expect(res.usage).toEqual({ inputTokens: 120, outputTokens: 30 });
+    expect(res.raw?.provider).toBe('openai');
   });
 
-  it('traduce la conversazione neutra nel formato Chat Completions', () => {
-    const msgs = toOpenAIMessages('SYS', [
+  it('segnala il troncamento per max_output_tokens', async () => {
+    const res = await collectOpenAIStream(
+      events([
+        { type: 'response.output_text.delta', delta: 'Parz' },
+        {
+          type: 'response.incomplete',
+          response: {
+            status: 'incomplete',
+            incomplete_details: { reason: 'max_output_tokens' },
+            output: [],
+          },
+        },
+      ]),
+      'gpt-6.1',
+    );
+    expect(res.text).toBe('Parz');
+    expect(res.stopReason).toBe('max_tokens');
+  });
+
+  it('traduce la conversazione e rinvia gli item originali senza id', () => {
+    const input = toOpenAIInput([
       { role: 'user', content: 'Ciao', images: [{ mimeType: 'image/png', base64: 'AAA' }] },
       {
         role: 'assistant',
         content: '',
         toolCalls: [{ id: 'c1', name: 'get_journal', arguments: { from: '2026-01-01' } }],
+        raw: {
+          provider: 'openai',
+          model: 'gpt-6.1',
+          data: [
+            { type: 'reasoning', id: 'rs_1', encrypted_content: 'ENC', summary: [] },
+            {
+              type: 'function_call',
+              id: 'fc_1',
+              call_id: 'c1',
+              name: 'get_journal',
+              arguments: '{"from":"2026-01-01"}',
+              status: 'completed',
+            },
+          ],
+        },
       },
       { role: 'tool', toolCallId: 'c1', toolName: 'get_journal', content: '[]' },
+      { role: 'assistant', content: 'Fatto.' },
     ]);
-    expect(msgs[0]).toEqual({ role: 'system', content: 'SYS' });
-    expect(msgs[1]).toMatchObject({
+    expect(input[0]).toMatchObject({
       role: 'user',
-      content: [{ type: 'image_url' }, { type: 'text', text: 'Ciao' }],
-    });
-    expect(msgs[2]).toMatchObject({
-      role: 'assistant',
-      content: null,
-      tool_calls: [
-        {
-          id: 'c1',
-          type: 'function',
-          function: { name: 'get_journal', arguments: '{"from":"2026-01-01"}' },
-        },
+      content: [
+        { type: 'input_image', image_url: 'data:image/png;base64,AAA' },
+        { type: 'input_text', text: 'Ciao' },
       ],
     });
-    expect(msgs[3]).toEqual({ role: 'tool', tool_call_id: 'c1', content: '[]' });
+    expect(input[1]).toEqual({ type: 'reasoning', encrypted_content: 'ENC', summary: [] });
+    expect(input[2]).toEqual({
+      type: 'function_call',
+      call_id: 'c1',
+      name: 'get_journal',
+      arguments: '{"from":"2026-01-01"}',
+    });
+    expect(input[3]).toEqual({ type: 'function_call_output', call_id: 'c1', output: '[]' });
+    expect(input[4]).toEqual({
+      role: 'assistant',
+      content: [{ type: 'output_text', text: 'Fatto.' }],
+    });
+  });
+
+  it('riconosce i modelli con ragionamento', () => {
+    expect(isReasoningModel('gpt-6.1-sol')).toBe(true);
+    expect(isReasoningModel('gpt-5.2')).toBe(true);
+    expect(isReasoningModel('o3')).toBe(true);
+    expect(isReasoningModel('gpt-4.1')).toBe(false);
   });
 
   it('suggerisce il modello di punta più recente, non mini', () => {

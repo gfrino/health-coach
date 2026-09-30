@@ -11,7 +11,13 @@ describe('fileMeta', () => {
     expect(
       guessMime({ uri: 'file:///x/a', mimeType: 'application/octet-stream', fileName: 'r.jpg' }),
     ).toBe('image/jpeg');
-    expect(guessMime({ uri: 'file:///x/a.docx', mimeType: null, fileName: null })).toBeNull();
+    expect(guessMime({ uri: 'file:///x/a.docx', mimeType: null, fileName: null })).toBe(
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    );
+    expect(guessMime({ uri: 'file:///x/a', mimeType: 'text/rtf', fileName: null })).toBe(
+      'application/rtf',
+    );
+    expect(guessMime({ uri: 'file:///x/a.zip', mimeType: null, fileName: null })).toBeNull();
   });
 
   it('usa il nome del file come titolo solo se significativo', () => {

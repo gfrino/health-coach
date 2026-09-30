@@ -43,6 +43,7 @@ async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Prom
     summaries,
     metrics: snapshot.metrics,
     anomalies: snapshot.anomalies,
+    insights: snapshot.insights,
     journal,
     now,
     compact: settings.ai.provider === 'device',
@@ -170,6 +171,10 @@ export async function runCoachTurn(
     return { assistantMessageId: assistant.id, text, usage };
   } catch (e) {
     const err = toAIError(e);
+    // Solo codice, stato HTTP e messaggio del provider: mai chiavi né contenuti della chat.
+    console.warn(
+      `[coach] ${settings.ai.provider}/${settings.ai.model} → ${err.code}${err.status ? ` (HTTP ${err.status})` : ''}: ${err.message.slice(0, 300)}`,
+    );
     await conversationRepository.finishMessage(db, assistant.id, {
       content: '',
       status: 'error',

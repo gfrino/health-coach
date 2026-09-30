@@ -30,6 +30,7 @@ export const NUTRITION_APPROACHES = [
   'none',
   'mediterranean',
   'keto',
+  'healthyKeto',
   'lowCarb',
   'vegetarian',
   'vegan',
@@ -37,6 +38,7 @@ export const NUTRITION_APPROACHES = [
   'intermittentFasting',
   'lowFodmap',
   'carnivore',
+  'lectinFree',
 ] as const;
 export const COACH_TONES = ['empathetic', 'direct', 'motivational', 'scientific'] as const;
 

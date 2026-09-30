@@ -71,7 +71,25 @@
   },
   "journal": {
     "emptyTitle": "Dein Tagebuch ist leer",
-    "emptyBody": "Notiere, wie du dich fühlst, deine Energie, Symptome und alles, was du dir merken möchtest. Dein Coach berücksichtigt es."
+    "emptyBody": "Notiere, wie du dich fühlst: Stimmung, Energie, Symptome und Notizen. Dein Coach berücksichtigt es.",
+    "addFirst": "Schreib, wie du dich fühlst",
+    "howTitle": "So funktioniert es",
+    "howBody": "Tippe auf +, um selbst zu schreiben, oder erzähl es einfach deinem Coach im Chat (\"Ich bin mit Kopfweh aufgewacht\", \"Heute fühle ich mich super\"): Er notiert es hier. Du kannst jeden Eintrag bearbeiten oder löschen.",
+    "byCoach": "vom Coach",
+    "newTitle": "Neuer Eintrag",
+    "editTitle": "Tagebucheintrag",
+    "date": "Tag",
+    "mood": "Stimmung",
+    "energy": "Energie",
+    "moodA11y": "Stimmung {{value}} von 5",
+    "energyA11y": "Energie {{value}} von 5",
+    "symptoms": "Symptome",
+    "symptomsHint": "Durch Kommas getrennt",
+    "symptomsPlaceholder": "z. B. Kopfweh, Blähungen",
+    "note": "Notizen",
+    "notePlaceholder": "Wie geht es dir? Schlaf, Essen, Stress, Ereignisse…",
+    "deleteTitle": "Diesen Eintrag löschen?",
+    "deleteBody": "Der Eintrag wird aus deinem Tagebuch entfernt."
   },
   "records": {
     "emptyTitle": "Noch keine Befunde",
@@ -85,7 +103,7 @@
     "defaultTitle": "Befund",
     "importFailed": "Import nicht möglich",
     "tooLarge": "Die Datei ist zu groß (max. 20 MB).",
-    "unsupported": "Nicht unterstütztes Format: Verwende PDF oder Bilder.",
+    "unsupported": "Nicht unterstütztes Format. Du kannst PDFs, Fotos, Word-, RTF-, ODT- und Textdateien hinzufügen.",
     "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen des Telefons.",
     "shareHint": "Tipp: Aus Mail, Dateien, Fotos oder der App deines Labors „Teilen → Health Coach“ wählen, um einen Befund sofort hinzuzufügen.",
     "sharedTitle": "Befund hinzugefügt",
@@ -234,7 +252,8 @@
       "unknown": "Beim KI-Anbieter ist ein unerwarteter Fehler aufgetreten.",
       "device_unavailable": "Die KI des Telefons ist gerade nicht verfügbar. Prüfe, ob sie aktiviert ist, oder nutze einen Online-Dienst.",
       "context_window": "Diese Unterhaltung ist zu lang für die KI des Telefons. Beginne eine neue Unterhaltung.",
-      "unsupported_language": "Die KI des Telefons unterstützt diese Sprache nicht. Ändere die Sprache oder nutze einen Online-Dienst."
+      "unsupported_language": "Die KI des Telefons unterstützt diese Sprache nicht. Ändere die Sprache oder nutze einen Online-Dienst.",
+      "org_verification": "OpenAI verlangt für dieses Modell eine Verifizierung deiner Organisation. Verifiziere sie auf platform.openai.com (Einstellungen → Organisation) oder wähle ein anderes Modell."
     },
     "device": {
       "title": "KI auf dem Telefon · {{engine}}",
@@ -353,13 +372,15 @@
       "none": "Keine Präferenz",
       "mediterranean": "Mediterran",
       "keto": "Ketogen",
+      "healthyKeto": "Healthy Keto (Dr. Berg)",
       "lowCarb": "Low Carb",
       "vegetarian": "Vegetarisch",
       "vegan": "Vegan",
       "paleo": "Paleo",
       "intermittentFasting": "Intervallfasten",
       "lowFodmap": "Low-FODMAP",
-      "carnivore": "Karnivor"
+      "carnivore": "Karnivor",
+      "lectinFree": "Lektinfrei (Plant Paradox)"
     },
     "tone": "Tonfall",
     "toneOptions": {
@@ -480,7 +501,8 @@
     "historyEmptyBody": "Deine Unterhaltungen mit dem Coach erscheinen hier.",
     "historyItemHint": "Tippen zum Öffnen, gedrückt halten zum Löschen",
     "welcomeTitle": "Willkommen",
-    "untitled": "Unterhaltung"
+    "untitled": "Unterhaltung",
+    "savingJournal": "Ich notiere es im Tagebuch…"
   },
   "integrations": {
     "healthTitle": "Gesundheitsdaten des Telefons",

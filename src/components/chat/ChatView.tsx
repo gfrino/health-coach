@@ -32,6 +32,8 @@ interface Props {
 
 export function ChatView({ conversationId, onConversationCreated }: Props) {
   const { t } = useTranslation();
+  const toolLabel = (tool: string) =>
+    tool === 'save_journal_entry' ? t('chat.savingJournal') : t('chat.readingData');
   const { spacing } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const [messages, setMessages] = useState<StoredMessage[]>([]);
@@ -173,14 +175,12 @@ export function ChatView({ conversationId, onConversationCreated }: Props) {
             return item.text ? (
               <View style={{ gap: spacing.xs }}>
                 <MessageBubble role="assistant" text={item.text} coachName={settings.coach.name} />
-                {item.tool ? <TypingIndicator label={t('chat.readingData')} /> : null}
+                {item.tool ? <TypingIndicator label={toolLabel(item.tool)} /> : null}
               </View>
             ) : (
               <TypingIndicator
                 label={
-                  item.tool
-                    ? t('chat.readingData')
-                    : t('chat.typing', { name: settings.coach.name })
+                  item.tool ? toolLabel(item.tool) : t('chat.typing', { name: settings.coach.name })
                 }
               />
             );

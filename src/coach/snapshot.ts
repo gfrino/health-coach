@@ -1,8 +1,9 @@
 import { healthDataRepository, healthQueries, type Db } from '@/db';
-import { DAY_MS } from '@/lib/dates';
+import { DAY_MS, localIsoDate } from '@/lib/dates';
 import { trendOf } from '@/lib/time';
 
 import type { MetricSummary } from './context';
+import { buildInsights, type DailyPoint, type Insights } from './insights';
 
 /** Metriche principali riassunte nel contesto (medie 7/30 giorni + trend). Solo aggregati. */
 const SNAPSHOT_TYPES: { type: string; label: string }[] = [
@@ -24,6 +25,7 @@ const r1 = (n: number | null) => (n == null ? null : Math.round(n * 10) / 10);
 export interface HealthSnapshot {
   metrics: MetricSummary[];
   anomalies: string[];
+  insights: Insights;
 }
 
 export async function buildHealthSnapshot(db: Db, now: Date): Promise<HealthSnapshot> {
@@ -32,10 +34,12 @@ export async function buildHealthSnapshot(db: Db, now: Date): Promise<HealthSnap
   const cutoff7 = to - 7 * DAY_MS;
   const metrics: MetricSummary[] = [];
   const anomalies: string[] = [];
+  const series: Record<string, DailyPoint[]> = {};
 
   for (const { type, label } of SNAPSHOT_TYPES) {
     const { unit, days } = await healthQueries.dailyMetric(db, type, from30, to);
     if (!days.length) continue;
+    series[type] = days;
     const last7 = days
       .filter((d) => new Date(`${d.day}T00:00:00`).getTime() >= cutoff7)
       .map((d) => d.value);
@@ -69,7 +73,8 @@ export async function buildHealthSnapshot(db: Db, now: Date): Promise<HealthSnap
     const recent = nights.filter((n) => n.endAt >= cutoff7);
     const h7 = avg(recent.map((n) => n.asleepMin / 60));
     const h30 = avg(hours);
-    metrics.push({
+    // Il sonno va in testa: nel prompt compatto le metriche vengono troncate.
+    metrics.unshift({
       label: 'Sleep per night',
       unit: 'hours',
       avg7: r1(h7),
@@ -95,5 +100,17 @@ export async function buildHealthSnapshot(db: Db, now: Date): Promise<HealthSnap
     });
   }
 
-  return { metrics, anomalies };
+  const insights = buildInsights({
+    today: localIsoDate(now),
+    steps: series.steps,
+    activeEnergy: series.activeEnergy,
+    restingHeartRate: series.restingHeartRate,
+    hrv: series.hrv,
+    weight: series.weight,
+    nights,
+    workouts7: workouts.length,
+    workouts30: workouts30.length,
+  });
+
+  return { metrics, anomalies, insights };
 }

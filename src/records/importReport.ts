@@ -68,7 +68,7 @@ export async function pickFromLibrary(): Promise<IncomingFile[]> {
 
 export async function pickDocument(): Promise<IncomingFile[]> {
   const res = await DocumentPicker.getDocumentAsync({
-    type: ['application/pdf', 'image/*'],
+    type: ACCEPTED_MIME,
     multiple: true,
     copyToCacheDirectory: true,
   });

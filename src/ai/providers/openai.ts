@@ -14,40 +14,39 @@ import type {
 
 const BASE = 'https://api.openai.com/v1';
 
-type OAIMessage =
-  | { role: 'system'; content: string }
-  | {
-      role: 'user';
-      content:
-        | string
-        | ({ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } })[];
-    }
-  | {
-      role: 'assistant';
-      content: string | null;
-      tool_calls?: {
-        id: string;
-        type: 'function';
-        function: { name: string; arguments: string };
-      }[];
-    }
-  | { role: 'tool'; tool_call_id: string; content: string };
+/**
+ * OpenAI tramite la Responses API (/v1/responses): i modelli più recenti non accettano tool
+ * con il ragionamento attivo su Chat Completions. `store: false` → OpenAI non conserva le
+ * conversazioni; il ragionamento cifrato viene rinviato tra un round di tool e l'altro.
+ */
 
-interface OAIChunk {
-  choices?: {
-    delta?: {
-      content?: string | null;
-      refusal?: string | null;
-      tool_calls?: {
-        index: number;
-        id?: string;
-        function?: { name?: string; arguments?: string };
-      }[];
-    };
-    finish_reason?: string | null;
-  }[];
-  usage?: { prompt_tokens?: number; completion_tokens?: number } | null;
-  error?: { message?: string };
+type InputItem = Record<string, unknown>;
+
+interface OutputItem {
+  type: string;
+  id?: string;
+  status?: string;
+  call_id?: string;
+  name?: string;
+  arguments?: string;
+  content?: { type: string; text?: string; refusal?: string }[];
+  [k: string]: unknown;
+}
+
+interface OAIResponse {
+  status?: string;
+  output?: OutputItem[];
+  usage?: { input_tokens?: number; output_tokens?: number };
+  incomplete_details?: { reason?: string } | null;
+  error?: { message?: string } | null;
+}
+
+interface OAIStreamEvent {
+  type: string;
+  delta?: string;
+  item?: OutputItem;
+  response?: OAIResponse;
+  message?: string;
 }
 
 const headers = (apiKey: string) => ({
@@ -55,110 +54,152 @@ const headers = (apiKey: string) => ({
   'Content-Type': 'application/json',
 });
 
-export function toOpenAIMessages(system: string, messages: ChatMessage[]): OAIMessage[] {
-  const out: OAIMessage[] = [{ role: 'system', content: system }];
+/** Modelli con ragionamento (serie o, GPT-5 e successivi). */
+export const isReasoningModel = (model: string) => /^(o\d|gpt-([5-9]|\d{2}))/.test(model);
+
+/** Con store:false gli id degli item non esistono lato server: si rinviano senza id/stato. */
+function replayable(item: OutputItem): InputItem {
+  const { id: _id, status: _status, ...rest } = item;
+  return rest;
+}
+
+export function toOpenAIInput(messages: ChatMessage[]): InputItem[] {
+  const out: InputItem[] = [];
   for (const m of messages) {
     if (m.role === 'user') {
-      if (m.images?.length) {
-        out.push({
-          role: 'user',
-          content: [
-            ...m.images.map((img) => ({
-              type: 'image_url' as const,
-              image_url: { url: `data:${img.mimeType};base64,${img.base64}` },
-            })),
-            { type: 'text' as const, text: m.content },
-          ],
-        });
-      } else {
-        out.push({ role: 'user', content: m.content });
-      }
-    } else if (m.role === 'assistant') {
       out.push({
-        role: 'assistant',
-        content: m.content || null,
-        tool_calls: m.toolCalls?.length
-          ? m.toolCalls.map((tc) => ({
-              id: tc.id,
-              type: 'function' as const,
-              function: { name: tc.name, arguments: JSON.stringify(tc.arguments) },
-            }))
-          : undefined,
+        role: 'user',
+        content: [
+          ...(m.images ?? []).map((img) => ({
+            type: 'input_image',
+            image_url: `data:${img.mimeType};base64,${img.base64}`,
+          })),
+          { type: 'input_text', text: m.content },
+        ],
       });
+    } else if (m.role === 'assistant') {
+      const raw =
+        m.raw?.provider === 'openai' ? (m.raw.data as OutputItem[] | undefined) : undefined;
+      if (Array.isArray(raw) && raw.length) {
+        // Turno con tool: si rinviano gli item originali (ragionamento cifrato compreso).
+        out.push(...raw.map(replayable));
+        continue;
+      }
+      if (m.content) {
+        out.push({ role: 'assistant', content: [{ type: 'output_text', text: m.content }] });
+      }
+      for (const tc of m.toolCalls ?? []) {
+        out.push({
+          type: 'function_call',
+          call_id: tc.id,
+          name: tc.name,
+          arguments: JSON.stringify(tc.arguments),
+        });
+      }
     } else {
-      out.push({ role: 'tool', tool_call_id: m.toolCallId, content: m.content });
+      out.push({ type: 'function_call_output', call_id: m.toolCallId, output: m.content });
     }
   }
   return out;
 }
 
-function mapFinish(reason: string | null | undefined): StopReason {
-  switch (reason) {
-    case 'stop':
-      return 'end';
-    case 'tool_calls':
-    case 'function_call':
-      return 'tool_use';
-    case 'length':
-      return 'max_tokens';
-    case 'content_filter':
-      return 'refusal';
-    default:
-      return 'other';
+/** Risultato neutro a partire dalla risposta completa (stream terminato o chiamata sincrona). */
+export function fromResponse(
+  response: OAIResponse,
+  model: string,
+  streamedText?: string,
+  onToken?: (delta: string) => void,
+): SendResult {
+  if (response.status === 'failed' || response.error) {
+    throw new AIError('server', response.error?.message ?? 'Risposta non riuscita');
   }
+  const output = response.output ?? [];
+  let text = '';
+  let refused = false;
+  for (const item of output) {
+    if (item.type !== 'message') continue;
+    for (const c of item.content ?? []) {
+      if (c.type === 'output_text' && c.text) text += c.text;
+      if (c.type === 'refusal') refused = true;
+    }
+  }
+  if (streamedText === undefined && text) onToken?.(text);
+  const toolCalls = output
+    .filter((i) => i.type === 'function_call')
+    .map((i, n) => ({
+      id: i.call_id || `call_${n}`,
+      name: i.name ?? '',
+      arguments: parseToolArguments(i.arguments ?? ''),
+    }));
+  const stopReason: StopReason = toolCalls.length
+    ? 'tool_use'
+    : refused && !text
+      ? 'refusal'
+      : response.status === 'incomplete'
+        ? response.incomplete_details?.reason === 'max_output_tokens'
+          ? 'max_tokens'
+          : response.incomplete_details?.reason === 'content_filter'
+            ? 'refusal'
+            : 'other'
+        : 'end';
+  return {
+    text: text || streamedText || '',
+    toolCalls,
+    usage: {
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    },
+    stopReason,
+    raw: toolCalls.length ? { provider: 'openai', model, data: output } : undefined,
+  };
 }
 
-/** Accumula i chunk dello stream in un risultato completo (esportata per i test). */
+/** Accumula lo stream della Responses API (esportata per i test). */
 export async function collectOpenAIStream(
   events: AsyncIterable<{ data: string }>,
+  model: string,
   onToken?: (delta: string) => void,
-): Promise<Omit<SendResult, 'raw'>> {
+): Promise<SendResult> {
   let text = '';
-  let finish: string | null | undefined;
-  const usage = { inputTokens: 0, outputTokens: 0 };
-  const calls = new Map<number, { id: string; name: string; args: string }>();
-
+  const items: OutputItem[] = [];
+  let final: OAIResponse | null = null;
   for await (const ev of events) {
     if (ev.data === '[DONE]') break;
-    let chunk: OAIChunk;
+    let e: OAIStreamEvent;
     try {
-      chunk = JSON.parse(ev.data) as OAIChunk;
+      e = JSON.parse(ev.data) as OAIStreamEvent;
     } catch {
       continue;
     }
-    if (chunk.error) throw new AIError('server', chunk.error.message);
-    const choice = chunk.choices?.[0];
-    const delta = choice?.delta;
-    if (delta?.content) {
-      text += delta.content;
-      onToken?.(delta.content);
-    }
-    for (const tc of delta?.tool_calls ?? []) {
-      const cur = calls.get(tc.index) ?? { id: '', name: '', args: '' };
-      if (tc.id) cur.id = tc.id;
-      if (tc.function?.name) cur.name += tc.function.name;
-      if (tc.function?.arguments) cur.args += tc.function.arguments;
-      calls.set(tc.index, cur);
-    }
-    if (choice?.finish_reason) finish = choice.finish_reason;
-    if (chunk.usage) {
-      usage.inputTokens = chunk.usage.prompt_tokens ?? 0;
-      usage.outputTokens = chunk.usage.completion_tokens ?? 0;
+    switch (e.type) {
+      case 'response.output_text.delta':
+        if (e.delta) {
+          text += e.delta;
+          onToken?.(e.delta);
+        }
+        break;
+      case 'response.output_item.done':
+        if (e.item) items.push(e.item);
+        break;
+      case 'response.completed':
+      case 'response.incomplete':
+      case 'response.failed':
+        final = e.response ?? null;
+        break;
+      case 'error':
+        throw new AIError('server', e.message ?? 'Errore nello stream');
+      default:
+        break;
     }
   }
-
-  const toolCalls = [...calls.entries()]
-    .sort(([a], [b]) => a - b)
-    .map(([i, c]) => ({
-      id: c.id || `call_${i}`,
-      name: c.name,
-      arguments: parseToolArguments(c.args),
-    }));
-  return { text, toolCalls, usage, stopReason: mapFinish(finish) };
+  const response: OAIResponse = final ?? { status: 'incomplete', output: items };
+  if (!response.output?.length) response.output = items;
+  return fromResponse(response, model, text, onToken);
 }
 
+// "pro" e "deep-research" funzionano solo con la Responses API.
 const EXCLUDED =
-  /(mini|nano|audio|realtime|search|transcribe|tts|image|codex|oss|instruct|embedding|moderation|dall-e|whisper|davinci|babbage)/i;
+  /(pro|deep-research|mini|nano|audio|realtime|search|transcribe|tts|image|codex|oss|instruct|embedding|moderation|dall-e|whisper|davinci|babbage)/i;
 
 function versionOf(id: string): number {
   const m = /^gpt-(\d+(?:\.\d+)?)/.exec(id);
@@ -173,38 +214,50 @@ export const openaiProvider: AIProvider = {
     messages: ChatMessage[],
     options: SendOptions,
   ): Promise<SendResult> {
-    const res = await request(`${BASE}/chat/completions`, {
-      method: 'POST',
-      headers: headers(options.apiKey),
-      signal: options.signal,
-      body: JSON.stringify({
-        model: options.model,
-        messages: toOpenAIMessages(context.system, messages),
-        stream: true,
-        stream_options: { include_usage: true },
-        max_completion_tokens: options.maxOutputTokens ?? 16000,
-        tools: context.tools?.length
-          ? context.tools.map((t) => ({
-              type: 'function',
-              function: { name: t.name, description: t.description, parameters: t.parameters },
-            }))
-          : undefined,
-      }),
-    });
+    const body = {
+      model: options.model,
+      instructions: context.system,
+      input: toOpenAIInput(messages),
+      store: false,
+      include: isReasoningModel(options.model) ? ['reasoning.encrypted_content'] : undefined,
+      max_output_tokens: options.maxOutputTokens ?? 16000,
+      tools: context.tools?.length
+        ? context.tools.map((t) => ({
+            type: 'function',
+            name: t.name,
+            description: t.description,
+            parameters: t.parameters,
+            strict: false,
+          }))
+        : undefined,
+    };
+    const post = (extra: object) =>
+      request(`${BASE}/responses`, {
+        method: 'POST',
+        headers: headers(options.apiKey),
+        signal: options.signal,
+        body: JSON.stringify({ ...body, ...extra }),
+      });
+
+    let res: Response;
+    try {
+      res = await post({ stream: true });
+    } catch (e) {
+      // Lo streaming di alcuni modelli richiede la verifica dell'organizzazione OpenAI:
+      // si ripete senza streaming (la risposta arriva tutta in una volta).
+      if (!(e instanceof AIError) || e.code !== 'org_verification') throw e;
+      const json = (await (await post({})).json()) as OAIResponse;
+      return fromResponse(json, options.model, undefined, options.onToken);
+    }
     if (!res.body) throw new AIError('network', 'Risposta senza body');
-    const result = await collectOpenAIStream(readSSE(res.body), options.onToken);
-    return result;
+    return collectOpenAIStream(readSSE(res.body), options.model, options.onToken);
   },
 
   async testConnection(apiKey, model) {
-    await request(`${BASE}/chat/completions`, {
+    await request(`${BASE}/responses`, {
       method: 'POST',
       headers: headers(apiKey),
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'user', content: 'ping' }],
-        max_completion_tokens: 32,
-      }),
+      body: JSON.stringify({ model, input: 'ping', max_output_tokens: 16, store: false }),
     });
   },
 

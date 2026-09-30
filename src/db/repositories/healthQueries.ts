@@ -49,19 +49,23 @@ export async function labResultsByName(db: Db, name: string, limit = 20) {
 
 export async function journalRange(db: Db, fromMs: number, toMs: number, limit = 30) {
   const rows = await db.getAllAsync<{
+    id: string;
     entry_at: number;
+    source: string;
     text: string | null;
     mood: number | null;
     energy: number | null;
     tags: string | null;
     symptoms: string | null;
   }>(
-    `SELECT entry_at, text, mood, energy, tags, symptoms FROM journal_entries
+    `SELECT id, entry_at, source, text, mood, energy, tags, symptoms FROM journal_entries
      WHERE entry_at >= ? AND entry_at < ? ORDER BY entry_at DESC LIMIT ?`,
     [fromMs, toMs, limit],
   );
   return rows.map((r) => ({
+    id: r.id,
     date: localIsoDate(new Date(r.entry_at)),
+    written_by: r.source,
     text: r.text,
     mood: r.mood,
     energy: r.energy,

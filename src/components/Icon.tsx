@@ -30,6 +30,7 @@ export const icons = {
   speaker: { ios: 'speaker.wave.2.fill', android: 'volume_up' },
   add: { ios: 'plus', android: 'add' },
   pdf: { ios: 'doc.richtext', android: 'picture_as_pdf' },
+  document: { ios: 'doc.text', android: 'description' },
   photo: { ios: 'photo', android: 'image' },
   camera: { ios: 'camera.fill', android: 'photo_camera' },
   trash: { ios: 'trash', android: 'delete' },

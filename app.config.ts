@@ -48,6 +48,29 @@ const variant = (process.env.APP_VARIANT ?? 'development') as
 /** Progetto EAS @ticinoweb/health-coach (non è un segreto). */
 const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID ?? '90f2abc0-4279-4591-8482-ce14873179c8';
 
+const SHARE_UTIS = [
+  'public.file-url',
+  'com.adobe.pdf',
+  'public.image',
+  'org.openxmlformats.wordprocessingml.document',
+  'com.microsoft.word.doc',
+  'org.oasis-open.opendocument.text',
+  'public.rtf',
+];
+const SHARE_ACTIVATION_RULE = `SUBQUERY (extensionItems, $extensionItem, SUBQUERY ($extensionItem.attachments, $attachment, ${SHARE_UTIS.map((u) => `ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "${u}"`).join(' || ')}).@count >= 1 AND SUBQUERY ($extensionItem.attachments, $attachment, TRUEPREDICATE).@count <= 10).@count >= 1`;
+const SHARE_MIME_TYPES = [
+  'application/pdf',
+  'image/*',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text',
+  'application/rtf',
+  'text/rtf',
+  'text/plain',
+  'text/csv',
+  'text/markdown',
+];
+
 const BASE_BUNDLE_ID = process.env.APP_BUNDLE_ID ?? 'ch.ticinoweb.healthcoach';
 const bundleId =
   variant === 'production'
@@ -63,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.0.0',
+  version: '1.1.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
@@ -159,12 +182,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-share-intent',
       {
         iosShareExtensionName: 'Health Coach',
-        iosActivationRules: {
-          NSExtensionActivationSupportsImageWithMaxCount: 10,
-          NSExtensionActivationSupportsFileWithMaxCount: 10,
-        },
-        androidIntentFilters: ['image/*', 'application/pdf'],
-        androidMultiIntentFilters: ['image/*', 'application/pdf'],
+        // PDF, immagini e documenti, sia come file sia come dati (es. il PDF di un report
+        // generato da un'altra app). I tipi non supportati vengono rifiutati con un messaggio.
+        iosActivationRules: SHARE_ACTIVATION_RULE,
+        androidIntentFilters: SHARE_MIME_TYPES,
+        androidMultiIntentFilters: SHARE_MIME_TYPES,
       },
     ],
     'expo-web-browser',

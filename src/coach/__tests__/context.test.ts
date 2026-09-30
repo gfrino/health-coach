@@ -36,7 +36,7 @@ describe('composeSystemPrompt', () => {
     });
     expect(p).not.toContain('USER PROFILE');
     expect(p).not.toContain('HEALTH DATA SNAPSHOT');
-    expect(p).not.toContain('JOURNAL');
+    expect(p).not.toContain('RECENT JOURNAL ENTRIES');
   });
 
   it('riassume profilo, farmaci, integratori e allergie', () => {

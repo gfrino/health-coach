@@ -6,6 +6,8 @@ import type {
   SupportedLanguage,
 } from '@/config/settingsSchema';
 
+import { DIET_GUIDES } from './diets';
+
 /**
  * Testi del system prompt. Scritti in inglese (massima aderenza dei modelli);
  * il coach risponde sempre nella lingua dell'utente.
@@ -25,20 +27,12 @@ export const MEDICAL_PROMPTS: Record<(typeof MEDICAL_APPROACHES)[number], string
     'Offer a naturopathic perspective (lifestyle, nutrition, natural remedies) as a complementary view, always checking for interactions with medications and conditions.',
 };
 
-export const NUTRITION_PROMPTS: Record<(typeof NUTRITION_APPROACHES)[number], string> = {
-  none: 'No specific dietary framework: give balanced, flexible nutrition advice.',
-  mediterranean: 'Base nutrition advice on the Mediterranean diet.',
-  keto: 'The user follows (or wants to follow) a ketogenic diet: keep suggestions compatible with ketosis.',
-  lowCarb: 'The user prefers a low-carb diet.',
-  vegetarian: 'The user is vegetarian: never suggest meat or fish.',
-  vegan: 'The user is vegan: never suggest animal products; watch B12, iron, omega-3, protein.',
-  paleo: 'The user follows a paleo diet.',
-  intermittentFasting:
-    'The user practises intermittent fasting: consider eating windows in your advice.',
-  lowFodmap: 'The user follows a low-FODMAP diet: avoid high-FODMAP foods in suggestions.',
-  carnivore:
-    'The user follows a carnivore diet: respect the choice but flag relevant nutritional risks.',
-};
+/** Riassunto di una riga per ogni dieta (le schede complete sono in ./diets). */
+export const NUTRITION_PROMPTS: Record<(typeof NUTRITION_APPROACHES)[number], string> =
+  Object.fromEntries(Object.entries(DIET_GUIDES).map(([k, g]) => [k, g.summary])) as Record<
+    (typeof NUTRITION_APPROACHES)[number],
+    string
+  >;
 
 export const TONE_PROMPTS: Record<(typeof COACH_TONES)[number], string> = {
   empathetic: 'Tone: warm, empathetic and encouraging. Acknowledge feelings before giving advice.',
@@ -70,3 +64,16 @@ You have access to the user's health data, which stays on their phone; you only 
 Reply in the language the user writes in; if unclear, use ${LANGUAGE_NAMES[language]}. Use Markdown sparingly (short paragraphs, bullet lists when useful).
 Be concise: the user reads on a phone.`;
 }
+
+/** Come strutturare le risposte: evita elenchi di numeri e consigli generici. */
+export const ANSWER_GUIDE = `HOW TO ANSWER
+- For questions about the user's health or progress: pick the 2–3 KEY FACTS that matter for the question, quote their numbers and say plainly what they mean (good, normal, or worth attention compared with their own average).
+- Then give 1–3 specific actions for today or tonight, tailored to their data and goals (for example a bedtime, a 20-minute walk after lunch, a lighter workout). No generic lists.
+- If the question is about one area (sleep, activity, heart…), stay on that area.
+- Don't repeat every metric. Keep it under about 150 words unless the user asks for more.`;
+
+/** Solo con i provider che supportano i tool: il coach tiene aggiornato il diario. */
+export const JOURNAL_RULE = `HEALTH JOURNAL
+- When the user tells you how they feel (mood, energy, symptoms, pain, sleep quality, stress, what they ate, notable events), save it with save_journal_entry, then mention it in one short phrase (e.g. "I've noted it in your journal").
+- One entry per day and topic: if today's entry already exists (see get_journal or your previous save), update it with entry_id instead of creating a new one.
+- Save only what the user said; never invent or guess mood or energy scores. Do not save your own advice.`;

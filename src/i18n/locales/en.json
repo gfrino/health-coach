@@ -71,7 +71,25 @@
   },
   "journal": {
     "emptyTitle": "Your journal is empty",
-    "emptyBody": "Write down how you feel, your energy, symptoms and anything you want to remember. Your coach will take it into account."
+    "emptyBody": "Note how you feel: mood, energy, symptoms and notes. Your coach takes it into account.",
+    "addFirst": "Write how you feel",
+    "howTitle": "How it works",
+    "howBody": "Tap + to write yourself, or just tell your coach in the chat (\"I woke up with a headache\", \"I feel great today\"): it notes it here for you. You can edit or delete any entry.",
+    "byCoach": "by coach",
+    "newTitle": "New entry",
+    "editTitle": "Journal entry",
+    "date": "Day",
+    "mood": "Mood",
+    "energy": "Energy",
+    "moodA11y": "Mood {{value}} of 5",
+    "energyA11y": "Energy {{value}} of 5",
+    "symptoms": "Symptoms",
+    "symptomsHint": "Separated by commas",
+    "symptomsPlaceholder": "e.g. headache, bloating",
+    "note": "Notes",
+    "notePlaceholder": "How are you? Sleep, food, stress, events…",
+    "deleteTitle": "Delete this entry?",
+    "deleteBody": "The entry will be removed from your journal."
   },
   "records": {
     "emptyTitle": "No reports yet",
@@ -85,7 +103,7 @@
     "defaultTitle": "Report",
     "importFailed": "Unable to import",
     "tooLarge": "The file is too large (20 MB max).",
-    "unsupported": "Unsupported format: use PDF or images.",
+    "unsupported": "Unsupported format. You can add PDFs, photos, Word, RTF, ODT and text files.",
     "cameraDenied": "Allow camera access in your phone's Settings.",
     "shareHint": "Tip: from Mail, Files, Photos or your lab's app, use \"Share → Health Coach\" to add a report in a second.",
     "sharedTitle": "Report added",
@@ -234,7 +252,8 @@
       "unknown": "An unexpected error occurred with the AI provider.",
       "device_unavailable": "The phone's AI isn't available right now. Check that it's turned on, or use an online service.",
       "context_window": "This conversation is too long for the phone's AI. Start a new conversation.",
-      "unsupported_language": "The phone's AI doesn't support this language. Change language or use an online service."
+      "unsupported_language": "The phone's AI doesn't support this language. Change language or use an online service.",
+      "org_verification": "OpenAI requires your organization to be verified for this model. Verify it on platform.openai.com (Settings → Organization) or choose another model."
     },
     "device": {
       "title": "Phone AI · {{engine}}",
@@ -353,13 +372,15 @@
       "none": "No preference",
       "mediterranean": "Mediterranean",
       "keto": "Ketogenic",
+      "healthyKeto": "Healthy Keto (Dr. Berg)",
       "lowCarb": "Low-carb",
       "vegetarian": "Vegetarian",
       "vegan": "Vegan",
       "paleo": "Paleo",
       "intermittentFasting": "Intermittent fasting",
       "lowFodmap": "Low-FODMAP",
-      "carnivore": "Carnivore"
+      "carnivore": "Carnivore",
+      "lectinFree": "Lectin-free (Plant Paradox)"
     },
     "tone": "Tone",
     "toneOptions": {
@@ -480,7 +501,8 @@
     "historyEmptyBody": "Your conversations with the coach will appear here.",
     "historyItemHint": "Tap to open, long-press to delete",
     "welcomeTitle": "Welcome",
-    "untitled": "Conversation"
+    "untitled": "Conversation",
+    "savingJournal": "Noting it in your journal…"
   },
   "integrations": {
     "healthTitle": "Phone health data",

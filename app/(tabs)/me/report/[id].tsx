@@ -10,6 +10,7 @@ import { AppText, Button, Card, DateField, Icon, Screen, TextField } from '@/com
 import { getDb, labReportRepository } from '@/db';
 import type { LabReport } from '@/db/repositories/labReportRepository';
 import { bytesToBase64 } from '@/lib/base64';
+import { fileTypeOf } from '@/records/fileMeta';
 import { useTheme } from '@/theme';
 
 export default function ReportScreen() {
@@ -50,7 +51,12 @@ export default function ReportScreen() {
     const db = await getDb();
     const f = await labReportRepository.getReportFile(db, id);
     if (!f) return;
-    const ext = f.mimeType === 'application/pdf' ? 'pdf' : (f.mimeType.split('/')[1] ?? 'bin');
+    const type = fileTypeOf(f.mimeType);
+    const ext =
+      f.fileName?.split('.').pop()?.toLowerCase() ||
+      type?.ext[0] ||
+      f.mimeType.split('/')[1] ||
+      'bin';
     const tmp = new File(
       Paths.cache,
       `${report.title.replace(/[^\w\- ]+/g, '').slice(0, 40) || 'referto'}.${ext}`,
@@ -61,7 +67,7 @@ export default function ReportScreen() {
       tmp.write(f.data);
       await Sharing.shareAsync(tmp.uri, {
         mimeType: f.mimeType,
-        UTI: f.mimeType === 'application/pdf' ? 'com.adobe.pdf' : undefined,
+        UTI: type?.uti,
       });
     } finally {
       try {
@@ -105,7 +111,11 @@ export default function ReportScreen() {
         ) : (
           <Card>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-              <Icon name="pdf" color={colors.primary} size={28} />
+              <Icon
+                name={report.mimeType === 'application/pdf' ? 'pdf' : 'document'}
+                color={colors.primary}
+                size={28}
+              />
               <AppText style={{ flex: 1 }} numberOfLines={2}>
                 {report.fileName ?? report.title}
               </AppText>

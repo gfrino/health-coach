@@ -1,5 +1,5 @@
 import type { ToolCall, ToolDefinition } from '@/ai/types';
-import { healthDataRepository, healthQueries, type Db } from '@/db';
+import { healthDataRepository, healthQueries, journalRepository, type Db } from '@/db';
 import { DAY_MS } from '@/lib/dates';
 import { METRIC_UNITS, SleepStage } from '@/sources/model';
 import { stageMinutes } from '@/sources/sleep';
@@ -55,6 +55,33 @@ export const COACH_TOOLS: ToolDefinition[] = [
       type: 'object',
       properties: { from: DATE, to: DATE },
       required: ['from', 'to'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'save_journal_entry',
+    description:
+      "Write in the user's health journal what they told you about how they feel: mood, energy, symptoms, and short notes (sleep quality, meals, stress, events). Omit entry_id to create a new entry; pass the id of an entry (from get_journal or a previous save) to update it — only the fields you send change. Use the user's own words, briefly, in their language.",
+    parameters: {
+      type: 'object',
+      properties: {
+        entry_id: { type: 'string', description: 'Id of the entry to update. Omit to create.' },
+        date: { ...DATE, description: 'Day of the entry (YYYY-MM-DD). Default: today.' },
+        mood: { type: 'integer', minimum: 1, maximum: 5, description: '1 = very bad … 5 = great.' },
+        energy: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 5,
+          description: '1 = exhausted … 5 = full of energy.',
+        },
+        symptoms: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Symptoms mentioned, e.g. "headache", "bloating".',
+        },
+        text: { type: 'string', description: 'Short note in the user’s language.' },
+        tags: { type: 'array', items: { type: 'string' }, description: 'Optional keywords.' },
+      },
       additionalProperties: false,
     },
   },
@@ -132,6 +159,18 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
         const rows = await healthQueries.journalRange(db, from, to);
         return ok(rows.length ? rows : { message: 'No journal entries in the period.' });
       }
+      case 'save_journal_entry': {
+        const input = journalInput(args);
+        if (typeof args.entry_id === 'string' && args.entry_id) {
+          const updated = await journalRepository.updateEntry(db, args.entry_id, input);
+          if (!updated) throw new ToolInputError('entry not found');
+          return ok({ saved: true, entry_id: args.entry_id });
+        }
+        if (input.mood == null && input.energy == null && !input.text && !input.symptoms?.length)
+          throw new ToolInputError('nothing to save: give mood, energy, symptoms or text');
+        const id = await journalRepository.createEntry(db, input, 'coach');
+        return ok({ saved: true, entry_id: id });
+      }
       default:
         return { content: JSON.stringify({ error: `unknown tool: ${call.name}` }), isError: true };
     }
@@ -140,6 +179,31 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
       e instanceof ToolInputError ? e.message : 'internal error while reading local data';
     return { content: JSON.stringify({ error: message }), isError: true };
   }
+}
+
+function journalInput(args: Record<string, unknown>): journalRepository.JournalInput {
+  const out: journalRepository.JournalInput = {};
+  if (args.date !== undefined) {
+    // Mezzogiorno del giorno indicato; oggi → adesso.
+    const day = parseDate(args.date, 'date');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    out.entryAt = day === today.getTime() ? Date.now() : day + 12 * 60 * 60 * 1000;
+  }
+  const scale = (v: unknown, field: string) => {
+    if (v === undefined) return undefined;
+    if (typeof v !== 'number' || v < 1 || v > 5) throw new ToolInputError(`"${field}" must be 1–5`);
+    return v;
+  };
+  const strings = (v: unknown) =>
+    Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : undefined;
+  out.mood = scale(args.mood, 'mood');
+  out.energy = scale(args.energy, 'energy');
+  if (typeof args.text === 'string') out.text = args.text.slice(0, 2000);
+  if (args.symptoms !== undefined) out.symptoms = strings(args.symptoms);
+  if (args.tags !== undefined) out.tags = strings(args.tags);
+  for (const k of Object.keys(out) as (keyof typeof out)[]) if (out[k] === undefined) delete out[k];
+  return out;
 }
 
 function sleepStageMinutes(stages: { stage: number; startAt: number; endAt: number }[]) {
