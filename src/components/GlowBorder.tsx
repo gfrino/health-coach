@@ -1,28 +1,32 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { AccessibilityInfo, Animated, Easing, View, type LayoutChangeEvent } from 'react-native';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 
 import { useTheme } from '@/theme';
 
 interface Props {
   children: ReactNode;
-  /** Se false, nessun effetto (il bordo resta invisibile). */
+  /** Se false, nessun effetto. */
   active?: boolean;
   /** Spessore del bordo luminoso. */
   width?: number;
-  /** Durata di un giro completo della luce. */
+  /** Durata di un giro completo della luce lungo il bordo. */
   durationMs?: number;
 }
 
+/** Diametro del punto di luce: grande e molto sfumato, così il passaggio è morbido. */
+const GLOW = 90;
+
 /**
- * Luce che gira lungo il bordo di un elemento (es. il primo passo da fare).
- * Una striscia luminosa ruota dietro il contenuto, visibile solo nel sottile bordo esterno.
- * Rispetta "Riduci movimento" del sistema: in quel caso il bordo è fisso e non si muove.
+ * Luce che scorre lungo il contorno di un elemento (es. il primo passo da fare): un punto
+ * luminoso molto sfumato percorre il perimetro a velocità costante, sopra un bordo tenue fisso.
+ * Il contenuto copre il centro, quindi la luce si vede solo nel sottile bordo esterno.
+ * Con "Riduci movimento" attivo resta solo il bordo fisso.
  */
-export function GlowBorder({ children, active = true, width = 3, durationMs = 2800 }: Props) {
+export function GlowBorder({ children, active = true, width = 2, durationMs = 4200 }: Props) {
   const { colors, radius } = useTheme();
   const [size, setSize] = useState({ w: 0, h: 0 });
-  const [rotation] = useState(() => new Animated.Value(0));
+  const [progress] = useState(() => new Animated.Value(0));
   const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
@@ -36,10 +40,10 @@ export function GlowBorder({ children, active = true, width = 3, durationMs = 28
   }, []);
 
   useEffect(() => {
-    if (!active || reduceMotion) return;
-    rotation.setValue(0);
+    if (!active || reduceMotion || !size.w) return;
+    progress.setValue(0);
     const loop = Animated.loop(
-      Animated.timing(rotation, {
+      Animated.timing(progress, {
         toValue: 1,
         duration: durationMs,
         easing: Easing.linear,
@@ -48,7 +52,7 @@ export function GlowBorder({ children, active = true, width = 3, durationMs = 28
     );
     loop.start();
     return () => loop.stop();
-  }, [active, reduceMotion, durationMs, rotation]);
+  }, [active, reduceMotion, durationMs, progress, size.w]);
 
   const onLayout = (e: LayoutChangeEvent) => {
     const { width: w, height: h } = e.nativeEvent.layout;
@@ -57,44 +61,60 @@ export function GlowBorder({ children, active = true, width = 3, durationMs = 28
 
   if (!active) return <>{children}</>;
 
-  // Quadrato che copre il riquadro anche ruotato (lato = diagonale).
-  const side = Math.ceil(Math.sqrt(size.w ** 2 + size.h ** 2));
-  const spin = rotation.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  // Percorso del centro della luce lungo il perimetro, a velocità costante.
+  const { w, h } = size;
+  const perimeter = 2 * (w + h) || 1;
+  const stops = [0, w / perimeter, (w + h) / perimeter, (2 * w + h) / perimeter, 1];
+  const half = GLOW / 2;
+  const translateX = progress.interpolate({
+    inputRange: stops,
+    outputRange: [-half, w - half, w - half, -half, -half],
+  });
+  const translateY = progress.interpolate({
+    inputRange: stops,
+    outputRange: [-half, -half, h - half, h - half, -half],
+  });
 
   return (
     <View
       onLayout={onLayout}
-      style={{
-        borderRadius: radius.md + width,
-        padding: width,
-        overflow: 'hidden',
-        backgroundColor: reduceMotion ? colors.primary : colors.primarySoft,
-      }}
+      style={{ borderRadius: radius.md + width, padding: width, overflow: 'hidden' }}
     >
-      {side > 0 && !reduceMotion ? (
+      {/* Bordo tenue sempre visibile. */}
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: colors.primary,
+          opacity: 0.35,
+        }}
+      />
+      {w > 0 && !reduceMotion ? (
         <Animated.View
           pointerEvents="none"
           style={{
             position: 'absolute',
-            width: side,
-            height: side,
-            left: (size.w - side) / 2,
-            top: (size.h - side) / 2,
-            transform: [{ rotate: spin }],
+            top: 0,
+            left: 0,
+            width: GLOW,
+            height: GLOW,
+            transform: [{ translateX }, { translateY }],
           }}
         >
-          <Svg width={side} height={side}>
+          <Svg width={GLOW} height={GLOW}>
             <Defs>
-              <LinearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
-                <Stop offset="0" stopColor={colors.primarySoft} stopOpacity="0" />
-                <Stop offset="0.42" stopColor={colors.primarySoft} stopOpacity="0" />
-                <Stop offset="0.5" stopColor="#FFFFFF" stopOpacity="0.95" />
-                <Stop offset="0.58" stopColor={colors.primary} stopOpacity="0.9" />
-                <Stop offset="1" stopColor={colors.primarySoft} stopOpacity="0" />
-              </LinearGradient>
+              <RadialGradient id="glow" cx="50%" cy="50%" r="50%">
+                <Stop offset="0" stopColor="#FFFFFF" stopOpacity="0.95" />
+                <Stop offset="0.25" stopColor="#FFFFFF" stopOpacity="0.6" />
+                <Stop offset="0.55" stopColor={colors.primary} stopOpacity="0.35" />
+                <Stop offset="1" stopColor={colors.primary} stopOpacity="0" />
+              </RadialGradient>
             </Defs>
-            {/* Metà superiore del quadrato: la luce è una "lama" che ruota dal centro. */}
-            <Rect x="0" y="0" width={side} height={side / 2} fill="url(#glow)" />
+            <Circle cx={half} cy={half} r={half} fill="url(#glow)" />
           </Svg>
         </Animated.View>
       ) : null}
