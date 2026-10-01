@@ -260,7 +260,8 @@
       "context_window": "This conversation is too long for the phone's AI. Start a new conversation.",
       "unsupported_language": "The phone's AI doesn't support this language. Change language or use an online service.",
       "org_verification": "OpenAI requires your organization to be verified for this model. Verify it on platform.openai.com (Settings → Organization) or choose another model.",
-      "app_update_required": "This feature needs the latest version of the app. Install the latest update and try again."
+      "app_update_required": "This feature needs the latest version of the app. Install the latest update and try again.",
+      "billing_required": "Google requires billing to be enabled to use Gemini from your region (Switzerland, EU, UK). In Google AI Studio open \"Billing\", add a payment method to the key's project and try again."
     },
     "device": {
       "title": "Phone AI · {{engine}}",
@@ -284,7 +285,8 @@
     },
     "paste": "Paste the copied code",
     "pasted": "Code found in the clipboard: verifying it…",
-    "pasteNothing": "There's no {{provider}} code in the clipboard. On the provider's page tap \"Copy\" next to the key, then come back here."
+    "pasteNothing": "There's no {{provider}} code in the clipboard. On the provider's page tap \"Copy\" next to the key, then come back here.",
+    "errorDetail": "Details: {{detail}}"
   },
   "sources": {
     "title": "Connect your data",

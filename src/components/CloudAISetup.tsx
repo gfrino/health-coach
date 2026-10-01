@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AIError, toAIError, type AIErrorCode } from '@/ai/errors';
+import { AIError, providerMessage, toAIError, type AIErrorCode } from '@/ai/errors';
 import { getApiKey, maskKey, saveApiKey } from '@/ai/keyStore';
 import { extractKey, getProvider, PROVIDERS } from '@/ai/registry';
 import type { ModelInfo } from '@/ai/types';
@@ -27,7 +27,7 @@ type Status =
   | { kind: 'idle' }
   | { kind: 'working'; what: 'models' | 'test' }
   | { kind: 'ok' }
-  | { kind: 'error'; code: AIErrorCode };
+  | { kind: 'error'; code: AIErrorCode; detail: string | null };
 
 /** Servizi AI online (BYOK): provider → guida → chiave → modello → test. */
 export function CloudAISetup({
@@ -103,7 +103,8 @@ export function CloudAISetup({
       await update({ ai: { provider, model: target } });
       setStatus({ kind: 'ok' });
     } catch (e) {
-      setStatus({ kind: 'error', code: toAIError(e).code });
+      const err = toAIError(e);
+      setStatus({ kind: 'error', code: err.code, detail: providerMessage(err) });
     }
   };
 
@@ -167,7 +168,8 @@ export function CloudAISetup({
         ))}
         <Button
           label={t('ai.openKeysPage')}
-          variant="secondary"
+          // Primo passo: ben visibile finché non c'è un codice.
+          variant={activeKey ? 'secondary' : 'primary'}
           onPress={openKeysPage}
           accessibilityHint={info.keysUrl}
         />
@@ -190,7 +192,17 @@ export function CloudAISetup({
         autoComplete="off"
         textContentType="none"
         hint={savedKey ? t('ai.keySavedHint') : t('ai.keyHint')}
-        error={status.kind === 'error' ? t(`ai.errors.${status.code}`) : null}
+        error={
+          status.kind === 'error'
+            ? [
+                t(`ai.errors.${status.code}`),
+                // Messaggio originale del provider: aiuta a capire il problema (anche da uno screenshot).
+                status.detail ? t('ai.errorDetail', { detail: status.detail }) : null,
+              ]
+                .filter(Boolean)
+                .join('\n')
+            : null
+        }
       />
 
       <Button

@@ -51,7 +51,7 @@ export const PROVIDERS: Record<AIProviderId, ProviderInfo> = {
     requiresKey: true,
     name: 'Google Gemini',
     keysUrl: 'https://aistudio.google.com/app/apikey',
-    keyHint: 'AIza…',
+    keyHint: 'AQ.… / AIza…',
     guideSteps: 3,
   },
 };
@@ -66,7 +66,8 @@ const ADAPTERS: Record<AIProviderId, AIProvider> = {
 const KEY_PATTERNS: Partial<Record<AIProviderId, RegExp>> = {
   anthropic: /^sk-ant-[A-Za-z0-9_-]{20,}$/,
   openai: /^sk-(?!ant-)[A-Za-z0-9_-]{20,}$/,
-  gemini: /^AIza[A-Za-z0-9_-]{30,}$/,
+  // Dal 28/5/2026 AI Studio emette chiavi "AQ.…" (auth key); le vecchie "AIza…" restano valide.
+  gemini: /^(AIza[A-Za-z0-9_-]{30,}|AQ\.[A-Za-z0-9_.-]{20,})$/,
 };
 
 /** Riconosce un codice di accesso copiato negli appunti (solo per l'autocompilazione, non è una validazione). */

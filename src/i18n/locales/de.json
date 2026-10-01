@@ -260,7 +260,8 @@
       "context_window": "Diese Unterhaltung ist zu lang für die KI des Telefons. Beginne eine neue Unterhaltung.",
       "unsupported_language": "Die KI des Telefons unterstützt diese Sprache nicht. Ändere die Sprache oder nutze einen Online-Dienst.",
       "org_verification": "OpenAI verlangt für dieses Modell eine Verifizierung deiner Organisation. Verifiziere sie auf platform.openai.com (Einstellungen → Organisation) oder wähle ein anderes Modell.",
-      "app_update_required": "Diese Funktion erfordert die neueste Version der App. Installiere das letzte Update und versuche es erneut."
+      "app_update_required": "Diese Funktion erfordert die neueste Version der App. Installiere das letzte Update und versuche es erneut.",
+      "billing_required": "Google verlangt eine aktive Abrechnung, um Gemini in deiner Region (Schweiz, EU, Vereinigtes Königreich) zu nutzen. Öffne in Google AI Studio \"Billing\", hinterlege eine Zahlungsmethode für das Projekt des Schlüssels und versuche es erneut."
     },
     "device": {
       "title": "KI auf dem Telefon · {{engine}}",
@@ -284,7 +285,8 @@
     },
     "paste": "Kopierten Code einfügen",
     "pasted": "Code in der Zwischenablage gefunden: wird geprüft…",
-    "pasteNothing": "In der Zwischenablage ist kein {{provider}}-Code. Tippe auf der Seite des Anbieters neben dem Schlüssel auf „Copy“ und kehre hierher zurück."
+    "pasteNothing": "In der Zwischenablage ist kein {{provider}}-Code. Tippe auf der Seite des Anbieters neben dem Schlüssel auf „Copy“ und kehre hierher zurück.",
+    "errorDetail": "Details: {{detail}}"
   },
   "sources": {
     "title": "Deine Daten verbinden",

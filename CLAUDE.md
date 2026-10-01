@@ -4,15 +4,13 @@ These rules apply to anyone working on the project, human or AI. Also read `AGEN
 
 ## Every change to the code
 
-1. **Bump the version** in `app.config.ts` (`version`) and `package.json` (`version`), keeping them identical. Use semver:
-   - patch (`1.1.0 → 1.1.1`): fixes, text and small UI changes;
-   - minor (`1.1.0 → 1.2.0`): new features;
-   - major: only for the store release decided with the owner.
-   The iOS build number and Android versionCode are managed by EAS (`autoIncrement`): don't touch them.
+1. **Bump the code version** in `package.json` (`version`) on every change (semver: patch for fixes and small UI changes, minor for new features). It is shown in Settings next to the app version.
+   - **Do not change `version` in `app.config.ts` for JavaScript-only changes.** It is the store/native version and is part of the runtime fingerprint: changing it stops OTA updates from reaching the builds already installed (TestFlight/App Store). Bump it only when making a new store build, setting it to the current code version.
+   - The iOS build number and Android versionCode are managed by EAS (`autoIncrement`): don't touch them.
 2. **Run the checks before declaring it done:** `npx tsc --noEmit`, `npx expo lint`, `npx jest`. All must pass. New logic needs tests (Jest with the `node:sqlite` adapter in `src/test/nodeSqliteDb.ts` for DB code).
 3. **Commit and push to GitHub** (`origin main`, repo `gfrino/health-coach`) at the end of every completed change, with a descriptive message in Italian. Never commit `Untitled.af` / `Untitled.af~lock~` (owner's files).
 4. **Say whether a new build is needed:**
-   - only JavaScript/TypeScript changed → it reaches the phone via Metro reload or an OTA update (`npx eas-cli@latest update --channel development`);
+   - only JavaScript/TypeScript changed → it reaches the phone via Metro reload or an OTA update (`npx eas-cli@latest update --channel development` for dev builds, `--channel production` for TestFlight/App Store). Check first that the runtime matches: `APP_VARIANT=production npx expo-updates runtimeversion:resolve --platform ios` must equal the build's `runtimeVersion`;
    - native changes (new native library, config plugin, permissions, share extension, entitlements) → new EAS build: `npx eas-cli@latest build --profile development --platform ios`.
 5. **Summarize for the owner** what changed and what to test on the phone, in the language they wrote in (usually Italian).
 

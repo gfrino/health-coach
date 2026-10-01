@@ -260,7 +260,8 @@
       "context_window": "Cette conversation est trop longue pour l'IA du téléphone. Commencez une nouvelle conversation.",
       "unsupported_language": "L'IA du téléphone ne prend pas en charge cette langue. Changez de langue ou utilisez un service en ligne.",
       "org_verification": "OpenAI exige la vérification de ton organisation pour ce modèle. Vérifie-la sur platform.openai.com (Paramètres → Organisation) ou choisis un autre modèle.",
-      "app_update_required": "Cette fonction nécessite la dernière version de l'app. Installe la dernière mise à jour et réessaie."
+      "app_update_required": "Cette fonction nécessite la dernière version de l'app. Installe la dernière mise à jour et réessaie.",
+      "billing_required": "Google exige que la facturation soit activée pour utiliser Gemini depuis ta région (Suisse, UE, Royaume-Uni). Dans Google AI Studio, ouvre « Billing », ajoute un moyen de paiement au projet de la clé et réessaie."
     },
     "device": {
       "title": "IA du téléphone · {{engine}}",
@@ -284,7 +285,8 @@
     },
     "paste": "Coller le code copié",
     "pasted": "Code trouvé dans le presse-papiers : vérification…",
-    "pasteNothing": "Le presse-papiers ne contient pas de code {{provider}}. Sur la page du fournisseur, touchez « Copy » à côté de la clé, puis revenez ici."
+    "pasteNothing": "Le presse-papiers ne contient pas de code {{provider}}. Sur la page du fournisseur, touchez « Copy » à côté de la clé, puis revenez ici.",
+    "errorDetail": "Détails : {{detail}}"
   },
   "sources": {
     "title": "Connectez vos données",

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText, Card, InfoRow, NavRow, OptionGroup, Screen } from '@/components';
 import { SUPPORTED_LANGUAGES, type AppSettings, type Units } from '@/config/settingsSchema';
-import { appVersion } from '@/config/env';
+import { appVersion, codeVersion } from '@/config/env';
 import { getDatabaseInfo } from '@/db';
 import { DEVELOPER, LEGAL_DOCS } from '@/legal';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -104,7 +104,10 @@ export default function SettingsScreen() {
 
         <AppText variant="headline">{t('settings.sections.about')}</AppText>
         <Card>
-          <InfoRow label={t('settings.about.version')} value={appVersion} />
+          <InfoRow
+            label={t('settings.about.version')}
+            value={codeVersion === appVersion ? appVersion : `${appVersion} (${codeVersion})`}
+          />
           <InfoRow
             label={t('settings.about.database')}
             value={

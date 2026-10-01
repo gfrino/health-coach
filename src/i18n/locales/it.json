@@ -260,7 +260,8 @@
       "context_window": "La conversazione è troppo lunga per l'AI del telefono. Inizia una nuova conversazione.",
       "unsupported_language": "L'AI del telefono non supporta questa lingua. Cambia lingua o usa un servizio online.",
       "org_verification": "OpenAI richiede la verifica della tua organizzazione per questo modello. Verificala su platform.openai.com (Impostazioni → Organizzazione) oppure scegli un altro modello.",
-      "app_update_required": "Questa funzione richiede la versione più recente dell'app. Installa l'ultimo aggiornamento e riprova."
+      "app_update_required": "Questa funzione richiede la versione più recente dell'app. Installa l'ultimo aggiornamento e riprova.",
+      "billing_required": "Google richiede la fatturazione attiva per usare Gemini dalla tua zona (Svizzera, UE, Regno Unito). Su Google AI Studio apri \"Billing\", collega un metodo di pagamento al progetto della chiave e riprova."
     },
     "device": {
       "title": "AI del telefono · {{engine}}",
@@ -284,7 +285,8 @@
     },
     "paste": "Incolla il codice copiato",
     "pasted": "Codice trovato negli appunti: lo verifico…",
-    "pasteNothing": "Negli appunti non c'è un codice {{provider}}. Sulla pagina del provider premi \"Copy\" accanto al codice, poi torna qui."
+    "pasteNothing": "Negli appunti non c'è un codice {{provider}}. Sulla pagina del provider premi \"Copy\" accanto al codice, poi torna qui.",
+    "errorDetail": "Dettagli: {{detail}}"
   },
   "sources": {
     "title": "Collega i tuoi dati",
