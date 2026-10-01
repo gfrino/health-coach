@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.4.7',
+  version: '1.4.8',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
@@ -119,7 +119,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     package: bundleId,
     adaptiveIcon: {
-      backgroundColor: '#E8F1EC',
+      backgroundColor: '#FFFFFF',
       foregroundImage: './assets/android-icon-foreground.png',
       backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',
@@ -142,7 +142,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-splash-screen',
       {
         image: './assets/splash-icon.png',
-        imageWidth: 160,
+        // Logotipo orizzontale ("Healthas"): più largo di un'icona quadrata.
+        imageWidth: 240,
         resizeMode: 'contain',
         backgroundColor: '#F6F4EF',
         dark: { image: './assets/splash-icon.png', backgroundColor: '#14171A' },
