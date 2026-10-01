@@ -15,6 +15,7 @@ import { useTheme } from '@/theme';
 import { AppText } from './AppText';
 import { BrandLogo } from './BrandLogo';
 import { Button } from './Button';
+import { GlowBorder } from './GlowBorder';
 import { Card } from './Card';
 import { ChipGroup } from './ChipGroup';
 import { Icon } from './Icon';
@@ -166,13 +167,16 @@ export function CloudAISetup({
             </AppText>
           </View>
         ))}
-        <Button
-          label={t('ai.openKeysPage')}
-          // Primo passo: ben visibile finché non c'è un codice.
-          variant={activeKey ? 'secondary' : 'primary'}
-          onPress={openKeysPage}
-          accessibilityHint={info.keysUrl}
-        />
+        {/* Primo passo: luce che gira intorno al pulsante finché non c'è un codice. */}
+        <GlowBorder active={!activeKey}>
+          <Button
+            label={t('ai.openKeysPage')}
+            // Primo passo: ben visibile finché non c'è un codice.
+            variant={activeKey ? 'secondary' : 'primary'}
+            onPress={openKeysPage}
+            accessibilityHint={info.keysUrl}
+          />
+        </GlowBorder>
         <AppText variant="caption" tone="textMuted">
           {t('ai.billingNote')}
         </AppText>

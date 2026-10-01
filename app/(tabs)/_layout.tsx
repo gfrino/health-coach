@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { useTranslation } from 'react-i18next';
 
@@ -35,6 +36,15 @@ export default function TabLayout() {
         <Tabs.Screen
           key={tab.name}
           name={tab.name}
+          listeners={({ navigation }) => ({
+            // Tornando al Coach da un'altra tab si parte da una chat nuova;
+            // le conversazioni precedenti restano in "Cronologia".
+            tabPress: (e) => {
+              if (tab.name !== 'coach' || navigation.isFocused()) return;
+              e.preventDefault();
+              router.navigate({ pathname: '/coach', params: { new: String(Date.now()) } });
+            },
+          })}
           options={{
             title: t(tab.labelKey),
             // Etichetta breve nella barra (6 tab), nome completo per VoiceOver/TalkBack.

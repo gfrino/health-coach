@@ -4,6 +4,7 @@ export { Card } from './Card';
 export { ChipGroup } from './ChipGroup';
 export { DateField } from './DateField';
 export { EmptyState } from './EmptyState';
+export { GlowBorder } from './GlowBorder';
 export { Icon, icons, type AppIconName } from './Icon';
 export { InfoRow } from './InfoRow';
 export { ListEditor } from './ListEditor';

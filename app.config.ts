@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.4.4',
+  version: '1.4.5',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
