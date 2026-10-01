@@ -14,11 +14,14 @@ import { buildHealthSnapshot } from './snapshot';
 import { COACH_TOOLS, executeTool } from './tools';
 
 const MAX_TOOL_ROUNDS = 5;
-/** Prima di rispondere si aggiornano i dati di salute, ma senza far aspettare troppo. */
-const FRESH_DATA_MAX_WAIT_MS = 6000;
-const FRESH_DATA_MIN_INTERVAL_MS = 60 * 1000;
+/**
+ * Rete di sicurezza: la sincronizzazione avviene già all'apertura dell'app. Prima di rispondere
+ * si aggiorna solo se l'ultima sync è vecchia (app aperta a lungo), senza far aspettare.
+ */
+const FRESH_DATA_MAX_WAIT_MS = 3000;
+const FRESH_DATA_MIN_INTERVAL_MS = 10 * 60 * 1000;
 
-/** Sincronizza Apple Salute / Health Connect se l'ultima sync ha più di un minuto. */
+/** Sincronizza Apple Salute / Health Connect se l'ultima sync ha più di 10 minuti. */
 async function refreshHealthData(): Promise<void> {
   try {
     // Import pigro: il motore della chat resta indipendente dai moduli nativi di salute.

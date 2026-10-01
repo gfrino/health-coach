@@ -13,7 +13,8 @@ import type { SyncProgress, SyncReport } from './syncTypes';
  * Orchestrazione della sincronizzazione della sorgente di piattaforma:
  * all'apertura dell'app (con limite di frequenza), manuale, in background e prima dei riepiloghi.
  */
-const MIN_INTERVAL_MS = 10 * 60 * 1000;
+/** All'apertura e al ritorno nell'app si sincronizza se l'ultima sync ha più di 2 minuti. */
+const MIN_INTERVAL_MS = 2 * 60 * 1000;
 
 interface SyncState {
   syncing: boolean;
