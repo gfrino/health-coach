@@ -116,7 +116,8 @@
     "encryptedNote": "Le fichier est enregistré uniquement sur ce téléphone, dans la base de données chiffrée.",
     "delete": "Supprimer le compte rendu",
     "deleteTitle": "Supprimer le compte rendu ?",
-    "deleteBody": "Le fichier sera définitivement supprimé de ce téléphone."
+    "deleteBody": "Le fichier sera définitivement supprimé de ce téléphone.",
+    "sharedNoFile": "Health Coach n'a reçu qu'un texte ou un lien, sans fichier. Partage le PDF ou une photo du rapport."
   },
   "settings": {
     "title": "Réglages",

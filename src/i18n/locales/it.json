@@ -116,7 +116,8 @@
     "encryptedNote": "Il file è salvato solo in questo telefono, dentro il database cifrato.",
     "delete": "Elimina referto",
     "deleteTitle": "Eliminare il referto?",
-    "deleteBody": "Il file verrà cancellato definitivamente da questo telefono."
+    "deleteBody": "Il file verrà cancellato definitivamente da questo telefono.",
+    "sharedNoFile": "Health Coach ha ricevuto solo un testo o un link, senza file. Condividi il PDF o la foto del referto."
   },
   "settings": {
     "title": "Impostazioni",

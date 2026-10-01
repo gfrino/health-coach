@@ -116,7 +116,8 @@
     "encryptedNote": "Die Datei ist nur auf diesem Telefon gespeichert, in der verschlüsselten Datenbank.",
     "delete": "Befund löschen",
     "deleteTitle": "Befund löschen?",
-    "deleteBody": "Die Datei wird endgültig von diesem Telefon gelöscht."
+    "deleteBody": "Die Datei wird endgültig von diesem Telefon gelöscht.",
+    "sharedNoFile": "Health Coach hat nur einen Text oder Link erhalten, keine Datei. Teile das PDF oder ein Foto des Befunds."
   },
   "settings": {
     "title": "Einstellungen",

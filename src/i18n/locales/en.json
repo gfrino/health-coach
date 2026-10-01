@@ -116,7 +116,8 @@
     "encryptedNote": "The file is stored only on this phone, inside the encrypted database.",
     "delete": "Delete report",
     "deleteTitle": "Delete the report?",
-    "deleteBody": "The file will be permanently deleted from this phone."
+    "deleteBody": "The file will be permanently deleted from this phone.",
+    "sharedNoFile": "Health Coach only received text or a link, no file. Share the PDF or a photo of the report."
   },
   "settings": {
     "title": "Settings",

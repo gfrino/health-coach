@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components';
 import { ChatView } from '@/components/chat/ChatView';
-import { conversationRepository, getDb } from '@/db';
 import { useSettingsStore } from '@/store/settingsStore';
 import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/theme';
@@ -21,13 +20,9 @@ export default function CoachScreen() {
 
   useEffect(() => {
     let active = true;
-    (async () => {
-      if (params.new) return active && setConversationId(null);
-      if (params.c) return active && setConversationId(params.c);
-      const db = await getDb();
-      const latest = (await conversationRepository.listConversations(db))[0];
-      if (active) setConversationId(latest?.id ?? null);
-    })();
+    // Conversazione indicata (?c=…, es. dalla Cronologia); altrimenti, anche all'apertura
+    // dell'app, una chat nuova: le precedenti restano in "Cronologia".
+    void Promise.resolve().then(() => active && setConversationId(params.c ?? null));
     return () => {
       active = false;
     };

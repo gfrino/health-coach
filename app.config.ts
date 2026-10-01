@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.4.2',
+  version: '1.4.4',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
@@ -189,7 +189,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       // "Condividi → Health Coach" da altre app: referti PDF e immagini finiscono nella Cartella salute.
       'expo-share-intent',
       {
-        // Nome del target Xcode: diverso dall'app "HealthCoach" (vedi withShareExtensionDisplayName).
+        // Nome del target Xcode: diverso dall'app "HealthCoach" (vedi withShareExtensionFixes).
         iosShareExtensionName: 'Health Coach Share',
         // PDF, immagini e documenti, sia come file sia come dati (es. il PDF di un report
         // generato da un'altra app). I tipi non supportati vengono rifiutati con un messaggio.
@@ -222,7 +222,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Ciclo di vita UIScene richiesto dall'SDK iOS 27 (rimuovere con SDK 58).
     './plugins/withIosSceneLifecycle',
     [
-      './plugins/withShareExtensionDisplayName',
+      './plugins/withShareExtensionFixes',
       { targetName: 'HealthCoachShare', displayName: 'Health Coach' },
     ],
   ],

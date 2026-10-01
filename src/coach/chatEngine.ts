@@ -14,6 +14,25 @@ import { buildHealthSnapshot } from './snapshot';
 import { COACH_TOOLS, executeTool } from './tools';
 
 const MAX_TOOL_ROUNDS = 5;
+/** Prima di rispondere si aggiornano i dati di salute, ma senza far aspettare troppo. */
+const FRESH_DATA_MAX_WAIT_MS = 6000;
+const FRESH_DATA_MIN_INTERVAL_MS = 60 * 1000;
+
+/** Sincronizza Apple Salute / Health Connect se l'ultima sync ha più di un minuto. */
+async function refreshHealthData(): Promise<void> {
+  try {
+    // Import pigro: il motore della chat resta indipendente dai moduli nativi di salute.
+    const { syncHealthData } =
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('@/sources/syncService') as typeof import('@/sources/syncService');
+    await Promise.race([
+      syncHealthData({ minIntervalMs: FRESH_DATA_MIN_INTERVAL_MS }),
+      new Promise((resolve) => setTimeout(resolve, FRESH_DATA_MAX_WAIT_MS)),
+    ]);
+  } catch {
+    // Dati non aggiornati: si risponde con quelli già presenti.
+  }
+}
 
 export interface TurnCallbacks {
   /** Testo completo dell'assistente finora (già concatenato). */
@@ -176,7 +195,6 @@ export async function runCoachTurn(
   attachments: MessageAttachment[] = [],
 ): Promise<TurnResult> {
   const db = await getDb();
-  const now = new Date();
 
   if (userText !== null) {
     await conversationRepository.addMessage(db, {
@@ -203,7 +221,8 @@ export async function runCoachTurn(
   });
 
   try {
-    const system = await buildSystemPrompt(db, settings, now);
+    await refreshHealthData();
+    const system = await buildSystemPrompt(db, settings, new Date());
     const history = await buildHistory(settings, stored);
     const { text, usage } = await runWithTools(db, settings, system, history, cb);
     await conversationRepository.finishMessage(db, assistant.id, {

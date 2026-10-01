@@ -26,7 +26,9 @@ export function ShareIntentImporter() {
       fileName: f.fileName,
     }));
     if (!files.length) {
+      // Condiviso solo testo o un link: niente da salvare, ma lo diciamo invece di ignorarlo.
       resetShareIntent();
+      Alert.alert(t('records.importFailed'), t('records.sharedNoFile'));
       return;
     }
     busy.current = true;
