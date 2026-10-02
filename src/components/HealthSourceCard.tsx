@@ -18,6 +18,7 @@ import { AppText } from './AppText';
 import { BrandLogo } from './BrandLogo';
 import { Button } from './Button';
 import { Card } from './Card';
+import { GlowBorder } from './GlowBorder';
 import { Icon } from './Icon';
 
 /** Apple Health (iOS) / Health Connect (Android): stato, spiegazione dei dati, collegamento. */
@@ -83,19 +84,6 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
         {t('sources.readOnly')}
       </AppText>
 
-      {showCategories
-        ? HEALTH_DATA_CATEGORIES.filter((c) => platformCategories.has(c)).map((c) => (
-            <View key={c} style={{ gap: 2, marginTop: spacing.xs }}>
-              <AppText variant="callout" style={{ fontWeight: '600' }}>
-                {t(`sources.categories.${c}.title`)}
-              </AppText>
-              <AppText variant="caption" tone="textMuted">
-                {t(`sources.categories.${c}.why`)}
-              </AppText>
-            </View>
-          ))
-        : null}
-
       {availability === 'needsInstall' ? (
         <>
           <AppText variant="callout">{t('sources.installHealthConnect')}</AppText>
@@ -133,18 +121,35 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
           />
         </View>
       ) : (
-        <Button
-          label={t('sources.connect', { source: sourceName })}
-          onPress={connect}
-          loading={busy}
-          disabled={availability === null}
-        />
+        // Primo passo: in evidenza, con la luce che gira intorno al pulsante.
+        <GlowBorder>
+          <Button
+            label={t('sources.connect', { source: sourceName })}
+            onPress={connect}
+            loading={busy}
+            disabled={availability === null}
+          />
+        </GlowBorder>
       )}
       {!isIOS && !connected ? (
         <AppText variant="caption" tone="textMuted">
           {t('sources.androidHistoryNote')}
         </AppText>
       ) : null}
+
+      {/* Cosa viene letto: sotto il pulsante, così il collegamento si vede subito. */}
+      {showCategories
+        ? HEALTH_DATA_CATEGORIES.filter((c) => platformCategories.has(c)).map((c) => (
+            <View key={c} style={{ gap: 2, marginTop: spacing.xs }}>
+              <AppText variant="callout" style={{ fontWeight: '600' }}>
+                {t(`sources.categories.${c}.title`)}
+              </AppText>
+              <AppText variant="caption" tone="textMuted">
+                {t(`sources.categories.${c}.why`)}
+              </AppText>
+            </View>
+          ))
+        : null}
     </Card>
   );
 }

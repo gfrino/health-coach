@@ -13,7 +13,8 @@ interface Props {
   title: string;
   subtitle?: string;
   children: ReactNode;
-  primary: { label: string; onPress: () => void; disabled?: boolean; loading?: boolean };
+  /** Assente quando l'azione principale è nel contenuto (es. "Collega Apple Health"). */
+  primary?: { label: string; onPress: () => void; disabled?: boolean; loading?: boolean };
   secondary?: { label: string; onPress: () => void };
   showBack?: boolean;
 }
@@ -59,7 +60,7 @@ export function OnboardingStep({
         edges={['top', 'bottom']}
         footer={
           <View style={{ gap: spacing.sm }}>
-            <Button {...primary} />
+            {primary ? <Button {...primary} /> : null}
             {secondary ? (
               <Button label={secondary.label} onPress={secondary.onPress} variant="ghost" />
             ) : null}

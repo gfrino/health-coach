@@ -24,7 +24,9 @@ export default function SourcesStep() {
       step={2}
       title={t('sources.title')}
       subtitle={t('sources.subtitle', { source: sourceName })}
-      primary={{ label: t('common.continue'), onPress: () => goToStep(3) }}
+      // Finché non è collegato, l'unico pulsante in evidenza è "Collega" nella scheda:
+      // in basso resta solo "Salta per ora" (Continua e Salta facevano la stessa cosa).
+      primary={connected ? { label: t('common.continue'), onPress: () => goToStep(3) } : undefined}
       secondary={connected ? undefined : { label: t('sources.skip'), onPress: () => goToStep(3) }}
     >
       <HealthSourceCard />
