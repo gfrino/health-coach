@@ -43,47 +43,50 @@ export function PreferencesForm({ value, onChange }: Props) {
         }))}
       />
 
+      {/* Passivo = nessuna notifica: orari, ore di silenzio e report non servono. */}
       {proactive ? (
-        <Card>
-          <Stepper
-            label={t('preferences.maxNotifications')}
-            display={String(value.maxNotificationsPerDay)}
-            onDecrement={() => set({ maxNotificationsPerDay: value.maxNotificationsPerDay - 1 })}
-            onIncrement={() => set({ maxNotificationsPerDay: value.maxNotificationsPerDay + 1 })}
-            canDecrement={value.maxNotificationsPerDay > 0}
-            canIncrement={value.maxNotificationsPerDay < 5}
-            decrementLabel={t('components.decrease')}
-            incrementLabel={t('components.increase')}
-          />
-          <AppText variant="caption" tone="textMuted">
-            {t('preferences.maxNotificationsHint')}
-          </AppText>
-        </Card>
+        <>
+          <Card>
+            <Stepper
+              label={t('preferences.maxNotifications')}
+              display={String(value.maxNotificationsPerDay)}
+              onDecrement={() => set({ maxNotificationsPerDay: value.maxNotificationsPerDay - 1 })}
+              onIncrement={() => set({ maxNotificationsPerDay: value.maxNotificationsPerDay + 1 })}
+              canDecrement={value.maxNotificationsPerDay > 0}
+              canIncrement={value.maxNotificationsPerDay < 5}
+              decrementLabel={t('components.decrease')}
+              incrementLabel={t('components.increase')}
+            />
+            <AppText variant="caption" tone="textMuted">
+              {t('preferences.maxNotificationsHint')}
+            </AppText>
+          </Card>
+
+          <Card>
+            {time(t('preferences.summaryTime'), 'eveningSummaryTime')}
+            <AppText variant="headline" style={{ marginTop: spacing.sm }}>
+              {t('preferences.quietHours')}
+            </AppText>
+            {time(t('preferences.quietStart'), 'quietHoursStart')}
+            {time(t('preferences.quietEnd'), 'quietHoursEnd')}
+            <AppText variant="caption" tone="textMuted">
+              {t('preferences.quietHint')}
+            </AppText>
+          </Card>
+
+          <Card>
+            <AppText variant="headline">{t('preferences.reports')}</AppText>
+            {(['daily', 'weekly', 'monthly'] as const).map((r) => (
+              <SwitchRow
+                key={r}
+                label={t(`preferences.reportTypes.${r}`)}
+                value={value.reports[r]}
+                onChange={(v) => set({ reports: { ...value.reports, [r]: v } })}
+              />
+            ))}
+          </Card>
+        </>
       ) : null}
-
-      <Card>
-        {time(t('preferences.summaryTime'), 'eveningSummaryTime')}
-        <AppText variant="headline" style={{ marginTop: spacing.sm }}>
-          {t('preferences.quietHours')}
-        </AppText>
-        {time(t('preferences.quietStart'), 'quietHoursStart')}
-        {time(t('preferences.quietEnd'), 'quietHoursEnd')}
-        <AppText variant="caption" tone="textMuted">
-          {t('preferences.quietHint')}
-        </AppText>
-      </Card>
-
-      <Card>
-        <AppText variant="headline">{t('preferences.reports')}</AppText>
-        {(['daily', 'weekly', 'monthly'] as const).map((r) => (
-          <SwitchRow
-            key={r}
-            label={t(`preferences.reportTypes.${r}`)}
-            value={value.reports[r]}
-            onChange={(v) => set({ reports: { ...value.reports, [r]: v } })}
-          />
-        ))}
-      </Card>
     </View>
   );
 }
