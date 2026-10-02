@@ -453,7 +453,7 @@
     "medicationsPlaceholder": "E.g. ramipril 5 mg",
     "supplements": "Supplements",
     "supplementsPlaceholder": "E.g. vitamin D, magnesium",
-    "optionalNote": "Tap an item to remove it. You can edit everything later in Health records."
+    "optionalNote": "You can change all of this at any time in Settings → My profile."
   },
   "preferences": {
     "title": "Proactivity",
@@ -700,5 +700,40 @@
       "body": "Average sleep {{sleep}}, {{steps}} steps a day. Tap for the report.",
       "ask": "Give me a report of my week and one goal for next week."
     }
+  },
+  "healthLists": {
+    "none": "Nothing added.",
+    "suggested": "Suggestions",
+    "addItem": "Add {{item}}",
+    "conditions": {
+      "title": "Chronic conditions",
+      "hint": "Your coach adapts advice, activity and diet.",
+      "placeholder": "Add another condition",
+      "suggestions": "High blood pressure|Type 2 diabetes|High cholesterol|Hypothyroidism|Asthma|Acid reflux|Migraine|Irritable bowel|Osteoarthritis|Anxiety"
+    },
+    "allergies": {
+      "title": "Allergies and intolerances",
+      "hint": "Your coach will never suggest these foods or substances.",
+      "placeholder": "Add an allergy or intolerance",
+      "suggestions": "Lactose|Gluten|Tree nuts|Peanuts|Shellfish|Eggs|Soy|Nickel|Penicillin|Pollen"
+    },
+    "medications": {
+      "title": "Medications",
+      "hint": "Name and dose if you know it (e.g. ramipril 5 mg). Your coach checks for interactions.",
+      "placeholder": "Add a medication",
+      "suggestions": "Levothyroxine|Metformin|Ramipril|Statin|Birth control pill|Antihistamine"
+    },
+    "supplements": {
+      "title": "Supplements and vitamins",
+      "hint": "Including ones you take only now and then.",
+      "placeholder": "Add a supplement",
+      "suggestions": "Vitamin D|Magnesium|Omega-3|Vitamin B12|Iron|Zinc|Multivitamin|Creatine|Probiotics|Collagen"
+    }
+  },
+  "profileSettings": {
+    "title": "My profile",
+    "subtitle": "Personal details, goals, conditions, medications and allergies",
+    "saved": "Saved",
+    "healthTitle": "Your health"
   }
 }

@@ -453,7 +453,7 @@
     "medicationsPlaceholder": "Es. ramipril 5 mg",
     "supplements": "Integratori",
     "supplementsPlaceholder": "Es. vitamina D, magnesio",
-    "optionalNote": "Tocca una voce per rimuoverla. Potrai modificare tutto in seguito dalla Cartella salute."
+    "optionalNote": "Puoi modificare tutto quando vuoi da Opzioni → Il mio profilo."
   },
   "preferences": {
     "title": "Proattività",
@@ -700,5 +700,40 @@
       "body": "Sonno medio {{sleep}}, {{steps}} passi al giorno. Tocca per il resoconto.",
       "ask": "Fammi il resoconto della mia settimana e dimmi un obiettivo per la prossima."
     }
+  },
+  "healthLists": {
+    "none": "Nessuna voce.",
+    "suggested": "Suggerimenti",
+    "addItem": "Aggiungi {{item}}",
+    "conditions": {
+      "title": "Condizioni croniche",
+      "hint": "Il coach adatta consigli, attività e dieta.",
+      "placeholder": "Aggiungi un'altra condizione",
+      "suggestions": "Ipertensione|Diabete tipo 2|Colesterolo alto|Ipotiroidismo|Asma|Reflusso|Emicrania|Colon irritabile|Artrosi|Ansia"
+    },
+    "allergies": {
+      "title": "Allergie e intolleranze",
+      "hint": "Il coach non ti suggerirà mai questi alimenti o sostanze.",
+      "placeholder": "Aggiungi un'allergia o intolleranza",
+      "suggestions": "Lattosio|Glutine|Frutta a guscio|Arachidi|Crostacei|Uova|Soia|Nichel|Penicillina|Polline"
+    },
+    "medications": {
+      "title": "Farmaci",
+      "hint": "Nome e dose, se la sai (es. ramipril 5 mg). Il coach controlla le interazioni.",
+      "placeholder": "Aggiungi un farmaco",
+      "suggestions": "Levotiroxina|Metformina|Ramipril|Statina|Pillola anticoncezionale|Antistaminico"
+    },
+    "supplements": {
+      "title": "Integratori e vitamine",
+      "hint": "Anche quelli presi solo ogni tanto.",
+      "placeholder": "Aggiungi un integratore",
+      "suggestions": "Vitamina D|Magnesio|Omega-3|Vitamina B12|Ferro|Zinco|Multivitaminico|Creatina|Probiotici|Collagene"
+    }
+  },
+  "profileSettings": {
+    "title": "Il mio profilo",
+    "subtitle": "Dati personali, obiettivi, condizioni, farmaci e allergie",
+    "saved": "Salvato",
+    "healthTitle": "La tua salute"
   }
 }

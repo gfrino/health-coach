@@ -453,7 +453,7 @@
     "medicationsPlaceholder": "Z. B. Ramipril 5 mg",
     "supplements": "Nahrungsergänzungsmittel",
     "supplementsPlaceholder": "Z. B. Vitamin D, Magnesium",
-    "optionalNote": "Tippe auf einen Eintrag, um ihn zu entfernen. Du kannst später alles in der Gesundheitsakte bearbeiten."
+    "optionalNote": "Du kannst alles jederzeit unter Optionen → Mein Profil ändern."
   },
   "preferences": {
     "title": "Proaktivität",
@@ -700,5 +700,40 @@
       "body": "Schlaf im Schnitt {{sleep}}, {{steps}} Schritte pro Tag. Tippe für den Bericht.",
       "ask": "Erstelle einen Bericht über meine Woche und nenne mir ein Ziel für nächste Woche."
     }
+  },
+  "healthLists": {
+    "none": "Noch nichts.",
+    "suggested": "Vorschläge",
+    "addItem": "{{item}} hinzufügen",
+    "conditions": {
+      "title": "Chronische Erkrankungen",
+      "hint": "Dein Coach passt Tipps, Bewegung und Ernährung an.",
+      "placeholder": "Weitere Erkrankung hinzufügen",
+      "suggestions": "Bluthochdruck|Typ-2-Diabetes|Hoher Cholesterinspiegel|Schilddrüsenunterfunktion|Asthma|Reflux|Migräne|Reizdarm|Arthrose|Angststörung"
+    },
+    "allergies": {
+      "title": "Allergien und Unverträglichkeiten",
+      "hint": "Dein Coach schlägt dir diese Lebensmittel oder Stoffe nie vor.",
+      "placeholder": "Allergie oder Unverträglichkeit hinzufügen",
+      "suggestions": "Laktose|Gluten|Schalenfrüchte|Erdnüsse|Krustentiere|Eier|Soja|Nickel|Penicillin|Pollen"
+    },
+    "medications": {
+      "title": "Medikamente",
+      "hint": "Name und Dosis, falls bekannt (z. B. Ramipril 5 mg). Dein Coach prüft Wechselwirkungen.",
+      "placeholder": "Medikament hinzufügen",
+      "suggestions": "Levothyroxin|Metformin|Ramipril|Statin|Antibabypille|Antihistaminikum"
+    },
+    "supplements": {
+      "title": "Nahrungsergänzung und Vitamine",
+      "hint": "Auch solche, die du nur ab und zu nimmst.",
+      "placeholder": "Nahrungsergänzung hinzufügen",
+      "suggestions": "Vitamin D|Magnesium|Omega-3|Vitamin B12|Eisen|Zink|Multivitamin|Kreatin|Probiotika|Kollagen"
+    }
+  },
+  "profileSettings": {
+    "title": "Mein Profil",
+    "subtitle": "Persönliche Daten, Ziele, Erkrankungen, Medikamente und Allergien",
+    "saved": "Gespeichert",
+    "healthTitle": "Deine Gesundheit"
   }
 }

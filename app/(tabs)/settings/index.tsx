@@ -30,6 +30,12 @@ export default function SettingsScreen() {
         <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
           <NavRow
             first
+            icon="me"
+            label={t('profileSettings.title')}
+            value={t('profileSettings.subtitle')}
+            onPress={() => router.push('/settings/profile')}
+          />
+          <NavRow
             icon="coach"
             label={t('coachSetup.title')}
             value={`${settings.coach.name} · ${t(`coachSetup.medicalOptions.${settings.coach.medicalApproach}.label`)}`}
