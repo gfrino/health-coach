@@ -141,7 +141,7 @@ export function ChatView({ conversationId, onConversationCreated, initialPrompt 
     })();
   });
   const openAttachment = (a: MessageAttachment) =>
-    router.push({ pathname: '/me/report/[id]', params: { id: a.reportId } });
+    router.push({ pathname: '/me/report/[id]', params: { id: a.reportId } }, { withAnchor: true });
 
   const openVoiceMode = async () => {
     stopSpeaking();

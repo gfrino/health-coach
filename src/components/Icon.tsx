@@ -32,6 +32,7 @@ export const icons = {
   pdf: { ios: 'doc.richtext', android: 'picture_as_pdf' },
   document: { ios: 'doc.text', android: 'description' },
   close: { ios: 'xmark', android: 'close' },
+  chevronLeft: { ios: 'chevron.left', android: 'chevron_left' },
   pill: { ios: 'pills.fill', android: 'medication' },
   leaf: { ios: 'leaf.fill', android: 'eco' },
   allergy: { ios: 'allergens', android: 'no_food' },

@@ -36,7 +36,10 @@ export function ShareIntentImporter() {
       .then((ids) => {
         router.navigate({ pathname: '/me', params: { section: 'records' } });
         if (ids.length === 1)
-          router.push({ pathname: '/me/report/[id]', params: { id: ids[0] as string } });
+          router.push(
+            { pathname: '/me/report/[id]', params: { id: ids[0] as string } },
+            { withAnchor: true },
+          );
         Alert.alert(t('records.sharedTitle'), t('records.sharedBody', { count: ids.length }));
       })
       .catch(() => Alert.alert(t('records.importFailed'), t('records.unsupported')))

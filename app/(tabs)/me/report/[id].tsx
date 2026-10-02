@@ -107,7 +107,34 @@ export default function ReportScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: report.title, headerLargeTitle: false }} />
+      <Stack.Screen
+        options={{
+          title: report.title,
+          headerLargeTitle: false,
+          // Aperto direttamente (es. da una condivisione) senza "Io" sotto: si torna comunque alla Cartella.
+          headerLeft: router.canGoBack()
+            ? undefined
+            : () => (
+                <Pressable
+                  onPress={() =>
+                    router.replace({ pathname: '/me', params: { section: 'records' } })
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={t('tabs.me')}
+                  hitSlop={10}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 4,
+                    paddingHorizontal: 8,
+                  }}
+                >
+                  <Icon name="chevronLeft" color={colors.primary} />
+                  <AppText tone="primary">{t('tabs.me')}</AppText>
+                </Pressable>
+              ),
+        }}
+      />
       <Screen>
         <Pressable
           onPress={() => void open()}
