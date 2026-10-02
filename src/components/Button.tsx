@@ -4,6 +4,7 @@ import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/theme';
 
 import { AppText } from './AppText';
+import { ButtonDecor } from './ButtonDecor';
 
 interface Props {
   label: string;
@@ -53,13 +54,16 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         {
+          // Il principale ha la sfumatura con le foglie (ButtonDecor), tagliata dagli angoli.
           backgroundColor: bg,
+          overflow: variant === 'primary' ? 'hidden' : undefined,
           borderRadius: radius.md,
           paddingHorizontal: spacing.lg,
           opacity: inactive ? 0.5 : pressed ? 0.8 : 1,
         },
       ]}
     >
+      {variant === 'primary' ? <ButtonDecor color={colors.primary} /> : null}
       {loading ? (
         <ActivityIndicator color={fg} />
       ) : (
