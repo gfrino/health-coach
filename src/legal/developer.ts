@@ -16,7 +16,7 @@ export const DEVELOPER = {
 } as const;
 
 /** Data dell'ultima revisione dei documenti legali (da aggiornare a ogni modifica dei testi). */
-export const LEGAL_UPDATED = '2026-09-30';
+export const LEGAL_UPDATED = '2026-10-02';
 
 export const LEGAL_DOCS = ['terms', 'privacy', 'disclaimer', 'impressum'] as const;
 export type LegalDoc = (typeof LEGAL_DOCS)[number];

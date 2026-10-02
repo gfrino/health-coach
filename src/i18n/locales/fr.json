@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Health Coach",
+    "appName": "Healthas",
     "continue": "Continuer",
     "back": "Retour",
     "cancel": "Annuler",
@@ -105,7 +105,7 @@
     "tooLarge": "Le fichier est trop volumineux (20 Mo max.).",
     "unsupported": "Format non pris en charge. Tu peux ajouter des PDF, photos, fichiers Word, RTF, ODT et texte.",
     "cameraDenied": "Autorisez l'accès à l'appareil photo dans les Réglages du téléphone.",
-    "shareHint": "Astuce : depuis Mail, Fichiers, Photos ou l'app de votre laboratoire, utilisez « Partager → Health Coach » pour ajouter un compte rendu en un instant.",
+    "shareHint": "Astuce : depuis Mail, Fichiers, Photos ou l'app de votre laboratoire, utilisez « Partager → Healthas » pour ajouter un compte rendu en un instant.",
     "sharedTitle": "Compte rendu ajouté",
     "sharedBody": "{{count}} fichier(s) enregistré(s) dans votre dossier santé.",
     "open": "Ouvrir le document",
@@ -117,7 +117,7 @@
     "delete": "Supprimer le compte rendu",
     "deleteTitle": "Supprimer le compte rendu ?",
     "deleteBody": "Le fichier sera définitivement supprimé de ce téléphone.",
-    "sharedNoFile": "Health Coach n'a reçu qu'un texte ou un lien, sans fichier. Partage le PDF ou une photo du rapport.",
+    "sharedNoFile": "Healthas n'a reçu qu'un texte ou un lien, sans fichier. Partage le PDF ou une photo du rapport.",
     "kinds": {
       "all": "Tous ({{count}})",
       "pdf": "PDF",
@@ -180,7 +180,7 @@
     "fr": "Français"
   },
   "onboarding": {
-    "welcomeTitle": "Bienvenue dans Health Coach",
+    "welcomeTitle": "Bienvenue dans Healthas",
     "welcomeBody": "Votre coach personnel qui connaît vos données de santé et vous accompagne chaque jour.",
     "privacyTitle": "Vos données restent les vôtres",
     "privacyPoints": {
@@ -189,7 +189,7 @@
       "noServer": "Aucun de nos serveurs ne reçoit, n'enregistre ni ne traite vos données de santé."
     },
     "disclaimerTitle": "Avertissement médical",
-    "disclaimer": "Health Coach est un outil de bien-être et d'information, pas un dispositif médical. Il ne fournit pas de diagnostic et ne remplace pas l'avis d'un médecin.",
+    "disclaimer": "Healthas est un outil de bien-être et d'information, pas un dispositif médical. Il ne fournit pas de diagnostic et ne remplace pas l'avis d'un médecin.",
     "acceptDisclaimer": "J'ai lu et j'accepte l'avertissement médical",
     "start": "Commencer",
     "stepOf": "Étape {{step}} sur {{total}}"
@@ -229,7 +229,7 @@
       "anthropic": {
         "1": "Ouvrez la Console Anthropic et connectez-vous ou créez un compte.",
         "2": "Dans Billing, ajoutez un moyen de paiement ou du crédit prépayé.",
-        "3": "Allez dans API Keys et touchez « Create Key » ; donnez-lui un nom, par exemple Health Coach.",
+        "3": "Allez dans API Keys et touchez « Create Key » ; donnez-lui un nom, par exemple Healthas.",
         "4": "Touchez « Copy » à côté de la clé et fermez la page : le code sera saisi et vérifié automatiquement."
       },
       "openai": {
@@ -245,7 +245,7 @@
       }
     },
     "openKeysPage": "Ouvrir la page et créer le code",
-    "billingNote": "L'utilisation de l'IA est facturée par le fournisseur sur votre compte, selon la consommation. Health Coach ne reçoit ni ne voit jamais votre clé.",
+    "billingNote": "L'utilisation de l'IA est facturée par le fournisseur sur votre compte, selon la consommation. Healthas ne reçoit ni ne voit jamais votre clé.",
     "apiKey": "Code d'accès (clé API)",
     "keyHint": "Elle est enregistrée dans le trousseau sécurisé de votre téléphone.",
     "keySavedHint": "Une clé est déjà enregistrée. Collez-en une nouvelle uniquement pour la remplacer.",
@@ -301,7 +301,7 @@
     "title": "Connectez vos données",
     "subtitle": "Le coach lit vos données depuis {{source}}. Vous choisissez, type par type, ce que vous partagez.",
     "skip": "Passer pour l'instant",
-    "readOnly": "Lecture seule : Health Coach n'écrit et ne modifie rien.",
+    "readOnly": "Lecture seule : Healthas n'écrit et ne modifie rien.",
     "categories": {
       "activity": {
         "title": "Activité",

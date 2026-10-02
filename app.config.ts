@@ -78,15 +78,15 @@ const bundleId =
     : `${BASE_BUNDLE_ID}.${variant === 'preview' ? 'preview' : 'dev'}`;
 const appName =
   variant === 'production'
-    ? 'Health Coach'
-    : `Health Coach (${variant === 'preview' ? 'Preview' : 'Dev'})`;
+    ? 'Healthas'
+    : `Healthas (${variant === 'preview' ? 'Preview' : 'Dev'})`;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.5.0',
+  version: '1.6.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
@@ -134,9 +134,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ['expo-sqlite', { useSQLCipher: true, enableFTS: true }],
     [
       'expo-secure-store',
-      { configureAndroidBackup: true, faceIDPermission: 'Usa Face ID per sbloccare Health Coach.' },
+      { configureAndroidBackup: true, faceIDPermission: 'Usa Face ID per sbloccare Healthas.' },
     ],
-    ['expo-local-authentication', { faceIDPermission: 'Usa Face ID per sbloccare Health Coach.' }],
+    ['expo-local-authentication', { faceIDPermission: 'Usa Face ID per sbloccare Healthas.' }],
     'expo-localization',
     [
       'expo-splash-screen',
@@ -156,16 +156,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-image-picker',
       {
         photosPermission:
-          'Health Coach accede alle foto solo per importare i referti che scegli tu.',
-        cameraPermission: 'Health Coach usa la fotocamera solo per fotografare i tuoi referti.',
-        microphonePermission: 'Health Coach usa il microfono solo mentre parli con il coach.',
+          'Healthas accede alle foto solo per importare i referti che scegli tu.',
+        cameraPermission: 'Healthas usa la fotocamera solo per fotografare i tuoi referti.',
+        microphonePermission: 'Healthas usa il microfono solo mentre parli con il coach.',
       },
     ],
     [
       'expo-camera',
       {
-        cameraPermission: 'Health Coach usa la fotocamera solo per fotografare i tuoi referti.',
-        microphonePermission: 'Health Coach usa il microfono solo mentre parli con il coach.',
+        cameraPermission: 'Healthas usa la fotocamera solo per fotografare i tuoi referti.',
+        microphonePermission: 'Healthas usa il microfono solo mentre parli con il coach.',
         recordAudioAndroid: false,
       },
     ],
@@ -173,21 +173,21 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-speech-recognition',
       {
-        microphonePermission: 'Health Coach usa il microfono solo mentre parli con il coach.',
+        microphonePermission: 'Healthas usa il microfono solo mentre parli con il coach.',
         speechRecognitionPermission:
-          'Health Coach trascrive la tua voce per parlare con il coach. Quando possibile, la trascrizione avviene sul telefono.',
+          'Healthas trascrive la tua voce per parlare con il coach. Quando possibile, la trascrizione avviene sul telefono.',
       },
     ],
     [
       // Conversazione a voce in tempo reale con OpenAI (audio diretto telefono ↔ OpenAI).
       '@config-plugins/react-native-webrtc',
       {
-        microphonePermission: 'Health Coach usa il microfono solo mentre parli con il coach.',
-        cameraPermission: 'Health Coach usa la fotocamera solo per fotografare i tuoi referti.',
+        microphonePermission: 'Healthas usa il microfono solo mentre parli con il coach.',
+        cameraPermission: 'Healthas usa la fotocamera solo per fotografare i tuoi referti.',
       },
     ],
     [
-      // "Condividi → Health Coach" da altre app: referti PDF e immagini finiscono nella Cartella salute.
+      // "Condividi → Healthas" da altre app: referti PDF e immagini finiscono nella Cartella salute.
       'expo-share-intent',
       {
         // Nome del target Xcode: diverso dall'app "HealthCoach" (vedi withShareExtensionFixes).
@@ -210,12 +210,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       '@kingstinct/react-native-healthkit',
       {
         NSHealthShareUsageDescription:
-          'Health Coach legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.',
+          'Healthas legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.',
         // v1.0 legge soltanto: nessuna richiesta di scrittura.
         // Obbligatoria per l'App Store anche se l'app legge soltanto: la libreria HealthKit
         // referenzia anche le API di scrittura. L'app non chiede mai il permesso di scrivere.
         NSHealthUpdateUsageDescription:
-          'Health Coach non scrive né modifica i tuoi dati in Salute: li legge soltanto per darti consigli personalizzati.',
+          'Healthas non scrive né modifica i tuoi dati in Salute: li legge soltanto per darti consigli personalizzati.',
         background: true,
       },
     ],
@@ -224,7 +224,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     './plugins/withIosSceneLifecycle',
     [
       './plugins/withShareExtensionFixes',
-      { targetName: 'HealthCoachShare', displayName: 'Health Coach' },
+      { targetName: 'HealthCoachShare', displayName: 'Healthas' },
     ],
   ],
   experiments: {

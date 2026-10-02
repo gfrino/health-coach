@@ -9,12 +9,12 @@ export const fr: Record<LegalDoc, string> = {
 Dernière mise à jour : ${LEGAL_UPDATED}
 
 ## 1. Qui sommes-nous
-L'app Health Coach est développée et distribuée par ${contact} (« nous »). En utilisant l'app, tu acceptes ces conditions.
+L'app Healthas est développée et distribuée par ${contact} (« nous »). En utilisant l'app, tu acceptes ces conditions.
 
 ## 2. Ce qu'est l'app
-Health Coach est un coach de bien-être personnel : l'app lit les données que tu choisis de partager (Apple Health ou Health Connect, profil, journal, documents), les conserve chiffrées sur ton téléphone et te donne des conseils sur le mode de vie, le sommeil, l'activité et l'alimentation à l'aide de l'intelligence artificielle.
+Healthas est un coach de bien-être personnel : l'app lit les données que tu choisis de partager (Apple Health ou Health Connect, profil, journal, documents), les conserve chiffrées sur ton téléphone et te donne des conseils sur le mode de vie, le sommeil, l'activité et l'alimentation à l'aide de l'intelligence artificielle.
 
-**Health Coach n'est pas un dispositif médical et ne fournit ni diagnostics, ni traitements, ni avis médicaux.** Lis aussi l'**Avertissement juridique**.
+**Healthas n'est pas un dispositif médical et ne fournit ni diagnostics, ni traitements, ni avis médicaux.** Lis aussi l'**Avertissement juridique**.
 
 ## 3. Conditions
 - Tu dois avoir au moins 16 ans.
@@ -53,7 +53,7 @@ ${contact}
 Dernière mise à jour : ${LEGAL_UPDATED}
 
 ## Le principe
-**Tes données de santé restent sur ton téléphone.** Health Coach n'a pas de serveur pour les données de santé : nous ne les recevons pas, ne les voyons pas et ne les vendons pas. Pas de publicité, pas de profilage, aucun outil d'analyse ou de suivi.
+**Tes données de santé restent sur ton téléphone.** Healthas n'a pas de serveur pour les données de santé : nous ne les recevons pas, ne les voyons pas et ne les vendons pas. Pas de publicité, pas de profilage, aucun outil d'analyse ou de suivi.
 
 ## Responsable du traitement
 ${contact}. La loi fédérale suisse sur la protection des données (LPD) s'applique et, pour les utilisateurs dans l'UE/EEE, le RGPD.
@@ -95,7 +95,7 @@ Nous mettrons à jour cette politique si la manière de traiter les données cha
 Dernière mise à jour : ${LEGAL_UPDATED}
 
 ## Pas un avis médical
-Health Coach est une app de bien-être et d'information. **Ce n'est pas un dispositif médical** et elle ne remplace ni les médecins, ni les pharmaciens, ni les autres professionnels de santé. Elle ne pose pas de diagnostic, ne prescrit pas de traitement et ne doit pas servir à prendre des décisions thérapeutiques.
+Healthas est une app de bien-être et d'information. **Ce n'est pas un dispositif médical** et elle ne remplace ni les médecins, ni les pharmaciens, ni les autres professionnels de santé. Elle ne pose pas de diagnostic, ne prescrit pas de traitement et ne doit pas servir à prendre des décisions thérapeutiques.
 
 ## Médicaments et traitements
 Ne commence, n'arrête ni ne modifie de médicaments, compléments ou traitements sur la base des suggestions de l'app : parles-en toujours à ton médecin.
@@ -113,7 +113,7 @@ Les approches non conventionnelles (p. ex. médecine traditionnelle chinoise, ay
 Les mesures dépendent des appareils et apps sources et peuvent contenir des erreurs ou des lacunes.
 
 ## Marques
-Apple Health, Apple Intelligence, Health Connect, OpenAI, Anthropic, Google, Gemini, Withings et les autres marques citées appartiennent à leurs propriétaires respectifs. Health Coach n'est ni affilié à eux ni approuvé par eux.
+Apple Health, Apple Intelligence, Health Connect, OpenAI, Anthropic, Google, Gemini, Withings et les autres marques citées appartiennent à leurs propriétaires respectifs. Healthas n'est ni affilié à eux ni approuvé par eux.
 `,
 
   impressum: `# Mentions légales

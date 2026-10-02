@@ -9,7 +9,7 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { importFiles } from './importReport';
 
 /**
- * Riceve i file condivisi verso Health Coach da altre app (menu "Condividi" di iOS/Android)
+ * Riceve i file condivisi verso Healthas da altre app (menu "Condividi" di iOS/Android)
  * e li salva come referti nella Cartella salute. Attende la fine dell'onboarding.
  */
 export function ShareIntentImporter() {

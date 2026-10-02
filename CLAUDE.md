@@ -1,4 +1,4 @@
-# Health Coach — development rules
+# Healthas — development rules
 
 These rules apply to anyone working on the project, human or AI. Also read `AGENTS.md` (Expo/EAS rules). **Add new rules here as they are agreed.**
 

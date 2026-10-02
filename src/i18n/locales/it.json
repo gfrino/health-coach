@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Health Coach",
+    "appName": "Healthas",
     "continue": "Continua",
     "back": "Indietro",
     "cancel": "Annulla",
@@ -105,7 +105,7 @@
     "tooLarge": "Il file è troppo grande (massimo 20 MB).",
     "unsupported": "Formato non supportato. Puoi aggiungere PDF, foto, documenti Word, RTF, ODT e file di testo.",
     "cameraDenied": "Consenti l'accesso alla fotocamera nelle Impostazioni del telefono.",
-    "shareHint": "Suggerimento: da Mail, File, Foto o dall'app del laboratorio usa \"Condividi → Health Coach\" per aggiungere un referto al volo.",
+    "shareHint": "Suggerimento: da Mail, File, Foto o dall'app del laboratorio usa \"Condividi → Healthas\" per aggiungere un referto al volo.",
     "sharedTitle": "Referto aggiunto",
     "sharedBody": "{{count}} file salvati nella Cartella salute.",
     "open": "Apri il documento",
@@ -117,7 +117,7 @@
     "delete": "Elimina referto",
     "deleteTitle": "Eliminare il referto?",
     "deleteBody": "Il file verrà cancellato definitivamente da questo telefono.",
-    "sharedNoFile": "Health Coach ha ricevuto solo un testo o un link, senza file. Condividi il PDF o la foto del referto.",
+    "sharedNoFile": "Healthas ha ricevuto solo un testo o un link, senza file. Condividi il PDF o la foto del referto.",
     "kinds": {
       "all": "Tutti ({{count}})",
       "pdf": "PDF",
@@ -180,7 +180,7 @@
     "fr": "Français"
   },
   "onboarding": {
-    "welcomeTitle": "Benvenuto in Health Coach",
+    "welcomeTitle": "Benvenuto in Healthas",
     "welcomeBody": "Il tuo coach personale che conosce i tuoi dati di salute e ti accompagna ogni giorno.",
     "privacyTitle": "I tuoi dati restano tuoi",
     "privacyPoints": {
@@ -189,7 +189,7 @@
       "noServer": "Nessun nostro server riceve, salva o elabora i tuoi dati sanitari."
     },
     "disclaimerTitle": "Avvertenza medica",
-    "disclaimer": "Health Coach è uno strumento di benessere e informazione, non un dispositivo medico. Non fornisce diagnosi né sostituisce il parere di un medico.",
+    "disclaimer": "Healthas è uno strumento di benessere e informazione, non un dispositivo medico. Non fornisce diagnosi né sostituisce il parere di un medico.",
     "acceptDisclaimer": "Ho letto e accetto l'avvertenza medica",
     "start": "Inizia",
     "stepOf": "Passo {{step}} di {{total}}"
@@ -229,7 +229,7 @@
       "anthropic": {
         "1": "Apri la Console Anthropic e accedi o crea un account.",
         "2": "In Billing aggiungi un metodo di pagamento o del credito prepagato.",
-        "3": "Vai su API Keys e premi \"Create Key\"; dalle un nome, ad esempio Health Coach.",
+        "3": "Vai su API Keys e premi \"Create Key\"; dalle un nome, ad esempio Healthas.",
         "4": "Premi \"Copy\" accanto alla chiave e chiudi la pagina: il codice verrà inserito e verificato da solo."
       },
       "openai": {
@@ -245,7 +245,7 @@
       }
     },
     "openKeysPage": "Apri la pagina e crea il codice",
-    "billingNote": "L'uso dell'AI è fatturato dal provider sul tuo account, in base al consumo. Health Coach non riceve né vede la chiave.",
+    "billingNote": "L'uso dell'AI è fatturato dal provider sul tuo account, in base al consumo. Healthas non riceve né vede la chiave.",
     "apiKey": "Codice di accesso (chiave API)",
     "keyHint": "Viene salvata nel portachiavi sicuro del telefono.",
     "keySavedHint": "Chiave già salvata. Incollane una nuova solo se vuoi sostituirla.",
@@ -301,7 +301,7 @@
     "title": "Collega i tuoi dati",
     "subtitle": "Il coach legge i tuoi dati da {{source}}. Puoi scegliere tipo per tipo cosa condividere.",
     "skip": "Salta per ora",
-    "readOnly": "Solo lettura: Health Coach non scrive e non modifica nulla.",
+    "readOnly": "Solo lettura: Healthas non scrive e non modifica nulla.",
     "categories": {
       "activity": {
         "title": "Attività",
