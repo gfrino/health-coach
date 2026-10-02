@@ -108,7 +108,7 @@
     "shareHint": "Suggerimento: da Mail, File, Foto o dall'app del laboratorio usa \"Condividi → Health Coach\" per aggiungere un referto al volo.",
     "sharedTitle": "Referto aggiunto",
     "sharedBody": "{{count}} file salvati nella Cartella salute.",
-    "open": "Apri il file",
+    "open": "Apri il documento",
     "title": "Titolo",
     "date": "Data dell'esame",
     "extractionTitle": "Lettura dei valori con l'AI",
@@ -124,7 +124,8 @@
       "image": "Foto",
       "document": "Documenti",
       "text": "Testo"
-    }
+    },
+    "share": "Condividi"
   },
   "settings": {
     "title": "Impostazioni",

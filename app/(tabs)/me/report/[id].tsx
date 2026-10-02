@@ -3,12 +3,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { Stack } from 'expo-router/stack';
 import { useEffect, useState } from 'react';
-import { Alert, Image, View } from 'react-native';
+import { Alert, Image, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Button, Card, DateField, Icon, Screen, TextField } from '@/components';
 import { getDb, labReportRepository } from '@/db';
 import type { LabReport } from '@/db/repositories/labReportRepository';
+import FilePreview from 'file-preview';
+
 import { bytesToBase64 } from '@/lib/base64';
 import { fileTypeOf } from '@/records/fileMeta';
 import { useTheme } from '@/theme';
@@ -46,8 +48,13 @@ export default function ReportScreen() {
     await labReportRepository.updateReport(db, id, patch);
   };
 
-  /** Apre il file originale: copia temporanea in cache, condivisione/anteprima di sistema, poi eliminata. */
-  const open = async () => {
+  /**
+   * Copia temporanea in cache (il file vive solo nel DB cifrato), poi anteprima o condivisione;
+   * la copia viene eliminata alla chiusura.
+   */
+  const withTempFile = async (
+    action: (uri: string, mimeType: string, uti?: string) => Promise<void>,
+  ) => {
     const db = await getDb();
     const f = await labReportRepository.getReportFile(db, id);
     if (!f) return;
@@ -65,10 +72,7 @@ export default function ReportScreen() {
       if (tmp.exists) tmp.delete();
       tmp.create();
       tmp.write(f.data);
-      await Sharing.shareAsync(tmp.uri, {
-        mimeType: f.mimeType,
-        UTI: type?.uti,
-      });
+      await action(tmp.uri, f.mimeType, type?.uti);
     } finally {
       try {
         tmp.delete();
@@ -77,6 +81,15 @@ export default function ReportScreen() {
       }
     }
   };
+
+  const share = () =>
+    withTempFile((uri, mimeType, UTI) => Sharing.shareAsync(uri, { mimeType, UTI }));
+
+  /** Anteprima nell'app (QuickLook su iOS); senza il modulo nativo, menu di condivisione. */
+  const open = () =>
+    FilePreview
+      ? withTempFile((uri) => FilePreview!.preview(uri, report.title)).catch(() => share())
+      : share();
 
   const remove = () =>
     Alert.alert(t('records.deleteTitle'), t('records.deleteBody'), [
@@ -96,33 +109,40 @@ export default function ReportScreen() {
     <>
       <Stack.Screen options={{ title: report.title, headerLargeTitle: false }} />
       <Screen>
-        {preview ? (
-          <Image
-            source={{ uri: preview }}
-            accessibilityLabel={report.title}
-            resizeMode="contain"
-            style={{
-              width: '100%',
-              height: 360,
-              borderRadius: radius.lg,
-              backgroundColor: colors.surfaceAlt,
-            }}
-          />
-        ) : (
-          <Card>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-              <Icon
-                name={report.mimeType === 'application/pdf' ? 'pdf' : 'document'}
-                color={colors.primary}
-                size={28}
-              />
-              <AppText style={{ flex: 1 }} numberOfLines={2}>
-                {report.fileName ?? report.title}
-              </AppText>
-            </View>
-          </Card>
-        )}
-        <Button label={t('records.open')} variant="secondary" onPress={open} />
+        <Pressable
+          onPress={() => void open()}
+          accessibilityRole="button"
+          accessibilityLabel={t('records.open')}
+        >
+          {preview ? (
+            <Image
+              source={{ uri: preview }}
+              accessibilityLabel={report.title}
+              resizeMode="contain"
+              style={{
+                width: '100%',
+                height: 360,
+                borderRadius: radius.lg,
+                backgroundColor: colors.surfaceAlt,
+              }}
+            />
+          ) : (
+            <Card>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+                <Icon
+                  name={report.mimeType === 'application/pdf' ? 'pdf' : 'document'}
+                  color={colors.primary}
+                  size={28}
+                />
+                <AppText style={{ flex: 1 }} numberOfLines={2}>
+                  {report.fileName ?? report.title}
+                </AppText>
+              </View>
+            </Card>
+          )}
+        </Pressable>
+        <Button label={t('records.open')} onPress={() => void open()} />
+        <Button label={t('records.share')} variant="secondary" onPress={() => void share()} />
 
         <TextField
           label={t('records.title')}

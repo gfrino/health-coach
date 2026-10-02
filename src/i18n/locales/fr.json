@@ -108,7 +108,7 @@
     "shareHint": "Astuce : depuis Mail, Fichiers, Photos ou l'app de votre laboratoire, utilisez « Partager → Health Coach » pour ajouter un compte rendu en un instant.",
     "sharedTitle": "Compte rendu ajouté",
     "sharedBody": "{{count}} fichier(s) enregistré(s) dans votre dossier santé.",
-    "open": "Ouvrir le fichier",
+    "open": "Ouvrir le document",
     "title": "Titre",
     "date": "Date de l'examen",
     "extractionTitle": "Lecture des valeurs par l'IA",
@@ -124,7 +124,8 @@
       "image": "Photos",
       "document": "Documents",
       "text": "Texte"
-    }
+    },
+    "share": "Partager"
   },
   "settings": {
     "title": "Réglages",

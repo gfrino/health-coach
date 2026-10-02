@@ -1,0 +1,7 @@
+{
+  "name": "file-preview",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "description": "In-app QuickLook preview of documents for Health Coach (PDF, images, Office, text)"
+}

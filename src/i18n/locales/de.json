@@ -108,7 +108,7 @@
     "shareHint": "Tipp: Aus Mail, Dateien, Fotos oder der App deines Labors „Teilen → Health Coach“ wählen, um einen Befund sofort hinzuzufügen.",
     "sharedTitle": "Befund hinzugefügt",
     "sharedBody": "{{count}} Datei(en) in der Gesundheitsakte gespeichert.",
-    "open": "Datei öffnen",
+    "open": "Dokument öffnen",
     "title": "Titel",
     "date": "Datum der Untersuchung",
     "extractionTitle": "Werte mit KI auslesen",
@@ -124,7 +124,8 @@
       "image": "Fotos",
       "document": "Dokumente",
       "text": "Text"
-    }
+    },
+    "share": "Teilen"
   },
   "settings": {
     "title": "Einstellungen",

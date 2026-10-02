@@ -9,7 +9,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "on-device-ai": ["./modules/on-device-ai"],
-      "audio-route": ["./modules/audio-route"]
+      "audio-route": ["./modules/audio-route"],
+      "file-preview": ["./modules/file-preview"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],

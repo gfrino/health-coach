@@ -108,7 +108,7 @@
     "shareHint": "Tip: from Mail, Files, Photos or your lab's app, use \"Share → Health Coach\" to add a report in a second.",
     "sharedTitle": "Report added",
     "sharedBody": "{{count}} file(s) saved in your health records.",
-    "open": "Open the file",
+    "open": "Open the document",
     "title": "Title",
     "date": "Exam date",
     "extractionTitle": "Reading values with AI",
@@ -124,7 +124,8 @@
       "image": "Photos",
       "document": "Documents",
       "text": "Text"
-    }
+    },
+    "share": "Share"
   },
   "settings": {
     "title": "Settings",
