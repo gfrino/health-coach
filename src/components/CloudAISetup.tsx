@@ -23,6 +23,9 @@ import { OptionGroup } from './OptionGroup';
 import { TextField } from './TextField';
 
 const MAX_MODELS_SHOWN = 12;
+const TEST_TIMEOUT_MS = 15_000;
+/** Errori della prova finale che non indicano una chiave sbagliata. */
+const SOFT_TEST_ERRORS = new Set<AIErrorCode>(['network', 'server', 'rate_limited', 'unknown']);
 
 type Status =
   | { kind: 'idle' }
@@ -97,7 +100,19 @@ export function CloudAISetup({
       if (!target) throw new AIError('model_not_found');
       setModel(target);
       setStatus({ kind: 'working', what: 'test' });
-      await adapter.testConnection(key, target);
+      // La chiave è già confermata dall'elenco dei modelli: la prova di risposta non deve bloccare.
+      // Con limite di tempo; problemi di rete o lentezza del modello non impediscono il collegamento.
+      try {
+        await Promise.race([
+          adapter.testConnection(key, target),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new AIError('network', 'timeout')), TEST_TIMEOUT_MS),
+          ),
+        ]);
+      } catch (e) {
+        const code = toAIError(e).code;
+        if (!SOFT_TEST_ERRORS.has(code)) throw e;
+      }
       await saveApiKey(provider, key);
       setSavedKey(key.trim());
       setKeyInput('');

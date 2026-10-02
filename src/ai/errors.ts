@@ -95,5 +95,9 @@ export function toAIError(e: unknown): AIError {
   if (e instanceof AIError) return e;
   if (e instanceof Error && e.name === 'AbortError') return new AIError('aborted');
   if (e instanceof TypeError) return new AIError('network', e.message);
+  // expo/fetch: "fetch failed: … The network connection was lost / timed out / offline".
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/fetch failed|network connection|timed out|offline|Internet connection/i.test(msg))
+    return new AIError('network', msg);
   return new AIError('unknown', e instanceof Error ? e.message : String(e));
 }

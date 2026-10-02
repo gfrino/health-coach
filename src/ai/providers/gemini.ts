@@ -220,7 +220,8 @@ export const geminiProvider: AIProvider = {
       headers: headers(apiKey),
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
-        generationConfig: { maxOutputTokens: 32 },
+        // Prova minima: niente ragionamento lungo prima di rispondere.
+        generationConfig: { maxOutputTokens: 32, thinkingConfig: { thinkingLevel: 'low' } },
       }),
     });
   },

@@ -12,6 +12,12 @@ import { useTheme } from '@/theme';
 
 import { loadToday, type TodayData } from './loadToday';
 
+/**
+ * Dati di esempio: in sviluppo, oppure nelle build locali per gli screenshot dello store
+ * (EXPO_PUBLIC_SCREENSHOTS=1 al momento della build). Mai nelle build per lo store.
+ */
+const SHOW_DEMO_DATA = __DEV__ || process.env.EXPO_PUBLIC_SCREENSHOTS === '1';
+
 export function TodaySection() {
   const { t, i18n } = useTranslation();
   const { spacing } = useTheme();
@@ -68,7 +74,7 @@ export function TodaySection() {
             }
           />
         )}
-        {__DEV__ ? (
+        {SHOW_DEMO_DATA ? (
           <Button
             label={t('today.loadDemo')}
             variant="ghost"
