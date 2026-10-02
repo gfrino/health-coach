@@ -1,5 +1,12 @@
 import type { ToolCall, ToolDefinition } from '@/ai/types';
-import { healthDataRepository, healthQueries, journalRepository, type Db } from '@/db';
+import {
+  healthDataRepository,
+  healthQueries,
+  journalRepository,
+  labReportRepository,
+  type Db,
+} from '@/db';
+import type { MessageAttachment } from '@/db/repositories/conversationRepository';
 import { DAY_MS } from '@/lib/dates';
 import { METRIC_UNITS, SleepStage } from '@/sources/model';
 import { stageMinutes } from '@/sources/sleep';
@@ -59,6 +66,19 @@ export const COACH_TOOLS: ToolDefinition[] = [
     },
   },
   {
+    name: 'read_document',
+    description:
+      "Open one document from the user's health records (lab reports, medical reports, Withings/doctor PDFs, photos of results) to read its contents. Use the id from the HEALTH RECORDS list. The document is shown to you right after this call.",
+    parameters: {
+      type: 'object',
+      properties: {
+        report_id: { type: 'string', description: 'Id of the document from HEALTH RECORDS.' },
+      },
+      required: ['report_id'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'save_journal_entry',
     description:
       "Write in the user's health journal what they told you about how they feel: mood, energy, symptoms, and short notes (sleep quality, meals, stress, events). Omit entry_id to create a new entry; pass the id of an entry (from get_journal or a previous save) to update it — only the fields you send change. Use the user's own words, briefly, in their language.",
@@ -110,6 +130,8 @@ function parseRange(args: Record<string, unknown>): [number, number] {
 export interface ToolOutcome {
   content: string;
   isError: boolean;
+  /** Documento della Cartella da mostrare al modello (contenuto inviato nel messaggio seguente). */
+  attachment?: MessageAttachment;
 }
 
 export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> {
@@ -158,6 +180,26 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
         const [from, to] = parseRange(args);
         const rows = await healthQueries.journalRange(db, from, to);
         return ok(rows.length ? rows : { message: 'No journal entries in the period.' });
+      }
+      case 'read_document': {
+        if (typeof args.report_id !== 'string' || !args.report_id)
+          throw new ToolInputError('"report_id" is required');
+        const report = await labReportRepository.getReport(db, args.report_id);
+        if (!report) throw new ToolInputError('document not found: use an id from HEALTH RECORDS');
+        return {
+          content: JSON.stringify({
+            ok: true,
+            title: report.title,
+            date: report.reportDate,
+            note: 'The document content follows in the next message.',
+          }),
+          isError: false,
+          attachment: {
+            reportId: report.id,
+            title: report.title,
+            mimeType: report.mimeType ?? '',
+          },
+        };
       }
       case 'save_journal_entry': {
         const input = journalInput(args);

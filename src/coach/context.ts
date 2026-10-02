@@ -73,6 +73,8 @@ export interface CoachContextInput {
   insights?: Insights;
   labs?: LabHighlight[];
   journal?: JournalContext[];
+  /** Documenti della Cartella salute (solo elenco; il contenuto si apre con read_document). */
+  records?: { id: string; title: string; date: string | null; kind: string }[];
   /** Prompt ridotto per i modelli sul telefono (contesto ~4K token). */
   compact?: boolean;
   /** Data corrente (YYYY-MM-DD) e ora locale: in fondo al prompt per non invalidare la cache. */
@@ -166,6 +168,20 @@ function labsSection(labs: LabHighlight[] | undefined): string | null {
   return `RECENT LAB RESULTS OUT OF RANGE\n${lines.join('\n')}`;
 }
 
+function recordsSection(
+  records: CoachContextInput['records'],
+  compact: boolean | undefined,
+): string | null {
+  if (!records?.length) return null;
+  const list = (compact ? records.slice(0, 5) : records.slice(0, 25)).map(
+    (r) => `- [${r.id}] ${r.title}${r.date ? ` — ${r.date}` : ''} (${r.kind})`,
+  );
+  const how = compact
+    ? 'You cannot open these documents with the on-device model: if the user asks about one, say it is saved and that an online AI model (Settings) can read it.'
+    : 'When the user asks about a report, exam, test result or document (e.g. "my latest Withings report"), call read_document with its id and base your answer on its contents. Never say you cannot see a document listed here.';
+  return `HEALTH RECORDS (documents the user saved in the app, newest first)\n${list.join('\n')}\n${how}`;
+}
+
 function journalSection(journal: JournalContext[] | undefined): string | null {
   if (!journal?.length) return null;
   const lines = journal.map((j) => {
@@ -226,6 +242,7 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     // I modelli sul telefono hanno poco contesto: bastano le osservazioni già calcolate.
     input.compact && input.insights?.lines.length ? null : metricsSection(input.metrics, []),
     labsSection(input.labs),
+    recordsSection(input.records, input.compact),
     journalSection(input.journal),
     dataAvailabilitySection(input),
     ANSWER_GUIDE,

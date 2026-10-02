@@ -117,7 +117,14 @@
     "delete": "Supprimer le compte rendu",
     "deleteTitle": "Supprimer le compte rendu ?",
     "deleteBody": "Le fichier sera définitivement supprimé de ce téléphone.",
-    "sharedNoFile": "Health Coach n'a reçu qu'un texte ou un lien, sans fichier. Partage le PDF ou une photo du rapport."
+    "sharedNoFile": "Health Coach n'a reçu qu'un texte ou un lien, sans fichier. Partage le PDF ou une photo du rapport.",
+    "kinds": {
+      "all": "Tous ({{count}})",
+      "pdf": "PDF",
+      "image": "Photos",
+      "document": "Documents",
+      "text": "Texte"
+    }
   },
   "settings": {
     "title": "Réglages",

@@ -117,7 +117,14 @@
     "delete": "Elimina referto",
     "deleteTitle": "Eliminare il referto?",
     "deleteBody": "Il file verrà cancellato definitivamente da questo telefono.",
-    "sharedNoFile": "Health Coach ha ricevuto solo un testo o un link, senza file. Condividi il PDF o la foto del referto."
+    "sharedNoFile": "Health Coach ha ricevuto solo un testo o un link, senza file. Condividi il PDF o la foto del referto.",
+    "kinds": {
+      "all": "Tutti ({{count}})",
+      "pdf": "PDF",
+      "image": "Foto",
+      "document": "Documenti",
+      "text": "Testo"
+    }
   },
   "settings": {
     "title": "Impostazioni",

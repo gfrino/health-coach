@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AppText, Button, EmptyState, Icon } from '@/components';
+import { AppText, Button, ChipGroup, EmptyState, Icon } from '@/components';
 import { getDb, labReportRepository } from '@/db';
 import type { LabReport } from '@/db/repositories/labReportRepository';
 import {
@@ -13,7 +13,16 @@ import {
   pickFromLibrary,
   type IncomingFile,
 } from '@/records/importReport';
+import { fileTypeOf, type FileKind } from '@/records/fileMeta';
 import { useTheme } from '@/theme';
+
+const kindOf = (mime: string | null): FileKind => fileTypeOf(mime)?.kind ?? 'document';
+
+function formatBytes(bytes: number, locale: string): string {
+  if (bytes < 1024 * 1024)
+    return `${Math.max(1, Math.round(bytes / 1024)).toLocaleString(locale)} KB`;
+  return `${(bytes / 1024 / 1024).toLocaleString(locale, { maximumFractionDigits: 1 })} MB`;
+}
 
 /** Scelta della fonte e import: usata dal "+" nell'header e dal pulsante dello stato vuoto. */
 export function useAddReport(onAdded: (ids: string[]) => void) {
@@ -51,6 +60,7 @@ export function RecordsSection({ reloadKey }: { reloadKey: number }) {
   const { t, i18n } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const [reports, setReports] = useState<LabReport[] | null>(null);
+  const [filter, setFilter] = useState<'all' | FileKind>('all');
 
   const load = useCallback(async () => {
     const db = await getDb();
@@ -92,7 +102,7 @@ export function RecordsSection({ reloadKey }: { reloadKey: number }) {
     );
   }
 
-  const fmt = (r: LabReport) =>
+  const date = (r: LabReport) =>
     r.reportDate
       ? new Date(`${r.reportDate}T00:00:00`).toLocaleDateString(i18n.language, {
           day: 'numeric',
@@ -100,10 +110,28 @@ export function RecordsSection({ reloadKey }: { reloadKey: number }) {
           year: 'numeric',
         })
       : '';
+  const kindLabel = (r: LabReport) => t(`records.kinds.${kindOf(r.mimeType)}`);
+  // Riga secondaria come in un archivio di file: tipo · dimensione · data.
+  const fmt = (r: LabReport) =>
+    [kindLabel(r), r.sizeBytes ? formatBytes(r.sizeBytes, i18n.language) : null, date(r)]
+      .filter(Boolean)
+      .join(' · ');
+  const kinds = [...new Set(reports.map((r) => kindOf(r.mimeType)))];
+  const visible = filter === 'all' ? reports : reports.filter((r) => kindOf(r.mimeType) === filter);
 
   return (
     <View style={{ gap: spacing.sm }}>
-      {reports.map((r) => (
+      {reports.length >= 4 && kinds.length > 1 ? (
+        <ChipGroup
+          value={filter}
+          onChange={setFilter}
+          options={[
+            { value: 'all' as const, label: t('records.kinds.all', { count: reports.length }) },
+            ...kinds.map((k) => ({ value: k, label: t(`records.kinds.${k}`) })),
+          ]}
+        />
+      ) : null}
+      {visible.map((r) => (
         <Pressable
           key={r.id}
           onPress={() => router.push({ pathname: '/me/report/[id]', params: { id: r.id } })}

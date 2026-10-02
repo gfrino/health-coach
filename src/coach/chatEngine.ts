@@ -3,9 +3,17 @@ import { getApiKey } from '@/ai/keyStore';
 import { getProvider, PROVIDERS } from '@/ai/registry';
 import type { ChatMessage, SendResult, Usage } from '@/ai/types';
 import type { AppSettings } from '@/config/settingsSchema';
-import { conversationRepository, getDb, healthQueries, profileRepository, type Db } from '@/db';
+import {
+  conversationRepository,
+  getDb,
+  healthQueries,
+  labReportRepository,
+  profileRepository,
+  type Db,
+} from '@/db';
 import type { MessageAttachment, StoredMessage } from '@/db/repositories/conversationRepository';
 import { loadAttachmentContent } from '@/records/attachmentContent';
+import { fileTypeOf } from '@/records/fileMeta';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS } from '@/lib/dates';
 
@@ -52,13 +60,20 @@ export interface TurnResult {
 }
 
 export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Promise<string> {
-  const [profile, memoryFacts, summaries, snapshot, journal] = await Promise.all([
+  const [profile, memoryFacts, summaries, snapshot, journal, reports] = await Promise.all([
     profileRepository.loadProfileContext(db),
     healthQueries.recentMemoryFacts(db),
     healthQueries.recentSummaries(db),
     buildHealthSnapshot(db, now),
     healthQueries.journalRange(db, now.getTime() - 7 * DAY_MS, now.getTime() + 1, 7),
+    labReportRepository.listReports(db),
   ]);
+  const records = reports.map((r) => ({
+    id: r.id,
+    title: r.title,
+    date: r.reportDate,
+    kind: fileTypeOf(r.mimeType)?.kind ?? 'document',
+  }));
   return composeSystemPrompt({
     coach: settings.coach,
     language: resolveLanguage(settings.language, deviceLanguageCodes()),
@@ -69,6 +84,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     anomalies: snapshot.anomalies,
     insights: snapshot.insights,
     journal,
+    records,
     now,
     compact: settings.ai.provider === 'device',
   });
@@ -128,6 +144,7 @@ async function runWithTools(
       toolCalls: result.toolCalls,
       raw: result.raw,
     });
+    const requested: MessageAttachment[] = [];
     for (const call of result.toolCalls) {
       cb.onToolUse?.(call.name);
       const outcome = await executeTool(db, call);
@@ -138,7 +155,10 @@ async function runWithTools(
         content: outcome.content,
         isError: outcome.isError,
       });
+      if (outcome.attachment) requested.push(outcome.attachment);
     }
+    // Documenti aperti con read_document: il contenuto (PDF, foto, testo) arriva subito dopo.
+    if (requested.length) messages.push(await documentMessage(settings, requested));
   }
   return { text: text.trim(), usage };
 }
@@ -148,6 +168,31 @@ export function attachmentNote(attachments: MessageAttachment[]): string {
   return attachments.length
     ? `[Attached: ${attachments.map((a) => a.title).join(', ')} — saved in the user's health records]`
     : '';
+}
+
+/** Messaggio con il contenuto dei documenti della Cartella richiesti dal modello. */
+async function documentMessage(
+  settings: AppSettings,
+  attachments: MessageAttachment[],
+): Promise<ChatMessage> {
+  const { provider, model } = await resolveAI(settings);
+  const content = await loadAttachmentContent(attachments, {
+    vision: provider.supportsVision(model),
+    pdf: provider.id !== 'device',
+  });
+  const parts = [
+    `Contents of the requested document(s) from the user's health records: ${attachments.map((a) => `"${a.title}"`).join(', ')}.`,
+    ...content.texts.map((d) => `--- Document "${d.name}" ---\n${d.text}\n--- End of document ---`),
+    content.unreadable.length
+      ? `(Could not be read with the current AI model: ${content.unreadable.join(', ')}.)`
+      : '',
+  ].filter(Boolean);
+  return {
+    role: 'user',
+    content: parts.join('\n\n'),
+    images: content.images.length ? content.images : undefined,
+    documents: content.documents.length ? content.documents : undefined,
+  };
 }
 
 /** Cronologia per il provider; l'ultimo messaggio utente porta il contenuto degli allegati. */

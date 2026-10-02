@@ -117,7 +117,14 @@
     "delete": "Delete report",
     "deleteTitle": "Delete the report?",
     "deleteBody": "The file will be permanently deleted from this phone.",
-    "sharedNoFile": "Health Coach only received text or a link, no file. Share the PDF or a photo of the report."
+    "sharedNoFile": "Health Coach only received text or a link, no file. Share the PDF or a photo of the report.",
+    "kinds": {
+      "all": "All ({{count}})",
+      "pdf": "PDF",
+      "image": "Photos",
+      "document": "Documents",
+      "text": "Text"
+    }
   },
   "settings": {
     "title": "Settings",

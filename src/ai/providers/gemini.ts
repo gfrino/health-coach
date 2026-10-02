@@ -74,15 +74,18 @@ export function toGeminiContents(messages: ChatMessage[], model: string): Gemini
   const out: GeminiContent[] = [];
   for (const m of messages) {
     if (m.role === 'user') {
-      out.push({
-        role: 'user',
-        parts: [
-          ...[...(m.images ?? []), ...(m.documents ?? [])].map((f) => ({
-            inlineData: { mimeType: f.mimeType, data: f.base64 },
-          })),
-          { text: m.content },
-        ],
-      });
+      const parts: GeminiPart[] = [
+        ...[...(m.images ?? []), ...(m.documents ?? [])].map((f) => ({
+          inlineData: { mimeType: f.mimeType, data: f.base64 },
+        })),
+        { text: m.content },
+      ];
+      // Dopo le risposte delle funzioni (es. documento aperto con read_document) si resta nello
+      // stesso turno utente: Gemini preferisce turni alternati.
+      const prev = out.at(-1);
+      if (prev?.role === 'user' && prev.parts.some((p) => p.functionResponse))
+        prev.parts.push(...parts);
+      else out.push({ role: 'user', parts });
     } else if (m.role === 'assistant') {
       if (m.raw?.provider === 'gemini' && m.raw.model === model) {
         // Rinvio delle parti originali: le thoughtSignature sono obbligatorie nelle chiamate a funzione.

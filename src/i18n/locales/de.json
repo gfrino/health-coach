@@ -117,7 +117,14 @@
     "delete": "Befund löschen",
     "deleteTitle": "Befund löschen?",
     "deleteBody": "Die Datei wird endgültig von diesem Telefon gelöscht.",
-    "sharedNoFile": "Health Coach hat nur einen Text oder Link erhalten, keine Datei. Teile das PDF oder ein Foto des Befunds."
+    "sharedNoFile": "Health Coach hat nur einen Text oder Link erhalten, keine Datei. Teile das PDF oder ein Foto des Befunds.",
+    "kinds": {
+      "all": "Alle ({{count}})",
+      "pdf": "PDF",
+      "image": "Fotos",
+      "document": "Dokumente",
+      "text": "Text"
+    }
   },
   "settings": {
     "title": "Einstellungen",
