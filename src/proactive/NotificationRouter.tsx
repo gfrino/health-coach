@@ -19,7 +19,16 @@ export function NotificationRouter() {
           shouldSetBadge: false,
         }),
       });
-      const open = (data: Record<string, unknown> | undefined) => {
+      const open = async (data: Record<string, unknown> | undefined) => {
+        // Check-in del mattino già preparato dal coach: si apre l'analisi completa.
+        const checkinId = typeof data?.checkinId === 'string' ? data.checkinId : null;
+        if (checkinId) {
+          const conversationId = await preparedCheckin(checkinId);
+          if (conversationId) {
+            router.navigate({ pathname: '/coach', params: { c: conversationId } });
+            return;
+          }
+        }
         const ask = typeof data?.ask === 'string' ? data.ask : null;
         if (!ask) return;
         router.navigate({ pathname: '/coach', params: { new: String(Date.now()), ask } });
@@ -27,12 +36,12 @@ export function NotificationRouter() {
       // App aperta da una notifica mentre era chiusa.
       void Notifications.getLastNotificationResponseAsync().then((r) => {
         if (r) {
-          open(r.notification.request.content.data);
+          void open(r.notification.request.content.data);
           void Notifications.clearLastNotificationResponseAsync();
         }
       });
       sub = Notifications.addNotificationResponseReceivedListener((r) => {
-        open(r.notification.request.content.data);
+        void open(r.notification.request.content.data);
         void Notifications.clearLastNotificationResponseAsync();
       });
     } catch {
@@ -41,4 +50,20 @@ export function NotificationRouter() {
     return () => sub?.remove();
   }, []);
   return null;
+}
+
+async function preparedCheckin(id: string): Promise<string | null> {
+  try {
+    const { conversationRepository, getDb, programRepository } =
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('@/db') as typeof import('@/db');
+    const db = await getDb();
+    const c = await programRepository.getCheckin(db, id);
+    if (!c?.conversationId) return null;
+    return (await conversationRepository.getConversation(db, c.conversationId))
+      ? c.conversationId
+      : null;
+  } catch {
+    return null;
+  }
 }

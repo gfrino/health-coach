@@ -36,7 +36,11 @@ interface Props {
 export function ChatView({ conversationId, onConversationCreated, initialPrompt }: Props) {
   const { t } = useTranslation();
   const toolLabel = (tool: string) =>
-    tool === 'save_journal_entry' ? t('chat.savingJournal') : t('chat.readingData');
+    tool === 'save_journal_entry'
+      ? t('chat.savingJournal')
+      : tool === 'create_program' || tool === 'update_program'
+        ? t('chat.savingProgram')
+        : t('chat.readingData');
   const { spacing } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const [messages, setMessages] = useState<StoredMessage[]>([]);

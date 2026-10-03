@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { ensureNotificationPermission } from '@/proactive/notifier';
+import { ensureNotificationPermission, refreshCheckins } from '@/proactive/notifier';
 import { useSettingsStore } from '@/store/settingsStore';
 
 import { enableHealthKitBackgroundDelivery, registerBackgroundSync } from './background';
@@ -16,13 +16,20 @@ export function HealthSyncManager() {
     (s) => s.settings.onboardingCompleted && s.settings.healthSourceConnectedAt !== null,
   );
 
-  const proactive = useSettingsStore(
-    (s) => s.settings.onboardingCompleted && s.settings.proactivity.mode === 'proactive',
-  );
-  // Coach proattivo: permesso per le notifiche (il sistema lo chiede una sola volta).
+  const onboarded = useSettingsStore((s) => s.settings.onboardingCompleted);
+  const proactivity = useSettingsStore((s) => s.settings.proactivity);
+  const prefsKey = JSON.stringify(proactivity);
+  // Coach proattivo: permesso per le notifiche (il sistema lo chiede una sola volta), poi i
+  // check-in del mattino e della sera vengono programmati (anche senza dati di salute collegati).
+  // Cambiando orari o modalità si riprogrammano.
   useEffect(() => {
-    if (proactive) void ensureNotificationPermission();
-  }, [proactive]);
+    if (!onboarded) return;
+    void (async () => {
+      if (proactivity.mode === 'proactive') await ensureNotificationPermission();
+      await refreshCheckins();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onboarded, prefsKey]);
 
   useEffect(() => {
     if (!connected) return;

@@ -54,6 +54,10 @@ export const icons = {
   info: { ios: 'info.circle', android: 'info' },
   chevronRight: { ios: 'chevron.right', android: 'chevron_right' },
   server: { ios: 'xmark.icloud', android: 'cloud_off' },
+  programs: { ios: 'checklist', android: 'checklist' },
+  edit: { ios: 'pencil', android: 'edit' },
+  circle: { ios: 'circle', android: 'radio_button_unchecked' },
+  calm: { ios: 'wind', android: 'self_improvement' },
 } satisfies Record<string, IconName>;
 
 export type AppIconName = keyof typeof icons;

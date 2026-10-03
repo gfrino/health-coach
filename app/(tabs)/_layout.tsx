@@ -9,9 +9,10 @@ import { useTheme } from '@/theme';
 const TABS: {
   name: string;
   icon: AppIconName;
-  labelKey: `tabs.${'coach' | 'me' | 'integrations' | 'settings'}`;
+  labelKey: `tabs.${'coach' | 'programs' | 'me' | 'integrations' | 'settings'}`;
 }[] = [
   { name: 'coach', icon: 'coach', labelKey: 'tabs.coach' },
+  { name: 'programs', icon: 'programs', labelKey: 'tabs.programs' },
   { name: 'me', icon: 'me', labelKey: 'tabs.me' },
   { name: 'integrations', icon: 'integrations', labelKey: 'tabs.integrations' },
   { name: 'settings', icon: 'settings', labelKey: 'tabs.settings' },

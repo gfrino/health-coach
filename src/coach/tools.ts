@@ -4,10 +4,13 @@ import {
   healthQueries,
   journalRepository,
   labReportRepository,
+  programRepository,
   type Db,
 } from '@/db';
+import { PROGRAM_CATEGORIES } from '@/db/repositories/programRepository';
+import { parseProgramItems } from '@/programs/parse';
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
-import { DAY_MS } from '@/lib/dates';
+import { DAY_MS, localIsoDate } from '@/lib/dates';
 import { METRIC_UNITS, SleepStage } from '@/sources/model';
 import { stageMinutes } from '@/sources/sleep';
 
@@ -24,6 +27,20 @@ const METRIC_TYPES = [
 ];
 const MAX_RANGE_DAYS = 400;
 const DATE = { type: 'string', description: 'Date in YYYY-MM-DD format (local time).' };
+const PROGRAM_ITEM = {
+  type: 'object',
+  properties: {
+    title: { type: 'string', description: 'The action, short and concrete.' },
+    details: { type: 'string', description: 'One line on how or why.' },
+    frequency: {
+      type: 'string',
+      enum: ['daily', 'once'],
+      description: 'daily = a habit to tick every day; once = a single step.',
+    },
+  },
+  required: ['title'],
+  additionalProperties: false,
+} as const;
 
 export const COACH_TOOLS: ToolDefinition[] = [
   {
@@ -102,6 +119,61 @@ export const COACH_TOOLS: ToolDefinition[] = [
         text: { type: 'string', description: 'Short note in the user’s language.' },
         tags: { type: 'array', items: { type: 'string' }, description: 'Optional keywords.' },
       },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'create_program',
+    description:
+      "Create a program in the Programs tab: a plan with concrete actions the user ticks off (daily habits or one-time steps). Use it when the user asks for a plan/routine/program or accepts one you proposed. Write in the user's language.",
+    parameters: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: 'Short title, e.g. "Better sleep in 14 days".' },
+        goal: { type: 'string', description: 'One sentence: what the program aims for.' },
+        category: { type: 'string', enum: [...PROGRAM_CATEGORIES] },
+        duration_days: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 365,
+          description: 'Length in days. Omit for an open-ended program.',
+        },
+        items: {
+          type: 'array',
+          minItems: 1,
+          maxItems: 12,
+          description: '3–7 concrete actions.',
+          items: PROGRAM_ITEM,
+        },
+      },
+      required: ['title', 'items'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'update_program',
+    description:
+      'Change one of the ACTIVE PROGRAMS: rename it, change the goal, mark it completed or archived, add actions, edit or remove actions (ids from ACTIVE PROGRAMS). Only the fields you send change.',
+    parameters: {
+      type: 'object',
+      properties: {
+        program_id: { type: 'string' },
+        title: { type: 'string' },
+        goal: { type: 'string' },
+        status: { type: 'string', enum: ['active', 'completed', 'archived'] },
+        add_items: { type: 'array', items: PROGRAM_ITEM },
+        update_items: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: { item_id: { type: 'string' }, ...PROGRAM_ITEM.properties },
+            required: ['item_id'],
+            additionalProperties: false,
+          },
+        },
+        remove_item_ids: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['program_id'],
       additionalProperties: false,
     },
   },
@@ -212,6 +284,67 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
           throw new ToolInputError('nothing to save: give mood, energy, symptoms or text');
         const id = await journalRepository.createEntry(db, input, 'coach');
         return ok({ saved: true, entry_id: id });
+      }
+      case 'create_program': {
+        if (typeof args.title !== 'string' || !args.title.trim())
+          throw new ToolInputError('"title" is required');
+        const items = parseProgramItems(args.items);
+        if (!items.length) throw new ToolInputError('"items" needs at least one action');
+        const duration =
+          typeof args.duration_days === 'number' && args.duration_days >= 1
+            ? Math.min(365, Math.round(args.duration_days))
+            : null;
+        const id = await programRepository.createProgram(
+          db,
+          {
+            title: args.title.slice(0, 80),
+            goal: typeof args.goal === 'string' ? args.goal.slice(0, 300) : null,
+            category: programRepository.asCategory(args.category),
+            startDay: localIsoDate(new Date()),
+            durationDays: duration,
+            items,
+          },
+          'coach',
+        );
+        const created = await programRepository.getProgram(db, id);
+        return ok({
+          created: true,
+          program_id: id,
+          item_ids: created?.items.map((i) => ({ id: i.id, title: i.title })),
+          note: 'Shown in the Programs tab, where the user can tick actions and edit it.',
+        });
+      }
+      case 'update_program': {
+        const id = typeof args.program_id === 'string' ? args.program_id : '';
+        const program = id ? await programRepository.getProgram(db, id) : null;
+        if (!program) throw new ToolInputError('program not found: use an id from ACTIVE PROGRAMS');
+        const status = args.status;
+        await programRepository.updateProgram(db, id, {
+          title: typeof args.title === 'string' ? args.title.slice(0, 80) : undefined,
+          goal: typeof args.goal === 'string' ? args.goal.slice(0, 300) : undefined,
+          status:
+            status === 'active' || status === 'completed' || status === 'archived'
+              ? status
+              : undefined,
+        });
+        const own = new Set(program.items.map((i) => i.id));
+        if (Array.isArray(args.remove_item_ids))
+          for (const itemId of args.remove_item_ids)
+            if (typeof itemId === 'string' && own.has(itemId))
+              await programRepository.removeItem(db, itemId);
+        if (Array.isArray(args.update_items))
+          for (const u of args.update_items as Record<string, unknown>[]) {
+            if (typeof u?.item_id !== 'string' || !own.has(u.item_id)) continue;
+            await programRepository.updateItem(db, u.item_id, {
+              title: typeof u.title === 'string' ? u.title.slice(0, 120) : undefined,
+              details: typeof u.details === 'string' ? u.details.slice(0, 300) : undefined,
+              frequency:
+                u.frequency === 'once' || u.frequency === 'daily' ? u.frequency : undefined,
+            });
+          }
+        for (const item of parseProgramItems(args.add_items))
+          await programRepository.addItem(db, id, item);
+        return ok({ updated: true, program_id: id });
       }
       default:
         return { content: JSON.stringify({ error: `unknown tool: ${call.name}` }), isError: true };

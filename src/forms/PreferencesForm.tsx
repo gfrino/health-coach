@@ -19,7 +19,10 @@ export function PreferencesForm({ value, onChange }: Props) {
   const set = (patch: Partial<Proactivity>) => onChange({ ...value, ...patch });
   const proactive = value.mode === 'proactive';
 
-  const time = (label: string, key: 'eveningSummaryTime' | 'quietHoursStart' | 'quietHoursEnd') => (
+  const time = (
+    label: string,
+    key: 'morningCheckinTime' | 'eveningSummaryTime' | 'quietHoursStart' | 'quietHoursEnd',
+  ) => (
     <Stepper
       label={label}
       display={value[key]}
@@ -63,6 +66,10 @@ export function PreferencesForm({ value, onChange }: Props) {
           </Card>
 
           <Card>
+            {time(t('preferences.morningTime'), 'morningCheckinTime')}
+            <AppText variant="caption" tone="textMuted">
+              {t('preferences.morningHint')}
+            </AppText>
             {time(t('preferences.summaryTime'), 'eveningSummaryTime')}
             <AppText variant="headline" style={{ marginTop: spacing.sm }}>
               {t('preferences.quietHours')}

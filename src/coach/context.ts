@@ -61,6 +61,17 @@ export interface JournalContext {
   tags?: string[];
 }
 
+export interface ProgramContext {
+  id: string;
+  title: string;
+  goal: string | null;
+  day: number;
+  durationDays: number | null;
+  /** Percentuale di azioni quotidiane fatte negli ultimi 7 giorni (null se appena iniziato). */
+  adherence7: number | null;
+  items: { id: string; title: string; frequency: 'daily' | 'once'; done: boolean }[];
+}
+
 export interface CoachContextInput {
   coach: CoachConfig;
   language: SupportedLanguage;
@@ -75,6 +86,8 @@ export interface CoachContextInput {
   journal?: JournalContext[];
   /** Documenti della Cartella salute (solo elenco; il contenuto si apre con read_document). */
   records?: { id: string; title: string; date: string | null; kind: string }[];
+  /** Programmi attivi con le azioni e le spunte di oggi. */
+  programs?: ProgramContext[];
   /** Prompt ridotto per i modelli sul telefono (contesto ~4K token). */
   compact?: boolean;
   /** Data corrente (YYYY-MM-DD) e ora locale: in fondo al prompt per non invalidare la cache. */
@@ -216,6 +229,22 @@ ${rule}`
 ${rule}`;
 }
 
+const PROGRAM_RULE = `PROGRAMS
+When the user asks for a plan, a routine or a program (or agrees to one you proposed), create it with create_program: a short title, the goal, 3–7 concrete, doable actions (daily habits or one-time steps), each with a one-line how-to. Adapt it to their data, conditions, diet and preferences. To change an existing program (add, edit or remove actions, rename, mark it completed) use update_program with ids from ACTIVE PROGRAMS. Tell the user the program is in the Programs tab, where they can tick actions and edit it. When relevant, encourage progress on their active programs.`;
+
+export function programsSection(programs: ProgramContext[] | undefined, compact?: boolean) {
+  if (!programs?.length) return null;
+  const lines = programs.map((p) => {
+    const head = `- ${compact ? '' : `[${p.id}] `}"${p.title}"${p.goal ? ` — goal: ${p.goal}` : ''} · day ${p.day}${p.durationDays ? ` of ${p.durationDays}` : ''}${p.adherence7 != null ? ` · last 7 days ${p.adherence7}% done` : ''}`;
+    const items = p.items.map(
+      (i) =>
+        `  - ${compact ? '' : `[${i.id}] `}${i.title} (${i.frequency === 'once' ? 'once' : 'daily'}${i.done ? ', done' + (i.frequency === 'daily' ? ' today' : '') : ''})`,
+    );
+    return [head, ...items].join('\n');
+  });
+  return `ACTIVE PROGRAMS\n${lines.join('\n')}`;
+}
+
 export function composeSystemPrompt(full: CoachContextInput): string {
   const input: CoachContextInput = full.compact
     ? {
@@ -244,10 +273,12 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     labsSection(input.labs),
     recordsSection(input.records, input.compact),
     journalSection(input.journal),
+    programsSection(input.programs, input.compact),
     dataAvailabilitySection(input),
     ANSWER_GUIDE,
     // Il modello sul telefono non ha tool: niente regole sul diario.
     input.compact ? null : JOURNAL_RULE,
+    input.compact ? null : PROGRAM_RULE,
     `CURRENT DATE: ${localIsoDate(input.now)} ${input.now.toTimeString().slice(0, 5)}`,
   ];
   return sections.filter((s): s is string => !!s).join('\n\n');

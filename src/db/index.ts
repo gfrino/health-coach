@@ -16,3 +16,4 @@ export * as labReportRepository from './repositories/labReportRepository';
 export * as integrationInterestRepository from './repositories/integrationInterestRepository';
 export * as journalRepository from './repositories/journalRepository';
 export * as notificationRepository from './repositories/notificationRepository';
+export * as programRepository from './repositories/programRepository';

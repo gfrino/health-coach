@@ -11,7 +11,8 @@
     "selected": "selezionato",
     "add": "Aggiungi",
     "delete": "Elimina",
-    "removeItem": "Rimuovi {{item}}"
+    "removeItem": "Rimuovi {{item}}",
+    "edit": "Modifica"
   },
   "tabs": {
     "coach": "Coach",
@@ -20,7 +21,8 @@
     "records": "Cartella",
     "settings": "Impostazioni",
     "integrations": "Integrazioni",
-    "me": "Io"
+    "me": "Io",
+    "programs": "Programmi"
   },
   "coach": {
     "emptyTitle": "Il tuo coach ti aspetta",
@@ -462,7 +464,7 @@
     "modes": {
       "proactive": {
         "label": "Proattivo",
-        "description": "Riepilogo serale e segnalazioni quando nota qualcosa di importante."
+        "description": "Un check-in al mattino sulla tua notte, un riepilogo la sera e avvisi quando nota qualcosa di importante."
       },
       "passive": {
         "label": "Passivo",
@@ -481,7 +483,9 @@
       "daily": "Giornaliero",
       "weekly": "Settimanale",
       "monthly": "Mensile"
-    }
+    },
+    "morningTime": "Check-in del mattino",
+    "morningHint": "Il coach analizza la tua notte e la giornata che ti aspetta e te la manda a quest'ora."
   },
   "sync": {
     "title": "Quasi pronto",
@@ -524,7 +528,8 @@
     "attach": "Allega",
     "attachHint": "Foto, fotocamera o documento",
     "attachmentA11y": "Allegato: {{name}}",
-    "removeAttachment": "Rimuovi {{name}}"
+    "removeAttachment": "Rimuovi {{name}}",
+    "savingProgram": "Aggiorno il tuo programma…"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",
@@ -625,7 +630,8 @@
     "coach": "Coach",
     "integrations": "Servizi",
     "settings": "Opzioni",
-    "me": "Io"
+    "me": "Io",
+    "programs": "Programmi"
   },
   "voice": {
     "talk": "Parla",
@@ -699,6 +705,14 @@
       "title": "La tua settimana",
       "body": "Sonno medio {{sleep}}, {{steps}} passi al giorno. Tocca per il resoconto.",
       "ask": "Fammi il resoconto della mia settimana e dimmi un obiettivo per la prossima."
+    },
+    "checkin": {
+      "morningBody": "Tocca per vedere come hai dormito e su cosa puntare oggi.",
+      "eveningBody": "Tocca per il punto del coach sulla giornata e i consigli per dormire bene.",
+      "eveningPrograms_one": "Ti resta 1 azione del programma da spuntare oggi. Tocca per il riepilogo della sera.",
+      "eveningPrograms_other": "Ti restano {{count}} azioni dei programmi da spuntare oggi. Tocca per il riepilogo della sera.",
+      "weeklyBody": "Il riepilogo della settimana è pronto: tocca per leggerlo.",
+      "conversationTitle": "Check-in · {{date}}"
     }
   },
   "healthLists": {
@@ -735,5 +749,62 @@
     "subtitle": "Dati personali, obiettivi, condizioni, farmaci e allergie",
     "saved": "Salvato",
     "healthTitle": "La tua salute"
+  },
+  "programs": {
+    "new": "Nuovo programma",
+    "emptyTitle": "Ancora nessun programma",
+    "emptyBody": "Il coach può prepararti un piano (sonno, attività, alimentazione, stress…) con azioni semplici da spuntare ogni giorno. Puoi chiederlo anche in chat.",
+    "noActive": "Nessun programma attivo. Creane uno nuovo con +.",
+    "finished": "Conclusi",
+    "openHint": "Apre il programma",
+    "status": {
+      "active": "Attivo",
+      "completed": "Completato",
+      "archived": "Archiviato"
+    },
+    "day": "Giorno {{day}}",
+    "dayOf": "Giorno {{day}} di {{total}}",
+    "todayProgress": "{{done}} di {{total}} fatte oggi",
+    "daily": "Ogni giorno",
+    "once": "Una volta",
+    "categories": {
+      "sleep": "Dormire meglio",
+      "activity": "Più movimento",
+      "nutrition": "Mangiare bene",
+      "stress": "Meno stress",
+      "weight": "Peso",
+      "general": "Altro"
+    },
+    "newIntro": "{{name}} preparerà il programma in base al tuo profilo e ai tuoi dati. Dopo puoi cambiare tutto.",
+    "newIntroNoAI": "Scrivi il tuo programma e le sue azioni. Per farlo creare dal coach, scegli un'AI nelle Opzioni.",
+    "focus": "Su cosa vuoi lavorare?",
+    "wish": "Qualcosa in particolare? (facoltativo)",
+    "wishPlaceholder": "Es. addormentarmi prima delle 23, camminare di più a pranzo…",
+    "duration": "Durata",
+    "openEnded": "Senza fine",
+    "days_one": "{{count}} giorno",
+    "days_other": "{{count}} giorni",
+    "generate": "Crealo con {{name}}",
+    "createManual": "Lo scrivo io",
+    "generating": "{{name}} sta preparando il tuo programma…",
+    "generateFailed": "Non è stato possibile creare il programma. Riprova o scrivilo tu.",
+    "notFound": "Programma non trovato",
+    "editTitle": "Modifica programma",
+    "titleLabel": "Titolo",
+    "goalLabel": "Obiettivo",
+    "actions": "Azioni",
+    "actionPlaceholder": "Azione",
+    "detailsPlaceholder": "Come farla (facoltativo)",
+    "addAction": "Aggiungi un'azione",
+    "byCoach": "creato dal coach",
+    "today": "Oggi",
+    "noActions": "Ancora nessuna azione: tocca Modifica per aggiungerne.",
+    "askCoach": "Parlane con il coach",
+    "askCoachPrompt": "Facciamo il punto sul mio programma \"{{title}}\": come sto andando e cosa dovrei cambiare?",
+    "markCompleted": "Segna come completato",
+    "restart": "Rendilo di nuovo attivo",
+    "delete": "Elimina programma",
+    "deleteTitle": "Eliminare il programma?",
+    "deleteBody": "Il programma e i progressi verranno eliminati da questo telefono."
   }
 }

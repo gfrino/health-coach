@@ -62,6 +62,8 @@ export const proactivitySchema = z.object({
   mode: z.enum(['proactive', 'passive']),
   maxNotificationsPerDay: z.number().int().min(0).max(5),
   eveningSummaryTime: timeOfDay,
+  /** Check-in del mattino (analisi della notte): aggiunto dopo, default per chi l'aveva già. */
+  morningCheckinTime: timeOfDay.default('08:00'),
   quietHoursStart: timeOfDay,
   quietHoursEnd: timeOfDay,
   reports: z.object({ daily: z.boolean(), weekly: z.boolean(), monthly: z.boolean() }),
@@ -131,6 +133,7 @@ export function getDefaultSettings(region?: string | null): AppSettings {
       mode: 'proactive',
       maxNotificationsPerDay: 2,
       eveningSummaryTime: '20:30',
+      morningCheckinTime: '08:00',
       quietHoursStart: '22:00',
       quietHoursEnd: '07:30',
       reports: { daily: true, weekly: true, monthly: false },

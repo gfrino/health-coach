@@ -11,7 +11,8 @@
     "selected": "selected",
     "add": "Add",
     "delete": "Delete",
-    "removeItem": "Remove {{item}}"
+    "removeItem": "Remove {{item}}",
+    "edit": "Edit"
   },
   "tabs": {
     "coach": "Coach",
@@ -20,7 +21,8 @@
     "records": "Records",
     "settings": "Settings",
     "integrations": "Integrations",
-    "me": "Me"
+    "me": "Me",
+    "programs": "Programs"
   },
   "coach": {
     "emptyTitle": "Your coach is waiting",
@@ -462,7 +464,7 @@
     "modes": {
       "proactive": {
         "label": "Proactive",
-        "description": "Evening summary and heads-ups when it notices something important."
+        "description": "A morning check-in on your night, an evening summary and heads-ups when it notices something important."
       },
       "passive": {
         "label": "Passive",
@@ -481,7 +483,9 @@
       "daily": "Daily",
       "weekly": "Weekly",
       "monthly": "Monthly"
-    }
+    },
+    "morningTime": "Morning check-in",
+    "morningHint": "Your coach analyses your night and your day ahead and sends it to you at this time."
   },
   "sync": {
     "title": "Almost ready",
@@ -524,7 +528,8 @@
     "attach": "Attach",
     "attachHint": "Photo, camera or document",
     "attachmentA11y": "Attachment: {{name}}",
-    "removeAttachment": "Remove {{name}}"
+    "removeAttachment": "Remove {{name}}",
+    "savingProgram": "Updating your program…"
   },
   "integrations": {
     "healthTitle": "Phone health data",
@@ -625,7 +630,8 @@
     "coach": "Coach",
     "integrations": "Services",
     "settings": "Settings",
-    "me": "Me"
+    "me": "Me",
+    "programs": "Programs"
   },
   "voice": {
     "talk": "Talk",
@@ -699,6 +705,14 @@
       "title": "Your week",
       "body": "Average sleep {{sleep}}, {{steps}} steps a day. Tap for the report.",
       "ask": "Give me a report of my week and one goal for next week."
+    },
+    "checkin": {
+      "morningBody": "Tap to see how you slept and what to focus on today.",
+      "eveningBody": "Tap for your coach's take on today and tips for a good night.",
+      "eveningPrograms_one": "You still have 1 program action to tick today. Tap for your evening summary.",
+      "eveningPrograms_other": "You still have {{count}} program actions to tick today. Tap for your evening summary.",
+      "weeklyBody": "Your week in review is ready: tap to read it.",
+      "conversationTitle": "Check-in · {{date}}"
     }
   },
   "healthLists": {
@@ -735,5 +749,62 @@
     "subtitle": "Personal details, goals, conditions, medications and allergies",
     "saved": "Saved",
     "healthTitle": "Your health"
+  },
+  "programs": {
+    "new": "New program",
+    "emptyTitle": "No programs yet",
+    "emptyBody": "Your coach can build a plan for you (sleep, activity, nutrition, stress…) with simple actions to tick off every day. You can also ask for one in the chat.",
+    "noActive": "No active programs. Create a new one with +.",
+    "finished": "Finished",
+    "openHint": "Opens the program",
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "day": "Day {{day}}",
+    "dayOf": "Day {{day}} of {{total}}",
+    "todayProgress": "{{done}} of {{total}} done today",
+    "daily": "Every day",
+    "once": "Once",
+    "categories": {
+      "sleep": "Better sleep",
+      "activity": "More activity",
+      "nutrition": "Eating well",
+      "stress": "Less stress",
+      "weight": "Weight",
+      "general": "Other"
+    },
+    "newIntro": "{{name}} will build the program from your profile and data. You can change everything afterwards.",
+    "newIntroNoAI": "Write your program and its actions. To have it created by your coach, choose an AI in Settings.",
+    "focus": "What do you want to work on?",
+    "wish": "Anything specific? (optional)",
+    "wishPlaceholder": "E.g. fall asleep before 11 pm, walk more at lunchtime…",
+    "duration": "Duration",
+    "openEnded": "No end",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "generate": "Create it with {{name}}",
+    "createManual": "Write it myself",
+    "generating": "{{name}} is preparing your program…",
+    "generateFailed": "The program couldn't be created. Try again or write it yourself.",
+    "notFound": "Program not found",
+    "editTitle": "Edit program",
+    "titleLabel": "Title",
+    "goalLabel": "Goal",
+    "actions": "Actions",
+    "actionPlaceholder": "Action",
+    "detailsPlaceholder": "How to do it (optional)",
+    "addAction": "Add an action",
+    "byCoach": "created by your coach",
+    "today": "Today",
+    "noActions": "No actions yet: tap Edit to add some.",
+    "askCoach": "Talk about it with your coach",
+    "askCoachPrompt": "Let's review my program \"{{title}}\": how am I doing and what should I adjust?",
+    "markCompleted": "Mark as completed",
+    "restart": "Make it active again",
+    "delete": "Delete program",
+    "deleteTitle": "Delete the program?",
+    "deleteBody": "The program and its progress will be deleted from this phone."
   }
 }

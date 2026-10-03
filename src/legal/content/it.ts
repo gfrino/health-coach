@@ -74,7 +74,7 @@ Sono conservati in un database **cifrato** (SQLCipher, AES-256) sul dispositivo;
 ## Quando i dati lasciano il telefono
 Solo nei casi seguenti, e sempre direttamente dal tuo telefono al servizio che hai scelto (mai attraverso di noi):
 
-1. **AI online** (OpenAI, Anthropic, Google), solo se la attivi: a ogni domanda l'app invia il tuo messaggio, un riepilogo dei dati pertinenti (es. medie di sonno e passi) e gli eventuali allegati. Il fornitore li tratta secondo la propria informativa; i server possono trovarsi fuori dalla Svizzera e dall'UE (es. USA). Con OpenAI chiediamo di non conservare le conversazioni (\`store: false\`). Con l'**AI del telefono** (predefinita) nulla lascia il dispositivo.
+1. **AI online** (OpenAI, Anthropic, Google), solo se la attivi: a ogni domanda l'app invia il tuo messaggio, un riepilogo dei dati pertinenti (es. medie di sonno e passi) e gli eventuali allegati. Se il coach è proattivo, lo stesso riepilogo viene inviato anche una volta al giorno per preparare il check-in del mattino. Il fornitore li tratta secondo la propria informativa; i server possono trovarsi fuori dalla Svizzera e dall'UE (es. USA). Con OpenAI chiediamo di non conservare le conversazioni (\`store: false\`). Con l'**AI del telefono** (predefinita) nulla lascia il dispositivo.
 2. **Voce**: la trascrizione avviene sul telefono quando possibile; altrimenti usa il servizio vocale di Apple o Google. Nella **conversazione a voce con OpenAI**, l'audio è inviato in tempo reale a OpenAI.
 3. **Condivisione ed esportazione** che avvii tu (es. aprire un documento in un'altra app).
 

@@ -196,7 +196,10 @@ export function evaluateNotifications(input: ProactiveInput): NotificationCandid
 }
 
 /** Tra i candidati, al massimo UNO per controllo: il più importante non ancora inviato. */
-export function pickNotification(input: ProactiveInput): NotificationCandidate | null {
+export function pickNotification(
+  input: ProactiveInput,
+  exclude: ReadonlySet<string> = new Set(),
+): NotificationCandidate | null {
   const { now, prefs, sent } = input;
   if (inQuietHours(now, prefs.quietHoursStart, prefs.quietHoursEnd)) return null;
   const startOfDay = new Date(now);
@@ -207,7 +210,7 @@ export function pickNotification(input: ProactiveInput): NotificationCandidate |
   const lastSent = Math.max(0, ...sent.map((s) => s.sentAt));
   const ids = new Set(sent.map((s) => s.id));
   const fresh = evaluateNotifications(input)
-    .filter((c) => !ids.has(c.id))
+    .filter((c) => !ids.has(c.id) && !exclude.has(c.kind))
     .filter((c) => c.priority >= 3 || now.getTime() - lastSent >= 90 * MIN)
     .sort((a, b) => b.priority - a.priority);
   return fresh[0] ?? null;

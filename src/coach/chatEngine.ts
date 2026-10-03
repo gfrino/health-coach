@@ -16,6 +16,7 @@ import { loadAttachmentContent } from '@/records/attachmentContent';
 import { fileTypeOf } from '@/records/fileMeta';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS } from '@/lib/dates';
+import { loadProgramContext } from '@/programs/summary';
 
 import { composeSystemPrompt, recentHistory } from './context';
 import { buildHealthSnapshot } from './snapshot';
@@ -60,14 +61,17 @@ export interface TurnResult {
 }
 
 export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Promise<string> {
-  const [profile, memoryFacts, summaries, snapshot, journal, reports] = await Promise.all([
-    profileRepository.loadProfileContext(db),
-    healthQueries.recentMemoryFacts(db),
-    healthQueries.recentSummaries(db),
-    buildHealthSnapshot(db, now),
-    healthQueries.journalRange(db, now.getTime() - 7 * DAY_MS, now.getTime() + 1, 7),
-    labReportRepository.listReports(db),
-  ]);
+  const [profile, memoryFacts, summaries, snapshot, journal, reports, programs] = await Promise.all(
+    [
+      profileRepository.loadProfileContext(db),
+      healthQueries.recentMemoryFacts(db),
+      healthQueries.recentSummaries(db),
+      buildHealthSnapshot(db, now),
+      healthQueries.journalRange(db, now.getTime() - 7 * DAY_MS, now.getTime() + 1, 7),
+      labReportRepository.listReports(db),
+      loadProgramContext(db, now),
+    ],
+  );
   const records = reports.map((r) => ({
     id: r.id,
     title: r.title,
@@ -85,6 +89,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     insights: snapshot.insights,
     journal,
     records,
+    programs,
     now,
     compact: settings.ai.provider === 'device',
   });
@@ -354,4 +359,62 @@ export async function generateWelcome(
     throw toAIError(e);
   }
   return conversationId;
+}
+
+/** Una richiesta senza tool né cronologia (es. generare un programma in JSON). */
+export async function completeOnce(
+  settings: AppSettings,
+  instruction: string,
+  signal?: AbortSignal,
+): Promise<string> {
+  const db = await getDb();
+  const { provider, model, apiKey } = await resolveAI(settings);
+  const system = await buildSystemPrompt(db, settings, new Date());
+  const result = await provider.sendMessage({ system }, [{ role: 'user', content: instruction }], {
+    apiKey,
+    model,
+    signal,
+  });
+  if (result.stopReason === 'refusal' && !result.text) throw new AIError('refused');
+  return result.text.trim();
+}
+
+/**
+ * Check-in del coach (es. analisi del mattino): una conversazione nuova con solo la risposta
+ * del coach, da aprire toccando la notifica. L'istruzione non viene salvata.
+ */
+export async function generateCheckin(
+  settings: AppSettings,
+  title: string,
+  instruction: string,
+  signal?: AbortSignal,
+): Promise<{ conversationId: string; text: string }> {
+  const db = await getDb();
+  const system = await buildSystemPrompt(db, settings, new Date());
+  const { text, usage } = await runWithTools(
+    db,
+    settings,
+    system,
+    [{ role: 'user', content: instruction }],
+    { signal },
+  );
+  if (!text) throw new AIError('unknown', 'Risposta vuota');
+  const conversationId = await conversationRepository.createConversation(db, {
+    title,
+    provider: settings.ai.provider,
+    model: settings.ai.model,
+  });
+  const msg = await conversationRepository.addMessage(db, {
+    conversationId,
+    role: 'assistant',
+    content: '',
+    status: 'streaming',
+  });
+  await conversationRepository.finishMessage(db, msg.id, {
+    content: text,
+    status: 'complete',
+    inputTokens: usage.inputTokens,
+    outputTokens: usage.outputTokens,
+  });
+  return { conversationId, text };
 }

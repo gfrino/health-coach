@@ -70,7 +70,7 @@ Sie werden in einer **verschlüsselten** Datenbank (SQLCipher, AES-256) auf dem 
 ## Wann Daten das Telefon verlassen
 Nur in den folgenden Fällen und immer direkt von deinem Telefon an den gewählten Dienst (nie über uns):
 
-1. **Online-KI** (OpenAI, Anthropic, Google), nur wenn du sie aktivierst: Bei jeder Frage sendet die App deine Nachricht, eine Zusammenfassung der relevanten Daten (z. B. Durchschnittswerte zu Schlaf und Schritten) und allfällige Anhänge. Der Anbieter verarbeitet sie gemäss seiner eigenen Datenschutzerklärung; die Server können sich ausserhalb der Schweiz und der EU befinden (z. B. in den USA). Bei OpenAI verlangen wir, dass Gespräche nicht gespeichert werden (\`store: false\`). Mit der **KI des Telefons** (Standard) verlässt nichts das Gerät.
+1. **Online-KI** (OpenAI, Anthropic, Google), nur wenn du sie aktivierst: Bei jeder Frage sendet die App deine Nachricht, eine Zusammenfassung der relevanten Daten (z. B. Durchschnittswerte zu Schlaf und Schritten) und allfällige Anhänge. Ist der Coach proaktiv, wird diese Zusammenfassung zudem einmal täglich gesendet, um deinen Check-in am Morgen vorzubereiten. Der Anbieter verarbeitet sie gemäss seiner eigenen Datenschutzerklärung; die Server können sich ausserhalb der Schweiz und der EU befinden (z. B. in den USA). Bei OpenAI verlangen wir, dass Gespräche nicht gespeichert werden (\`store: false\`). Mit der **KI des Telefons** (Standard) verlässt nichts das Gerät.
 2. **Sprache**: Die Transkription erfolgt wenn möglich auf dem Telefon, sonst über den Sprachdienst von Apple oder Google. Im **Sprachgespräch mit OpenAI** wird das Audio in Echtzeit an OpenAI übertragen.
 3. **Teilen und Exportieren**, das du selbst auslöst (z. B. ein Dokument in einer anderen App öffnen).
 

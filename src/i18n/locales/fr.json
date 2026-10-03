@@ -11,7 +11,8 @@
     "selected": "sélectionné",
     "add": "Ajouter",
     "delete": "Supprimer",
-    "removeItem": "Retirer {{item}}"
+    "removeItem": "Retirer {{item}}",
+    "edit": "Modifier"
   },
   "tabs": {
     "coach": "Coach",
@@ -20,7 +21,8 @@
     "records": "Dossier",
     "settings": "Réglages",
     "integrations": "Intégrations",
-    "me": "Moi"
+    "me": "Moi",
+    "programs": "Programmes"
   },
   "coach": {
     "emptyTitle": "Votre coach vous attend",
@@ -462,7 +464,7 @@
     "modes": {
       "proactive": {
         "label": "Proactif",
-        "description": "Résumé du soir et signalements lorsqu'il remarque quelque chose d'important."
+        "description": "Un check-in le matin sur ta nuit, un résumé le soir et des alertes quand il remarque quelque chose d'important."
       },
       "passive": {
         "label": "Passif",
@@ -481,7 +483,9 @@
       "daily": "Quotidien",
       "weekly": "Hebdomadaire",
       "monthly": "Mensuel"
-    }
+    },
+    "morningTime": "Check-in du matin",
+    "morningHint": "Ton coach analyse ta nuit et la journée qui t'attend et te l'envoie à cette heure-ci."
   },
   "sync": {
     "title": "Presque prêt",
@@ -524,7 +528,8 @@
     "attach": "Joindre",
     "attachHint": "Photo, appareil photo ou document",
     "attachmentA11y": "Pièce jointe : {{name}}",
-    "removeAttachment": "Retirer {{name}}"
+    "removeAttachment": "Retirer {{name}}",
+    "savingProgram": "Mise à jour de ton programme…"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",
@@ -625,7 +630,8 @@
     "coach": "Coach",
     "integrations": "Services",
     "settings": "Réglages",
-    "me": "Moi"
+    "me": "Moi",
+    "programs": "Programmes"
   },
   "voice": {
     "talk": "Parler",
@@ -699,6 +705,14 @@
       "title": "Ta semaine",
       "body": "Sommeil moyen {{sleep}}, {{steps}} pas par jour. Touche pour le bilan.",
       "ask": "Fais le bilan de ma semaine et donne-moi un objectif pour la suivante."
+    },
+    "checkin": {
+      "morningBody": "Touche pour voir comment tu as dormi et sur quoi te concentrer aujourd'hui.",
+      "eveningBody": "Touche pour l'avis de ton coach sur la journée et des conseils pour bien dormir.",
+      "eveningPrograms_one": "Il te reste 1 action de programme à cocher aujourd'hui. Touche pour ton résumé du soir.",
+      "eveningPrograms_other": "Il te reste {{count}} actions de programme à cocher aujourd'hui. Touche pour ton résumé du soir.",
+      "weeklyBody": "Le bilan de ta semaine est prêt : touche pour le lire.",
+      "conversationTitle": "Check-in · {{date}}"
     }
   },
   "healthLists": {
@@ -735,5 +749,62 @@
     "subtitle": "Données personnelles, objectifs, maladies, médicaments et allergies",
     "saved": "Enregistré",
     "healthTitle": "Ta santé"
+  },
+  "programs": {
+    "new": "Nouveau programme",
+    "emptyTitle": "Pas encore de programme",
+    "emptyBody": "Ton coach peut te préparer un plan (sommeil, activité, alimentation, stress…) avec des actions simples à cocher chaque jour. Tu peux aussi le lui demander dans le chat.",
+    "noActive": "Aucun programme actif. Crée-en un nouveau avec +.",
+    "finished": "Terminés",
+    "openHint": "Ouvre le programme",
+    "status": {
+      "active": "Actif",
+      "completed": "Terminé",
+      "archived": "Archivé"
+    },
+    "day": "Jour {{day}}",
+    "dayOf": "Jour {{day}} sur {{total}}",
+    "todayProgress": "{{done}} sur {{total}} faites aujourd'hui",
+    "daily": "Chaque jour",
+    "once": "Une fois",
+    "categories": {
+      "sleep": "Mieux dormir",
+      "activity": "Bouger plus",
+      "nutrition": "Bien manger",
+      "stress": "Moins de stress",
+      "weight": "Poids",
+      "general": "Autre"
+    },
+    "newIntro": "{{name}} préparera le programme à partir de ton profil et de tes données. Ensuite, tu peux tout modifier.",
+    "newIntroNoAI": "Écris ton programme et ses actions. Pour que ton coach le crée, choisis une IA dans les Réglages.",
+    "focus": "Sur quoi veux-tu travailler ?",
+    "wish": "Quelque chose de précis ? (facultatif)",
+    "wishPlaceholder": "P. ex. m'endormir avant 23 h, marcher plus à midi…",
+    "duration": "Durée",
+    "openEnded": "Sans fin",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours",
+    "generate": "Le créer avec {{name}}",
+    "createManual": "Je l'écris moi-même",
+    "generating": "{{name}} prépare ton programme…",
+    "generateFailed": "Le programme n'a pas pu être créé. Réessaie ou écris-le toi-même.",
+    "notFound": "Programme introuvable",
+    "editTitle": "Modifier le programme",
+    "titleLabel": "Titre",
+    "goalLabel": "Objectif",
+    "actions": "Actions",
+    "actionPlaceholder": "Action",
+    "detailsPlaceholder": "Comment la faire (facultatif)",
+    "addAction": "Ajouter une action",
+    "byCoach": "créé par ton coach",
+    "today": "Aujourd'hui",
+    "noActions": "Pas encore d'actions : touche Modifier pour en ajouter.",
+    "askCoach": "En parler avec ton coach",
+    "askCoachPrompt": "Faisons le point sur mon programme « {{title}} » : où en suis-je et que devrais-je ajuster ?",
+    "markCompleted": "Marquer comme terminé",
+    "restart": "Le réactiver",
+    "delete": "Supprimer le programme",
+    "deleteTitle": "Supprimer le programme ?",
+    "deleteBody": "Le programme et ta progression seront supprimés de ce téléphone."
   }
 }

@@ -2,6 +2,7 @@ import { migration001 } from './001_initial';
 import { migration002 } from './002_journal_source';
 import { migration003 } from './003_message_attachments';
 import { migration004 } from './004_notification_log';
+import { migration005 } from './005_programs';
 import type { Migration } from './types';
 
 /**
@@ -14,6 +15,7 @@ export const migrations: readonly Migration[] = [
   migration002,
   migration003,
   migration004,
+  migration005,
 ];
 
 export type { Migration } from './types';

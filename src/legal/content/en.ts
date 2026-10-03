@@ -70,7 +70,7 @@ They are stored in an **encrypted** database (SQLCipher, AES-256) on the device;
 ## When data leaves your phone
 Only in the following cases, and always directly from your phone to the service you chose (never through us):
 
-1. **Online AI** (OpenAI, Anthropic, Google), only if you turn it on: with each question the app sends your message, a summary of the relevant data (e.g. sleep and step averages) and any attachments. The provider processes them under its own privacy policy; its servers may be located outside Switzerland and the EU (e.g. in the USA). With OpenAI we ask for conversations not to be stored (\`store: false\`). With the **phone's AI** (the default) nothing leaves the device.
+1. **Online AI** (OpenAI, Anthropic, Google), only if you turn it on: with each question the app sends your message, a summary of the relevant data (e.g. sleep and step averages) and any attachments. If the coach is proactive, the same summary is also sent once a day to prepare your morning check-in. The provider processes them under its own privacy policy; its servers may be located outside Switzerland and the EU (e.g. in the USA). With OpenAI we ask for conversations not to be stored (\`store: false\`). With the **phone's AI** (the default) nothing leaves the device.
 2. **Voice**: transcription happens on the phone when possible; otherwise Apple's or Google's speech service is used. In the **voice conversation with OpenAI**, audio is streamed to OpenAI in real time.
 3. **Sharing and exporting** that you start (e.g. opening a document in another app).
 
