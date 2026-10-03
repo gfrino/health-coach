@@ -37,6 +37,77 @@ export function extractionInstruction(language: string): string {
   ].join('\n');
 }
 
+/**
+ * Il modello sul telefono è piccolo: con il JSON sbaglia spesso la sintassi. Gli si chiede un
+ * formato a righe, facile da scrivere e da leggere, e nessun giudizio sui valori (lo fa l'app).
+ */
+export function deviceExtractionInstruction(language: string): string {
+  return [
+    'Read the health document below and copy its data in EXACTLY this format, nothing else:',
+    'DATE: the date of the exam as YYYY-MM-DD, or none',
+    'LAB: the laboratory or clinic, or none',
+    `SUMMARY: one sentence in ${language} saying what kind of document this is. Do not judge the values.`,
+    'VALUES:',
+    'name | value | unit | reference range as written',
+    'Write one line per measured value, copied exactly from the document. Never invent values.',
+  ].join('\n');
+}
+
+/** Intervallo di riferimento dal testo: "13.0 – 17.0", "3,5-20", "< 200", "≥ 40". */
+export function parseRange(text: string | null): { low: number | null; high: number | null } {
+  if (!text) return { low: null, high: null };
+  const t = text.replace(/,/g, '.').replace(/\s+/g, ' ').trim();
+  const n = String.raw`(-?\d+(?:\.\d+)?)`;
+  const between = new RegExp(`^${n}\\s*(?:-|–|—|to|a|bis|à)\\s*${n}`, 'i').exec(t);
+  if (between) return { low: Number(between[1]), high: Number(between[2]) };
+  const upper = new RegExp(`^(?:<|≤|<=|max\\.?|up to|fino a)\\s*${n}`, 'i').exec(t);
+  if (upper) return { low: null, high: Number(upper[1]) };
+  const lower = new RegExp(`^(?:>|≥|>=|min\\.?)\\s*${n}`, 'i').exec(t);
+  if (lower) return { low: Number(lower[1]), high: null };
+  return { low: null, high: null };
+}
+
+/** Risposta a righe del modello sul telefono. */
+export function parseDeviceExtraction(text: string): ParsedExtraction | null {
+  const field = (key: string) => {
+    const m = new RegExp(`^\\s*\\**${key}\\**\\s*:\\s*(.+)$`, 'im').exec(text);
+    const v = m?.[1]?.trim() ?? '';
+    return v && !/^(none|null|n\/a|-)$/i.test(v) ? v : null;
+  };
+  const results: LabResultInput[] = [];
+  for (const line of text.split('\n')) {
+    const parts = line
+      .replace(/^[\s*•-]+/, '')
+      .split('|')
+      .map((p) => p.trim());
+    if (parts.length < 2 || !parts[0] || /^name$/i.test(parts[0])) continue;
+    const value = num(parts[1]);
+    const valueText = value === null ? str(parts[1], 60) : null;
+    if (value === null && !valueText) continue;
+    const refText = str(parts[3], 60);
+    const range = parseRange(refText);
+    results.push({
+      name: parts[0].slice(0, 120),
+      value,
+      valueText,
+      unit: str(parts[2], 30),
+      refLow: range.low,
+      refHigh: range.high,
+      refText,
+    });
+    if (results.length >= 200) break;
+  }
+  const date = field('DATE');
+  const summary = field('SUMMARY');
+  if (!results.length && !summary) return null;
+  return {
+    reportDate: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null,
+    labName: field('LAB')?.slice(0, 120) ?? null,
+    summary: summary?.slice(0, 600) ?? null,
+    results,
+  };
+}
+
 const num = (v: unknown): number | null => {
   if (typeof v === 'number' && Number.isFinite(v)) return v;
   if (typeof v === 'string') {
@@ -68,15 +139,11 @@ export function parseExtraction(text: string): ParsedExtraction | null {
     const value = num(r.value);
     const valueText = value === null ? (str(r.value_text, 60) ?? str(r.value, 60)) : null;
     if (value === null && !valueText) continue;
-    results.push({
-      name,
-      value,
-      valueText,
-      unit: str(r.unit, 30),
-      refLow: num(r.ref_low),
-      refHigh: num(r.ref_high),
-      refText: str(r.ref_text, 60),
-    });
+    const refText = str(r.ref_text, 60);
+    let refLow = num(r.ref_low);
+    let refHigh = num(r.ref_high);
+    if (refLow === null && refHigh === null) ({ low: refLow, high: refHigh } = parseRange(refText));
+    results.push({ name, value, valueText, unit: str(r.unit, 30), refLow, refHigh, refText });
     if (results.length >= 200) break;
   }
   return {
@@ -118,6 +185,10 @@ export async function extractReport(
       [{ reportId, title: report.title, mimeType: report.mimeType ?? '' }],
       { vision: provider.supportsVision(model), pdf: !device },
     );
+    if (__DEV__)
+      console.warn(
+        `[referti] ${provider.id}/${model}: immagini ${content.images.length}, pdf ${content.documents.length}, testi ${content.texts.length}, illeggibili ${content.unreadable.length}`,
+      );
     if (!content.images.length && !content.documents.length && !content.texts.length) {
       await labReportRepository.setExtractionStatus(db, reportId, 'failed');
       return 'unreadable';
@@ -135,15 +206,19 @@ export async function extractReport(
       [
         {
           role: 'user',
-          content: [extractionInstruction(language), ...texts].join('\n\n'),
+          content: [
+            device ? deviceExtractionInstruction(language) : extractionInstruction(language),
+            ...texts,
+          ].join('\n\n'),
           images: content.images.length ? content.images : undefined,
           documents: content.documents.length ? content.documents : undefined,
         },
       ],
       { apiKey, model },
     );
-    const parsed = parseExtraction(result.text);
+    const parsed = device ? parseDeviceExtraction(result.text) : parseExtraction(result.text);
     if (!parsed) {
+      if (__DEV__) console.warn(`[referti] risposta non leggibile: ${JSON.stringify(result.text)}`);
       await labReportRepository.setExtractionStatus(db, reportId, 'failed');
       return 'failed';
     }

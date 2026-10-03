@@ -2,7 +2,7 @@ import { migrate } from '@/db/migrate';
 import * as labReportRepository from '@/db/repositories/labReportRepository';
 import { createTestDb } from '@/test/nodeSqliteDb';
 
-import { parseExtraction } from '../labExtraction';
+import { parseDeviceExtraction, parseExtraction, parseRange } from '../labExtraction';
 
 let mockSeq = 0;
 jest.mock('@/db/ids', () => ({ newId: () => `id-${++mockSeq}` }));
@@ -13,6 +13,63 @@ jest.mock('@/db', () => ({
 jest.mock('@/i18n', () => ({ resolveLanguage: () => 'it', deviceLanguageCodes: () => ['it'] }));
 
 describe('lettura dei referti', () => {
+  it('intervalli di riferimento dal testo', () => {
+    expect(parseRange('13.0 – 17.0')).toEqual({ low: 13, high: 17 });
+    expect(parseRange('3,5-20')).toEqual({ low: 3.5, high: 20 });
+    expect(parseRange('< 200')).toEqual({ low: null, high: 200 });
+    expect(parseRange('≥40')).toEqual({ low: 40, high: null });
+    expect(parseRange('negativo')).toEqual({ low: null, high: null });
+  });
+
+  it("formato a righe del modello sul telefono (e limiti calcolati dall'app)", () => {
+    const text = [
+      'DATE: 2026-09-28',
+      'LAB: Medical Laboratory',
+      'SUMMARY: A blood test report.',
+      'VALUES:',
+      'name | value | unit | reference range as written',
+      '- Total cholesterol | 212 | mg/dL | < 200',
+      'Hemoglobin | 14.2 | g/dL | 13.0 – 17.0',
+      'HIV | negative | | ',
+    ].join('\n');
+    const r = parseDeviceExtraction(text)!;
+    expect(r).toMatchObject({
+      reportDate: '2026-09-28',
+      labName: 'Medical Laboratory',
+      summary: 'A blood test report.',
+    });
+    expect(r.results).toEqual([
+      {
+        name: 'Total cholesterol',
+        value: 212,
+        valueText: null,
+        unit: 'mg/dL',
+        refLow: null,
+        refHigh: 200,
+        refText: '< 200',
+      },
+      {
+        name: 'Hemoglobin',
+        value: 14.2,
+        valueText: null,
+        unit: 'g/dL',
+        refLow: 13,
+        refHigh: 17,
+        refText: '13.0 – 17.0',
+      },
+      {
+        name: 'HIV',
+        value: null,
+        valueText: 'negative',
+        unit: null,
+        refLow: null,
+        refHigh: null,
+        refText: null,
+      },
+    ]);
+    expect(parseDeviceExtraction('nothing useful')).toBeNull();
+  });
+
   it('legge il JSON del modello in modo tollerante', () => {
     const text =
       'Ecco i valori:\n```json\n{"report_date":"2026-09-12","lab_name":"Lab Ticino","summary":"Esami del sangue: LDL alto.","results":[' +
