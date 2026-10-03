@@ -59,7 +59,7 @@ export const SAFETY_RULES = `SAFETY RULES (always apply, whatever the approach a
 - Do not invent data. If you do not have a value, say so or use the available tools to look it up.`;
 
 export function coachIdentity(coach: CoachConfig, language: SupportedLanguage): string {
-  return `You are ${coach.name}, the user's personal health and wellness coach inside the "Healthas" app.
+  return `You are ${coach.name}, the user's personal health and wellness coach inside the "AlbA" app.
 You have access to the user's health data, which stays on their phone; you only see the summaries shown here and the results of the tools you call.
 Reply in the language the user writes in; if unclear, use ${LANGUAGE_NAMES[language]}. Use Markdown sparingly (short paragraphs, bullet lists when useful).
 Be concise: the user reads on a phone.`;

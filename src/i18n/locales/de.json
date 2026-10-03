@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Healthas",
+    "appName": "AlbA",
     "continue": "Weiter",
     "back": "Zurück",
     "cancel": "Abbrechen",
@@ -107,7 +107,7 @@
     "tooLarge": "Die Datei ist zu groß (max. 20 MB).",
     "unsupported": "Nicht unterstütztes Format. Du kannst PDFs, Fotos, Word-, RTF-, ODT- und Textdateien hinzufügen.",
     "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen des Telefons.",
-    "shareHint": "Tipp: Aus Mail, Dateien, Fotos oder der App deines Labors „Teilen → Healthas“ wählen, um einen Befund sofort hinzuzufügen.",
+    "shareHint": "Tipp: Aus Mail, Dateien, Fotos oder der App deines Labors „Teilen → AlbA“ wählen, um einen Befund sofort hinzuzufügen.",
     "sharedTitle": "Befund hinzugefügt",
     "sharedBody": "{{count}} Datei(en) in der Gesundheitsakte gespeichert.",
     "open": "Dokument öffnen",
@@ -119,7 +119,7 @@
     "delete": "Befund löschen",
     "deleteTitle": "Befund löschen?",
     "deleteBody": "Die Datei wird endgültig von diesem Telefon gelöscht.",
-    "sharedNoFile": "Healthas hat nur einen Text oder Link erhalten, keine Datei. Teile das PDF oder ein Foto des Befunds.",
+    "sharedNoFile": "AlbA hat nur einen Text oder Link erhalten, keine Datei. Teile das PDF oder ein Foto des Befunds.",
     "kinds": {
       "all": "Alle ({{count}})",
       "pdf": "PDF",
@@ -182,7 +182,7 @@
     "fr": "Français"
   },
   "onboarding": {
-    "welcomeTitle": "Willkommen bei Healthas",
+    "welcomeTitle": "Willkommen bei AlbA",
     "welcomeBody": "Dein persönlicher Coach, der deine Gesundheitsdaten kennt und dich jeden Tag begleitet.",
     "privacyTitle": "Deine Daten bleiben deine",
     "privacyPoints": {
@@ -191,7 +191,7 @@
       "noServer": "Keiner unserer Server empfängt, speichert oder verarbeitet deine Gesundheitsdaten."
     },
     "disclaimerTitle": "Medizinischer Hinweis",
-    "disclaimer": "Healthas ist ein Wellness- und Informationswerkzeug, kein Medizinprodukt. Es stellt keine Diagnosen und ersetzt nicht den Rat einer Ärztin oder eines Arztes.",
+    "disclaimer": "AlbA ist ein Wellness- und Informationswerkzeug, kein Medizinprodukt. Es stellt keine Diagnosen und ersetzt nicht den Rat einer Ärztin oder eines Arztes.",
     "acceptDisclaimer": "Ich habe den medizinischen Hinweis gelesen und akzeptiere ihn",
     "start": "Los geht's",
     "stepOf": "Schritt {{step}} von {{total}}"
@@ -231,7 +231,7 @@
       "anthropic": {
         "1": "Öffne die Anthropic Console und melde dich an oder erstelle ein Konto.",
         "2": "Füge unter Billing eine Zahlungsmethode oder Prepaid-Guthaben hinzu.",
-        "3": "Gehe zu API Keys und tippe auf „Create Key“; gib ihm einen Namen, z. B. Healthas.",
+        "3": "Gehe zu API Keys und tippe auf „Create Key“; gib ihm einen Namen, z. B. AlbA.",
         "4": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Code wird automatisch eingefügt und geprüft."
       },
       "openai": {
@@ -247,7 +247,7 @@
       }
     },
     "openKeysPage": "Seite öffnen und Code erstellen",
-    "billingNote": "Die KI-Nutzung rechnet der Anbieter nach Verbrauch über dein Konto ab. Healthas erhält und sieht deinen Schlüssel nie.",
+    "billingNote": "Die KI-Nutzung rechnet der Anbieter nach Verbrauch über dein Konto ab. AlbA erhält und sieht deinen Schlüssel nie.",
     "apiKey": "Zugangscode (API-Schlüssel)",
     "keyHint": "Er wird im sicheren Schlüsselbund deines Telefons gespeichert.",
     "keySavedHint": "Ein Schlüssel ist bereits gespeichert. Füge nur einen neuen ein, wenn du ihn ersetzen möchtest.",
@@ -303,7 +303,7 @@
     "title": "Deine Daten verbinden",
     "subtitle": "Der Coach liest deine Daten aus {{source}}. Du entscheidest für jeden Datentyp, was du teilst.",
     "skip": "Vorerst überspringen",
-    "readOnly": "Nur Lesen: Healthas schreibt und ändert nichts.",
+    "readOnly": "Nur Lesen: AlbA schreibt und ändert nichts.",
     "categories": {
       "activity": {
         "title": "Aktivität",

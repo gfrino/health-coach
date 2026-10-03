@@ -78,8 +78,8 @@ const bundleId =
     : `${BASE_BUNDLE_ID}.${variant === 'preview' ? 'preview' : 'dev'}`;
 const appName =
   variant === 'production'
-    ? 'Healthas'
-    : `Healthas (${variant === 'preview' ? 'Preview' : 'Dev'})`;
+    ? 'AlbA'
+    : `AlbA (${variant === 'preview' ? 'Preview' : 'Dev'})`;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -134,19 +134,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ['expo-sqlite', { useSQLCipher: true, enableFTS: true }],
     [
       'expo-secure-store',
-      { configureAndroidBackup: true, faceIDPermission: 'Usa Face ID per sbloccare Healthas.' },
+      { configureAndroidBackup: true, faceIDPermission: 'Usa Face ID per sbloccare AlbA.' },
     ],
-    ['expo-local-authentication', { faceIDPermission: 'Usa Face ID per sbloccare Healthas.' }],
+    ['expo-local-authentication', { faceIDPermission: 'Usa Face ID per sbloccare AlbA.' }],
     'expo-localization',
     [
       'expo-splash-screen',
       {
         image: './assets/splash-icon.png',
-        // Logotipo orizzontale ("Healthas"): più largo di un'icona quadrata.
-        imageWidth: 240,
+        // Logo AlbA completo (simbolo, nome e slogan); al buio la versione con l'inchiostro chiaro.
+        imageWidth: 220,
         resizeMode: 'contain',
         backgroundColor: '#F6F4EF',
-        dark: { image: './assets/splash-icon.png', backgroundColor: '#14171A' },
+        dark: { image: './assets/splash-icon-dark.png', backgroundColor: '#14171A' },
       },
     ],
     'expo-font',
@@ -156,16 +156,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-image-picker',
       {
         photosPermission:
-          'Healthas accede alle foto solo per importare i referti che scegli tu.',
-        cameraPermission: 'Healthas usa la fotocamera solo per fotografare i tuoi referti.',
-        microphonePermission: 'Healthas usa il microfono solo mentre parli con il coach.',
+          'AlbA accede alle foto solo per importare i referti che scegli tu.',
+        cameraPermission: 'AlbA usa la fotocamera solo per fotografare i tuoi referti.',
+        microphonePermission: 'AlbA usa il microfono solo mentre parli con il coach.',
       },
     ],
     [
       'expo-camera',
       {
-        cameraPermission: 'Healthas usa la fotocamera solo per fotografare i tuoi referti.',
-        microphonePermission: 'Healthas usa il microfono solo mentre parli con il coach.',
+        cameraPermission: 'AlbA usa la fotocamera solo per fotografare i tuoi referti.',
+        microphonePermission: 'AlbA usa il microfono solo mentre parli con il coach.',
         recordAudioAndroid: false,
       },
     ],
@@ -173,21 +173,21 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-speech-recognition',
       {
-        microphonePermission: 'Healthas usa il microfono solo mentre parli con il coach.',
+        microphonePermission: 'AlbA usa il microfono solo mentre parli con il coach.',
         speechRecognitionPermission:
-          'Healthas trascrive la tua voce per parlare con il coach. Quando possibile, la trascrizione avviene sul telefono.',
+          'AlbA trascrive la tua voce per parlare con il coach. Quando possibile, la trascrizione avviene sul telefono.',
       },
     ],
     [
       // Conversazione a voce in tempo reale con OpenAI (audio diretto telefono ↔ OpenAI).
       '@config-plugins/react-native-webrtc',
       {
-        microphonePermission: 'Healthas usa il microfono solo mentre parli con il coach.',
-        cameraPermission: 'Healthas usa la fotocamera solo per fotografare i tuoi referti.',
+        microphonePermission: 'AlbA usa il microfono solo mentre parli con il coach.',
+        cameraPermission: 'AlbA usa la fotocamera solo per fotografare i tuoi referti.',
       },
     ],
     [
-      // "Condividi → Healthas" da altre app: referti PDF e immagini finiscono nella Cartella salute.
+      // "Condividi → AlbA" da altre app: referti PDF e immagini finiscono nella Cartella salute.
       'expo-share-intent',
       {
         // Nome del target Xcode: diverso dall'app "HealthCoach" (vedi withShareExtensionFixes).
@@ -210,12 +210,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       '@kingstinct/react-native-healthkit',
       {
         NSHealthShareUsageDescription:
-          'Healthas legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.',
+          'AlbA legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.',
         // v1.0 legge soltanto: nessuna richiesta di scrittura.
         // Obbligatoria per l'App Store anche se l'app legge soltanto: la libreria HealthKit
         // referenzia anche le API di scrittura. L'app non chiede mai il permesso di scrivere.
         NSHealthUpdateUsageDescription:
-          'Healthas non scrive né modifica i tuoi dati in Salute: li legge soltanto per darti consigli personalizzati.',
+          'AlbA non scrive né modifica i tuoi dati in Salute: li legge soltanto per darti consigli personalizzati.',
         background: true,
       },
     ],
@@ -224,7 +224,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     './plugins/withIosSceneLifecycle',
     [
       './plugins/withShareExtensionFixes',
-      { targetName: 'HealthCoachShare', displayName: 'Healthas' },
+      { targetName: 'HealthCoachShare', displayName: 'AlbA' },
     ],
   ],
   experiments: {

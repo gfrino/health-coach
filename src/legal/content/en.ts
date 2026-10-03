@@ -9,12 +9,12 @@ export const en: Record<LegalDoc, string> = {
 Last updated: ${LEGAL_UPDATED}
 
 ## 1. Who we are
-The Healthas app is developed and distributed by ${contact} ("we"). By using the app you accept these terms.
+The AlbA app is developed and distributed by ${contact} ("we"). By using the app you accept these terms.
 
 ## 2. What the app is
-Healthas is a personal wellness coach: it reads the data you choose to share (Apple Health or Health Connect, profile, journal, documents), keeps it encrypted on your phone and gives you lifestyle, sleep, activity and nutrition advice with the help of artificial intelligence.
+AlbA is a personal wellness coach: it reads the data you choose to share (Apple Health or Health Connect, profile, journal, documents), keeps it encrypted on your phone and gives you lifestyle, sleep, activity and nutrition advice with the help of artificial intelligence.
 
-**Healthas is not a medical device and does not provide diagnoses, treatments or medical advice.** Please also read the **Legal disclaimer**.
+**AlbA is not a medical device and does not provide diagnoses, treatments or medical advice.** Please also read the **Legal disclaimer**.
 
 ## 3. Requirements
 - You must be at least 16 years old.
@@ -53,7 +53,7 @@ ${contact}
 Last updated: ${LEGAL_UPDATED}
 
 ## The principle
-**Your health data stays on your phone.** Healthas has no server for health data: we do not receive it, see it or sell it. No advertising, no profiling, no analytics or tracking tools.
+**Your health data stays on your phone.** AlbA has no server for health data: we do not receive it, see it or sell it. No advertising, no profiling, no analytics or tracking tools.
 
 ## Controller
 ${contact}. The Swiss Federal Act on Data Protection (FADP) applies and, for users in the EU/EEA, the GDPR.
@@ -95,7 +95,7 @@ We will update this policy if the way data is processed changes; the date at the
 Last updated: ${LEGAL_UPDATED}
 
 ## Not medical advice
-Healthas is a wellness and information app. **It is not a medical device** and does not replace doctors, pharmacists or other healthcare professionals. It does not diagnose, prescribe treatments, and must not be used to make treatment decisions.
+AlbA is a wellness and information app. **It is not a medical device** and does not replace doctors, pharmacists or other healthcare professionals. It does not diagnose, prescribe treatments, and must not be used to make treatment decisions.
 
 ## Medications and treatments
 Do not start, stop or change medications, supplements or treatments based on the app's suggestions: always talk to your doctor.
@@ -113,7 +113,7 @@ Non-conventional approaches (e.g. Traditional Chinese Medicine, Ayurveda, naturo
 Measurements depend on the source devices and apps and may contain errors or gaps.
 
 ## Trademarks
-Apple Health, Apple Intelligence, Health Connect, OpenAI, Anthropic, Google, Gemini, Withings and the other trademarks mentioned belong to their respective owners. Healthas is not affiliated with or endorsed by them.
+Apple Health, Apple Intelligence, Health Connect, OpenAI, Anthropic, Google, Gemini, Withings and the other trademarks mentioned belong to their respective owners. AlbA is not affiliated with or endorsed by them.
 `,
 
   impressum: `# Imprint

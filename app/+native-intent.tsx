@@ -1,7 +1,7 @@
 import { getShareExtensionKey } from 'expo-share-intent';
 
 /**
- * Link di sistema: la condivisione da un'altra app apre Healthas con un URL
+ * Link di sistema: la condivisione da un'altra app apre AlbA con un URL
  * "…dataUrl=<scheme>ShareKey". Non è una route: si va alla home e il file viene
  * importato da <ShareIntentImporter /> (app/_layout.tsx).
  */

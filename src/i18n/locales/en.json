@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Healthas",
+    "appName": "AlbA",
     "continue": "Continue",
     "back": "Back",
     "cancel": "Cancel",
@@ -107,7 +107,7 @@
     "tooLarge": "The file is too large (20 MB max).",
     "unsupported": "Unsupported format. You can add PDFs, photos, Word, RTF, ODT and text files.",
     "cameraDenied": "Allow camera access in your phone's Settings.",
-    "shareHint": "Tip: from Mail, Files, Photos or your lab's app, use \"Share → Healthas\" to add a report in a second.",
+    "shareHint": "Tip: from Mail, Files, Photos or your lab's app, use \"Share → AlbA\" to add a report in a second.",
     "sharedTitle": "Report added",
     "sharedBody": "{{count}} file(s) saved in your health records.",
     "open": "Open the document",
@@ -119,7 +119,7 @@
     "delete": "Delete report",
     "deleteTitle": "Delete the report?",
     "deleteBody": "The file will be permanently deleted from this phone.",
-    "sharedNoFile": "Healthas only received text or a link, no file. Share the PDF or a photo of the report.",
+    "sharedNoFile": "AlbA only received text or a link, no file. Share the PDF or a photo of the report.",
     "kinds": {
       "all": "All ({{count}})",
       "pdf": "PDF",
@@ -182,7 +182,7 @@
     "fr": "Français"
   },
   "onboarding": {
-    "welcomeTitle": "Welcome to Healthas",
+    "welcomeTitle": "Welcome to AlbA",
     "welcomeBody": "Your personal coach that knows your health data and supports you every day.",
     "privacyTitle": "Your data stays yours",
     "privacyPoints": {
@@ -191,7 +191,7 @@
       "noServer": "None of our servers receive, store or process your health data."
     },
     "disclaimerTitle": "Medical disclaimer",
-    "disclaimer": "Healthas is a wellness and information tool, not a medical device. It does not provide diagnoses or replace the advice of a doctor.",
+    "disclaimer": "AlbA is a wellness and information tool, not a medical device. It does not provide diagnoses or replace the advice of a doctor.",
     "acceptDisclaimer": "I have read and accept the medical disclaimer",
     "start": "Get started",
     "stepOf": "Step {{step}} of {{total}}"
@@ -231,7 +231,7 @@
       "anthropic": {
         "1": "Open the Anthropic Console and sign in or create an account.",
         "2": "Under Billing, add a payment method or prepaid credit.",
-        "3": "Go to API Keys and tap \"Create Key\"; give it a name such as Healthas.",
+        "3": "Go to API Keys and tap \"Create Key\"; give it a name such as AlbA.",
         "4": "Tap \"Copy\" next to the key and close the page: the code will be filled in and verified automatically."
       },
       "openai": {
@@ -247,7 +247,7 @@
       }
     },
     "openKeysPage": "Open the page and create the code",
-    "billingNote": "AI usage is billed by the provider to your account, based on consumption. Healthas never receives or sees your key.",
+    "billingNote": "AI usage is billed by the provider to your account, based on consumption. AlbA never receives or sees your key.",
     "apiKey": "Access code (API key)",
     "keyHint": "It is stored in your phone's secure keychain.",
     "keySavedHint": "A key is already saved. Paste a new one only if you want to replace it.",
@@ -303,7 +303,7 @@
     "title": "Connect your data",
     "subtitle": "The coach reads your data from {{source}}. You can choose, type by type, what to share.",
     "skip": "Skip for now",
-    "readOnly": "Read-only: Healthas never writes or changes anything.",
+    "readOnly": "Read-only: AlbA never writes or changes anything.",
     "categories": {
       "activity": {
         "title": "Activity",
