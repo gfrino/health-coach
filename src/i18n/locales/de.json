@@ -805,6 +805,9 @@
     "restart": "Wieder aktivieren",
     "delete": "Programm löschen",
     "deleteTitle": "Programm löschen?",
-    "deleteBody": "Das Programm und dein Fortschritt werden von diesem Telefon gelöscht."
+    "deleteBody": "Das Programm und dein Fortschritt werden von diesem Telefon gelöscht.",
+    "showDetails": "Details und bearbeiten",
+    "expand": "Zeigt die Aktionen",
+    "collapse": "Blendet die Aktionen aus"
   }
 }

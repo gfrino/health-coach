@@ -805,6 +805,9 @@
     "restart": "Make it active again",
     "delete": "Delete program",
     "deleteTitle": "Delete the program?",
-    "deleteBody": "The program and its progress will be deleted from this phone."
+    "deleteBody": "The program and its progress will be deleted from this phone.",
+    "showDetails": "Details and edit",
+    "expand": "Opens the actions",
+    "collapse": "Closes the actions"
   }
 }

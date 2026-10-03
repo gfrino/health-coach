@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Stack } from 'expo-router/stack';
-import { Pressable, View } from 'react-native';
+import { useState } from 'react';
+import { LayoutAnimation, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Card, EmptyState, Icon, NavRow, ProgressBar, Screen } from '@/components';
@@ -58,7 +59,9 @@ export default function ProgramsScreen() {
                 <AppText variant="callout">{t('programs.noActive')}</AppText>
               </Card>
             ) : (
-              active.map((v) => <ProgramCard key={v.program.id} view={v} onToggle={toggle} />)
+              active.map((v, i) => (
+                <ProgramCard key={v.program.id} view={v} onToggle={toggle} first={i === 0} />
+              ))
             )}
             {finished.length ? (
               <View style={{ gap: spacing.xs }}>
@@ -85,18 +88,31 @@ export default function ProgramsScreen() {
   );
 }
 
+/** Programmi aperti/chiusi a fisarmonica: lo stato resta finché l'app è aperta. */
+const expandedState = new Map<string, boolean>();
+
 function ProgramCard({
   view,
   onToggle,
+  first,
 }: {
   view: ProgramView;
   onToggle: ReturnType<typeof usePrograms>['toggle'];
+  first: boolean;
 }) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const { program, done, day } = view;
   const total = program.items.length;
   const doneCount = program.items.filter((i) => done.has(i.id)).length;
+  // Di default è aperto solo il primo programma.
+  const [expanded, setExpanded] = useState(() => expandedState.get(program.id) ?? first);
+  const toggleExpanded = () => {
+    haptic.select();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    expandedState.set(program.id, !expanded);
+    setExpanded(!expanded);
+  };
   const open = () => {
     haptic.tap();
     router.push({ pathname: '/programs/[id]', params: { id: program.id } });
@@ -105,9 +121,10 @@ function ProgramCard({
   return (
     <Card>
       <Pressable
-        onPress={open}
+        onPress={toggleExpanded}
         accessibilityRole="button"
-        accessibilityHint={t('programs.openHint')}
+        accessibilityState={{ expanded }}
+        accessibilityHint={expanded ? t('programs.collapse') : t('programs.expand')}
         style={({ pressed }) => ({
           flexDirection: 'row',
           alignItems: 'center',
@@ -138,7 +155,7 @@ function ProgramCard({
               : t('programs.day', { day })}
           </AppText>
         </View>
-        <Icon name="chevronRight" size={14} color={colors.textMuted} />
+        <Icon name={expanded ? 'chevronUp' : 'chevronDown'} size={14} color={colors.textMuted} />
       </Pressable>
 
       {total ? (
@@ -153,16 +170,40 @@ function ProgramCard({
         </View>
       ) : null}
 
-      <View>
-        {program.items.map((item) => (
-          <ProgramItemRow
-            key={item.id}
-            item={item}
-            done={done.has(item.id)}
-            onToggle={(d) => onToggle(item, d)}
-          />
-        ))}
-      </View>
+      {expanded ? (
+        <>
+          <View>
+            {program.items.map((item) => (
+              <ProgramItemRow
+                key={item.id}
+                item={item}
+                done={done.has(item.id)}
+                onToggle={(d) => onToggle(item, d)}
+              />
+            ))}
+          </View>
+          <Pressable
+            onPress={open}
+            accessibilityRole="button"
+            accessibilityHint={t('programs.openHint')}
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              minHeight: 44,
+              paddingTop: spacing.xs,
+              borderTopWidth: 1,
+              borderTopColor: colors.border,
+              opacity: pressed ? 0.6 : 1,
+            })}
+          >
+            <AppText variant="callout" tone="primary" style={{ fontWeight: '600' }}>
+              {t('programs.showDetails')}
+            </AppText>
+            <Icon name="chevronRight" size={14} color={colors.primary} />
+          </Pressable>
+        </>
+      ) : null}
     </Card>
   );
 }

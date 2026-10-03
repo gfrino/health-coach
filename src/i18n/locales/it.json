@@ -805,6 +805,9 @@
     "restart": "Rendilo di nuovo attivo",
     "delete": "Elimina programma",
     "deleteTitle": "Eliminare il programma?",
-    "deleteBody": "Il programma e i progressi verranno eliminati da questo telefono."
+    "deleteBody": "Il programma e i progressi verranno eliminati da questo telefono.",
+    "showDetails": "Dettagli e modifica",
+    "expand": "Mostra le azioni",
+    "collapse": "Nasconde le azioni"
   }
 }

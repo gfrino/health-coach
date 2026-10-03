@@ -53,6 +53,8 @@ export const icons = {
   warning: { ios: 'exclamationmark.triangle.fill', android: 'warning' },
   info: { ios: 'info.circle', android: 'info' },
   chevronRight: { ios: 'chevron.right', android: 'chevron_right' },
+  chevronDown: { ios: 'chevron.down', android: 'expand_more' },
+  chevronUp: { ios: 'chevron.up', android: 'expand_less' },
   server: { ios: 'xmark.icloud', android: 'cloud_off' },
   programs: { ios: 'checklist', android: 'checklist' },
   edit: { ios: 'pencil', android: 'edit' },
