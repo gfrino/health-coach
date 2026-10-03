@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { FlatList, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { toAIError } from '@/ai/errors';
@@ -17,6 +17,7 @@ import { useTheme } from '@/theme';
 
 import { AppText } from '../AppText';
 import { EmptyState } from '../EmptyState';
+import { KeyboardAvoider } from '../KeyboardAvoider';
 import { Composer } from './Composer';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
@@ -201,11 +202,7 @@ export function ChatView({ conversationId, onConversationCreated, initialPrompt 
   const quick = [1, 2, 3, 4].map((i) => t(`chat.quick.${i}` as 'chat.quick.1'));
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
-    >
+    <KeyboardAvoider>
       <FlatList
         ref={listRef}
         data={rows}
@@ -294,7 +291,7 @@ export function ChatView({ conversationId, onConversationCreated, initialPrompt 
         onRemoveAttachment={(rid) => setAttachments((cur) => cur.filter((a) => a.reportId !== rid))}
         onVoiceMode={() => void openVoiceMode()}
       />
-    </KeyboardAvoidingView>
+    </KeyboardAvoider>
   );
 }
 

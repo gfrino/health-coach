@@ -7,6 +7,7 @@ export { EmptyState } from './EmptyState';
 export { GlowBorder } from './GlowBorder';
 export { Icon, icons, type AppIconName } from './Icon';
 export { InfoRow } from './InfoRow';
+export { KeyboardAvoider } from './KeyboardAvoider';
 export { ListEditor } from './ListEditor';
 export { Markdown } from './Markdown';
 export { MetricCard } from './MetricCard';
