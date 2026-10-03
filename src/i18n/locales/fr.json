@@ -438,6 +438,7 @@
     "goalsLabel": "Objectifs",
     "goals": {
       "loseWeight": "Perdre du poids",
+      "gainWeight": "Prendre du poids",
       "gainMuscle": "Prendre du muscle",
       "sleepBetter": "Mieux dormir",
       "moreEnergy": "Avoir plus d'énergie",

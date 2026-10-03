@@ -11,6 +11,7 @@ import { useTheme } from '@/theme';
 
 const GOALS = [
   'loseWeight',
+  'gainWeight',
   'gainMuscle',
   'sleepBetter',
   'moreEnergy',
