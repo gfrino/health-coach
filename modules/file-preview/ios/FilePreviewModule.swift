@@ -1,4 +1,5 @@
 import ExpoModulesCore
+import ImageIO
 import PDFKit
 import QuickLook
 import Vision
