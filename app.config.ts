@@ -203,8 +203,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-build-properties',
       {
-        // ML Kit GenAI (AI del telefono su Android) è compilato con Kotlin 2.3.
-        android: { minSdkVersion: 26, kotlinVersion: '2.3.0' },
+        android: { minSdkVersion: 26 },
       },
     ],
     [

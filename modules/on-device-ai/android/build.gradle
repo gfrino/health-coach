@@ -19,5 +19,7 @@ android {
 
 dependencies {
   // Gemini Nano on-device (AICore). Disponibile solo sui dispositivi supportati.
-  implementation "com.google.mlkit:genai-prompt:1.0.0-beta4"
+  // beta3/beta4 sono compilate con Kotlin 2.3, che il compilatore Kotlin 2.1 di React Native
+  // non sa leggere: beta2 (metadati 2.2) ha la stessa API usata qui.
+  implementation "com.google.mlkit:genai-prompt:1.0.0-beta2"
 }
