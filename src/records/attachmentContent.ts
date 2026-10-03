@@ -3,6 +3,7 @@ import { getDb, labReportRepository } from '@/db';
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
 import { bytesToBase64 } from '@/lib/base64';
 
+import { readTextOnDevice } from './deviceText';
 import { extractDocumentText } from './documentText';
 
 /** Lato lungo massimo delle foto inviate all'AI: leggibili, ma leggere da trasmettere. */
@@ -49,6 +50,17 @@ async function resizeImage(mimeType: string, data: Uint8Array): Promise<ImagePar
   return { mimeType: 'image/jpeg', base64: out.base64 ?? '' };
 }
 
+/** Il modello non sa aprire il file: si prova con il testo letto sul telefono. */
+async function pushDeviceText(
+  out: AttachmentContent,
+  title: string,
+  file: { mimeType: string; fileName: string | null; data: Uint8Array },
+) {
+  const text = await readTextOnDevice(file);
+  if (text) out.texts.push({ name: title, text });
+  else out.unreadable.push(title);
+}
+
 /**
  * Prepara gli allegati per il modello. `vision`/`pdf`: cosa sa leggere il modello in uso.
  */
@@ -64,7 +76,7 @@ export async function loadAttachmentContent(
     try {
       if (file.mimeType.startsWith('image/')) {
         if (caps.vision) out.images.push(await resizeImage(file.mimeType, file.data));
-        else out.unreadable.push(a.title);
+        else await pushDeviceText(out, a.title, file);
       } else if (file.mimeType === 'application/pdf') {
         if (caps.pdf && file.data.byteLength <= MAX_PDF_BYTES) {
           out.documents.push({
@@ -72,7 +84,7 @@ export async function loadAttachmentContent(
             base64: bytesToBase64(file.data),
             name: file.fileName ?? `${a.title}.pdf`,
           });
-        } else out.unreadable.push(a.title);
+        } else await pushDeviceText(out, a.title, file);
       } else {
         const text = extractDocumentText(file.mimeType, file.data);
         if (text) out.texts.push({ name: a.title, text });

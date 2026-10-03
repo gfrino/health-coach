@@ -62,7 +62,7 @@ ${contact}. The Swiss Federal Act on Data Protection (FADP) applies and, for use
 - **Health data** you authorise from Apple Health or Health Connect (e.g. steps, sleep, heart rate, weight, workouts).
 - **Profile**: name, age, height, goals, conditions, medications and allergies you enter.
 - **Journal**: mood, energy, symptoms and notes (written by you or noted by the coach at your request).
-- **Documents**: reports, lab results and photos you add or share with the app.
+- **Documents**: reports, lab results and photos you add or share with the app, with the values and summary the AI reads from them.
 - **Conversations** with the coach.
 
 They are stored in an **encrypted** database (SQLCipher, AES-256) on the device; the key is kept in the system's protected keychain and never leaves the phone. Automatic cloud backup of this data is disabled.
@@ -70,7 +70,7 @@ They are stored in an **encrypted** database (SQLCipher, AES-256) on the device;
 ## When data leaves your phone
 Only in the following cases, and always directly from your phone to the service you chose (never through us):
 
-1. **Online AI** (OpenAI, Anthropic, Google), only if you turn it on: with each question the app sends your message, a summary of the relevant data (e.g. sleep and step averages) and any attachments. If the coach is proactive, the same summary is also sent once a day to prepare your morning check-in. The provider processes them under its own privacy policy; its servers may be located outside Switzerland and the EU (e.g. in the USA). With OpenAI we ask for conversations not to be stored (\`store: false\`). With the **phone's AI** (the default) nothing leaves the device.
+1. **Online AI** (OpenAI, Anthropic, Google), only if you turn it on: with each question the app sends your message, a summary of the relevant data (e.g. sleep and step averages) and any attachments. If the coach is proactive, the same summary is also sent once a day to prepare your morning check-in. Each document you add to your health records is also sent once, so the AI can read its values and summarise it; with the phone's AI the text of PDFs and photos is read on the device. The provider processes them under its own privacy policy; its servers may be located outside Switzerland and the EU (e.g. in the USA). With OpenAI we ask for conversations not to be stored (\`store: false\`). With the **phone's AI** (the default) nothing leaves the device.
 2. **Voice**: transcription happens on the phone when possible; otherwise Apple's or Google's speech service is used. In the **voice conversation with OpenAI**, audio is streamed to OpenAI in real time.
 3. **Sharing and exporting** that you start (e.g. opening a document in another app).
 

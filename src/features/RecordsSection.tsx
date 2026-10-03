@@ -13,6 +13,8 @@ import {
   pickFromLibrary,
   type IncomingFile,
 } from '@/records/importReport';
+import { useSettingsStore } from '@/store/settingsStore';
+import { extractUnreadReports, useExtractionStore } from '@/records/labExtraction';
 import { fileTypeOf, type FileKind } from '@/records/fileMeta';
 import { useTheme } from '@/theme';
 
@@ -70,8 +72,22 @@ export function RecordsSection({ reloadKey }: { reloadKey: number }) {
   useFocusEffect(
     useCallback(() => {
       void load();
+      // Referti mai letti dal coach: lettura in background (valori e riassunto).
+      void extractUnreadReports(useSettingsStore.getState().settings);
     }, [load]),
   );
+  // Fine di una lettura: si aggiorna l'elenco (data del referto).
+  const extractionVersion = useExtractionStore((s) => s.version);
+  useEffect(() => {
+    if (!extractionVersion) return;
+    let active = true;
+    getDb()
+      .then((db) => labReportRepository.listReports(db))
+      .then((list) => active && setReports(list));
+    return () => {
+      active = false;
+    };
+  }, [extractionVersion]);
   // Ricarica anche quando la schermata padre segnala un nuovo import (es. dal "+" nell'header).
   useEffect(() => {
     let active = true;

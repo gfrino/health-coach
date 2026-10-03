@@ -113,8 +113,7 @@
     "open": "Apri il documento",
     "title": "Titolo",
     "date": "Data dell'esame",
-    "extractionTitle": "Lettura dei valori con l'AI",
-    "extractionBody": "Presto il coach potrà leggere i valori dell'esame (con il tuo consenso) e mostrarti l'andamento nel tempo.",
+    "extractionTitle": "Cosa ha letto il coach",
     "encryptedNote": "Il file è salvato solo in questo telefono, dentro il database cifrato.",
     "delete": "Elimina referto",
     "deleteTitle": "Eliminare il referto?",
@@ -127,7 +126,20 @@
       "document": "Documenti",
       "text": "Testo"
     },
-    "share": "Condividi"
+    "share": "Condividi",
+    "extractionReading": "{{name}} sta leggendo il documento…",
+    "extractionFailed": "Non è stato possibile leggere il documento. Riprova; per foto e scansioni puoi anche scegliere un'AI online nelle Opzioni.",
+    "extractionNone": "{{name}} non ha ancora letto questo documento.",
+    "extractionNoAI": "Scegli un'AI nelle Opzioni perché il coach possa leggere i tuoi referti.",
+    "extractionRead": "Fallo leggere al coach",
+    "extractionAgain": "Rileggi",
+    "extractionValues": "Valori",
+    "extractionNoValues": "Nessun valore misurato in questo documento.",
+    "extraction_high": "Alto",
+    "extraction_low": "Basso",
+    "extractionRange": "Riferimento {{range}}",
+    "extractionPrevious": "Prima: {{value}} ({{date}})",
+    "extractionNote": "I valori sono letti dall'AI e possono contenere errori: confrontali con il documento. Restano su questo telefono, cifrati."
   },
   "settings": {
     "title": "Impostazioni",

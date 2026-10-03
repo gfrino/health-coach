@@ -67,8 +67,8 @@ export interface TurnResult {
 }
 
 export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Promise<string> {
-  const [profile, memoryFacts, summaries, snapshot, journal, reports, programs] = await Promise.all(
-    [
+  const [profile, memoryFacts, summaries, snapshot, journal, reports, programs, latest] =
+    await Promise.all([
       profileRepository.loadProfileContext(db),
       healthQueries.recentMemoryFacts(db),
       healthQueries.recentSummaries(db),
@@ -76,14 +76,28 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
       healthQueries.journalRange(db, now.getTime() - 7 * DAY_MS, now.getTime() + 1, 7),
       labReportRepository.listReports(db),
       loadProgramContext(db, now),
-    ],
-  );
+      labReportRepository.latestResults(db),
+    ]);
   const records = reports.map((r) => ({
     id: r.id,
     title: r.title,
     date: r.reportDate,
     kind: fileTypeOf(r.mimeType)?.kind ?? 'document',
+    summary: r.summary,
   }));
+  const compact = settings.ai.provider === 'device';
+  // Ultimo valore di ogni esame; sul telefono (poco contesto) solo quelli fuori intervallo.
+  const labs = latest
+    .filter((l) => !compact || labReportRepository.outOfRange(l))
+    .slice(0, compact ? 8 : 60)
+    .map((l) => ({
+      name: l.name,
+      value: l.value ?? l.valueText ?? '',
+      unit: l.unit,
+      refLow: l.refLow,
+      refHigh: l.refHigh,
+      date: l.measuredAt,
+    }));
   return composeSystemPrompt({
     coach: settings.coach,
     language: resolveLanguage(settings.language, deviceLanguageCodes()),
@@ -95,10 +109,11 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     insights: snapshot.insights,
     journal,
     records,
+    labs,
     programs,
     todayTotalsAt: getTodayTotalsAt(),
     now,
-    compact: settings.ai.provider === 'device',
+    compact,
   });
 }
 

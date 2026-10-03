@@ -113,8 +113,7 @@
     "open": "Ouvrir le document",
     "title": "Titre",
     "date": "Date de l'examen",
-    "extractionTitle": "Lecture des valeurs par l'IA",
-    "extractionBody": "Bientôt, votre coach pourra lire les valeurs de l'examen (avec votre accord) et vous montrer leur évolution.",
+    "extractionTitle": "Ce que ton coach a lu",
     "encryptedNote": "Le fichier est enregistré uniquement sur ce téléphone, dans la base de données chiffrée.",
     "delete": "Supprimer le compte rendu",
     "deleteTitle": "Supprimer le compte rendu ?",
@@ -127,7 +126,20 @@
       "document": "Documents",
       "text": "Texte"
     },
-    "share": "Partager"
+    "share": "Partager",
+    "extractionReading": "{{name}} lit le document…",
+    "extractionFailed": "Le document n'a pas pu être lu. Réessaie ; pour les photos et les scans, tu peux aussi choisir une IA en ligne dans les Réglages.",
+    "extractionNone": "{{name}} n'a pas encore lu ce document.",
+    "extractionNoAI": "Choisis une IA dans les Réglages pour que ton coach puisse lire tes résultats.",
+    "extractionRead": "Le faire lire par ton coach",
+    "extractionAgain": "Relire",
+    "extractionValues": "Valeurs",
+    "extractionNoValues": "Aucune valeur mesurée dans ce document.",
+    "extraction_high": "Élevé",
+    "extraction_low": "Bas",
+    "extractionRange": "Référence {{range}}",
+    "extractionPrevious": "Avant : {{value}} ({{date}})",
+    "extractionNote": "Les valeurs sont lues par l'IA et peuvent contenir des erreurs : compare-les avec le document. Elles restent sur ce téléphone, chiffrées."
   },
   "settings": {
     "title": "Réglages",

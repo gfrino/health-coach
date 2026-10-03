@@ -13,6 +13,8 @@ import FilePreview from 'file-preview';
 
 import { bytesToBase64 } from '@/lib/base64';
 import { fileTypeOf } from '@/records/fileMeta';
+import { useExtractionStore } from '@/records/labExtraction';
+import { ReportFindings } from '@/records/ReportFindings';
 import { useTheme } from '@/theme';
 
 export default function ReportScreen() {
@@ -22,6 +24,8 @@ export default function ReportScreen() {
   const [report, setReport] = useState<LabReport | null>(null);
   const [title, setTitle] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
+  // Dopo la lettura del coach la data del referto può cambiare (quella scritta sul documento).
+  const extractionVersion = useExtractionStore((st) => st.version);
 
   useEffect(() => {
     let active = true;
@@ -39,7 +43,7 @@ export default function ReportScreen() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, extractionVersion]);
 
   if (!report) return null;
 
@@ -178,15 +182,13 @@ export default function ReportScreen() {
           onEndEditing={() => title.trim() && save({ title })}
         />
         <DateField
+          key={report.reportDate ?? 'none'}
           label={t('records.date')}
           value={report.reportDate}
           onChange={(reportDate) => save({ reportDate })}
         />
 
-        <Card tone="soft">
-          <AppText variant="headline">{t('records.extractionTitle')}</AppText>
-          <AppText variant="callout">{t('records.extractionBody')}</AppText>
-        </Card>
+        <ReportFindings reportId={id} />
 
         <AppText variant="caption" tone="textMuted">
           {t('records.encryptedNote')}

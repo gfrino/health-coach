@@ -113,8 +113,7 @@
     "open": "Dokument öffnen",
     "title": "Titel",
     "date": "Datum der Untersuchung",
-    "extractionTitle": "Werte mit KI auslesen",
-    "extractionBody": "Bald kann dein Coach die Werte der Untersuchung (mit deiner Zustimmung) auslesen und ihren Verlauf zeigen.",
+    "extractionTitle": "Was dein Coach gelesen hat",
     "encryptedNote": "Die Datei ist nur auf diesem Telefon gespeichert, in der verschlüsselten Datenbank.",
     "delete": "Befund löschen",
     "deleteTitle": "Befund löschen?",
@@ -127,7 +126,20 @@
       "document": "Dokumente",
       "text": "Text"
     },
-    "share": "Teilen"
+    "share": "Teilen",
+    "extractionReading": "{{name}} liest das Dokument…",
+    "extractionFailed": "Das Dokument konnte nicht gelesen werden. Versuche es erneut; für Fotos und Scans kannst du auch eine Online-KI in den Einstellungen wählen.",
+    "extractionNone": "{{name}} hat dieses Dokument noch nicht gelesen.",
+    "extractionNoAI": "Wähle in den Einstellungen eine KI, damit dein Coach deine Befunde lesen kann.",
+    "extractionRead": "Vom Coach lesen lassen",
+    "extractionAgain": "Erneut lesen",
+    "extractionValues": "Werte",
+    "extractionNoValues": "Keine Messwerte in diesem Dokument.",
+    "extraction_high": "Hoch",
+    "extraction_low": "Niedrig",
+    "extractionRange": "Referenz {{range}}",
+    "extractionPrevious": "Vorher: {{value}} ({{date}})",
+    "extractionNote": "Die Werte werden von der KI gelesen und können Fehler enthalten: vergleiche sie mit dem Dokument. Sie bleiben verschlüsselt auf diesem Telefon."
   },
   "settings": {
     "title": "Einstellungen",

@@ -85,7 +85,14 @@ export interface CoachContextInput {
   labs?: LabHighlight[];
   journal?: JournalContext[];
   /** Documenti della Cartella salute (solo elenco; il contenuto si apre con read_document). */
-  records?: { id: string; title: string; date: string | null; kind: string }[];
+  records?: {
+    id: string;
+    title: string;
+    date: string | null;
+    kind: string;
+    /** Riassunto scritto dall'AI quando ha letto il documento. */
+    summary?: string | null;
+  }[];
   /** Programmi attivi con le azioni e le spunte di oggi. */
   programs?: ProgramContext[];
   /** Prompt ridotto per i modelli sul telefono (contesto ~4K token). */
@@ -178,9 +185,15 @@ function labsSection(labs: LabHighlight[] | undefined): string | null {
       l.refLow != null || l.refHigh != null
         ? ` (reference ${l.refLow ?? '…'}–${l.refHigh ?? '…'})`
         : '';
-    return `- ${l.date} ${l.name}: ${l.value}${l.unit ? ` ${l.unit}` : ''}${range}`;
+    const flag =
+      typeof l.value === 'number' && l.refHigh != null && l.value > l.refHigh
+        ? ' HIGH'
+        : typeof l.value === 'number' && l.refLow != null && l.value < l.refLow
+          ? ' LOW'
+          : '';
+    return `- ${l.date} ${l.name}: ${l.value}${l.unit ? ` ${l.unit}` : ''}${range}${flag}`;
   });
-  return `RECENT LAB RESULTS OUT OF RANGE\n${lines.join('\n')}`;
+  return `LAB RESULTS (latest value of each test, read from the user's reports; use get_lab_results for the history of a test)\n${lines.join('\n')}\nBase your advice on these real values when relevant, and mention the date of the result.`;
 }
 
 function recordsSection(
@@ -188,12 +201,13 @@ function recordsSection(
   compact: boolean | undefined,
 ): string | null {
   if (!records?.length) return null;
-  const list = (compact ? records.slice(0, 5) : records.slice(0, 25)).map(
-    (r) => `- [${r.id}] ${r.title}${r.date ? ` — ${r.date}` : ''} (${r.kind})`,
-  );
+  const list = (compact ? records.slice(0, 5) : records.slice(0, 25)).map((r) => {
+    const summary = r.summary ? `\n  Summary: ${r.summary.slice(0, compact ? 240 : 500)}` : '';
+    return `- ${compact ? '' : `[${r.id}] `}${r.title}${r.date ? ` — ${r.date}` : ''} (${r.kind})${summary}`;
+  });
   const how = compact
-    ? 'You cannot open these documents with the on-device model: if the user asks about one, say it is saved and that an online AI model (Settings) can read it.'
-    : 'When the user asks about a report, exam, test result or document (e.g. "my latest Withings report"), call read_document with its id and base your answer on its contents. Never say you cannot see a document listed here.';
+    ? 'The summaries and LAB RESULTS above come from these documents: use them. You cannot open the full documents with the on-device model.'
+    : 'Each summary and the LAB RESULTS were read from these documents. When the user asks about a report, exam, test result or document (e.g. "my latest Withings report") and you need more detail, call read_document with its id and base your answer on its contents. Never say you cannot see a document listed here. the user asks about a report, exam, test result or document (e.g. "my latest Withings report"), call read_document with its id and base your answer on its contents. Never say you cannot see a document listed here.';
   return `HEALTH RECORDS (documents the user saved in the app, newest first)\n${list.join('\n')}\n${how}`;
 }
 

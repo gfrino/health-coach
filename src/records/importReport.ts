@@ -34,6 +34,17 @@ export async function importFiles(files: IncomingFile[], fallbackTitle: string):
       // file non eliminabile (fornito dal sistema): ignorato
     }
   }
+  // Il coach legge subito i nuovi referti (valori e riassunto), in background.
+  if (ids.length) {
+    /* eslint-disable @typescript-eslint/no-require-imports -- evita cicli di import */
+    const { extractReport } = require('./labExtraction') as typeof import('./labExtraction');
+    const { useSettingsStore } =
+      require('@/store/settingsStore') as typeof import('@/store/settingsStore');
+    /* eslint-enable @typescript-eslint/no-require-imports */
+    void (async () => {
+      for (const id of ids) await extractReport(useSettingsStore.getState().settings, id);
+    })();
+  }
   return ids;
 }
 

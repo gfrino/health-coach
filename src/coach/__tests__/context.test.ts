@@ -102,7 +102,7 @@ describe('composeSystemPrompt', () => {
       journal: [{ date: '2026-09-28', mood: 2, energy: 3, text: 'Stanca' }],
     });
     expect(p).toContain('- Steps per day (count): 7-day avg 8123.4, 30-day avg 7000, trend up');
-    expect(p).toContain('- 2026-09-01 LDL: 190 mg/dL (reference …–130)');
+    expect(p).toContain('- 2026-09-01 LDL: 190 mg/dL (reference …–130) HIGH');
     expect(p).toContain('- 2026-09-28: mood 2/5, energy 3/5 — "Stanca"');
   });
 });

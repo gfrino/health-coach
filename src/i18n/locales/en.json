@@ -113,8 +113,7 @@
     "open": "Open the document",
     "title": "Title",
     "date": "Exam date",
-    "extractionTitle": "Reading values with AI",
-    "extractionBody": "Soon your coach will be able to read the exam values (with your consent) and show you how they change over time.",
+    "extractionTitle": "What your coach read",
     "encryptedNote": "The file is stored only on this phone, inside the encrypted database.",
     "delete": "Delete report",
     "deleteTitle": "Delete the report?",
@@ -127,7 +126,20 @@
       "document": "Documents",
       "text": "Text"
     },
-    "share": "Share"
+    "share": "Share",
+    "extractionReading": "{{name}} is reading the document…",
+    "extractionFailed": "The document couldn't be read. Try again; for photos and scans you can also choose an online AI in Settings.",
+    "extractionNone": "{{name}} hasn't read this document yet.",
+    "extractionNoAI": "Choose an AI in Settings so your coach can read your reports.",
+    "extractionRead": "Read it with your coach",
+    "extractionAgain": "Read again",
+    "extractionValues": "Values",
+    "extractionNoValues": "No measured values in this document.",
+    "extraction_high": "High",
+    "extraction_low": "Low",
+    "extractionRange": "Reference {{range}}",
+    "extractionPrevious": "Before: {{value}} ({{date}})",
+    "extractionNote": "The values are read by the AI and may contain mistakes: check them against the document. They stay on this phone, encrypted."
   },
   "settings": {
     "title": "Settings",

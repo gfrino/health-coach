@@ -57,7 +57,7 @@ describe('documenti della Cartella per il coach', () => {
     expect(cloud).toContain('[r1] Withings report — 2026-10-02 (pdf)');
     expect(cloud).toContain('call read_document');
     expect(composeSystemPrompt({ ...base, compact: true })).toContain(
-      'cannot open these documents',
+      'cannot open the full documents',
     );
   });
 });
