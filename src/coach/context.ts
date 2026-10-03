@@ -90,6 +90,8 @@ export interface CoachContextInput {
   programs?: ProgramContext[];
   /** Prompt ridotto per i modelli sul telefono (contesto ~4K token). */
   compact?: boolean;
+  /** Quando sono stati letti i totali di oggi dalla sorgente (null = non noto). */
+  todayTotalsAt?: number | null;
   /** Data corrente (YYYY-MM-DD) e ora locale: in fondo al prompt per non invalidare la cache. */
   now: Date;
 }
@@ -245,6 +247,13 @@ export function programsSection(programs: ProgramContext[] | undefined, compact?
   return `ACTIVE PROGRAMS\n${lines.join('\n')}`;
 }
 
+/** Totali di oggi parziali: il modello deve dire "finora" e l'ora dei dati. */
+export function todayTotalsLine(at: number | null | undefined): string | null {
+  if (!at) return null;
+  const hhmm = new Date(at).toTimeString().slice(0, 5);
+  return `TODAY'S TOTALS (steps, calories, distance…) were read from the health app at ${hhmm}: they are partial and keep growing during the day. Say "so far today" and use these numbers or get_metric, never older ones from the conversation.`;
+}
+
 export function composeSystemPrompt(full: CoachContextInput): string {
   const input: CoachContextInput = full.compact
     ? {
@@ -279,6 +288,7 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     // Il modello sul telefono non ha tool: niente regole sul diario.
     input.compact ? null : JOURNAL_RULE,
     input.compact ? null : PROGRAM_RULE,
+    todayTotalsLine(input.todayTotalsAt),
     `CURRENT DATE: ${localIsoDate(input.now)} ${input.now.toTimeString().slice(0, 5)}`,
   ];
   return sections.filter((s): s is string => !!s).join('\n\n');

@@ -237,3 +237,38 @@ export async function syncAppleHealth(
 
   return report;
 }
+
+/**
+ * Aggiornamento rapido dei totali di oggi e di ieri (passi, calorie, distanza, piani…): una
+ * query di statistiche per tipo, in parallelo. Usato prima di ogni risposta del coach, perché
+ * la sincronizzazione completa è più lenta e i passi cambiano di continuo.
+ */
+export async function refreshTodayAppleHealth(db: Db): Promise<number> {
+  const now = Date.now();
+  const from = startOfDay(now - DAY_MS);
+  const ids = (Object.keys(HK_QUANTITY) as QuantityTypeIdentifier[]).filter(
+    (id) => HK_QUANTITY[id]?.cumulative,
+  );
+  const results = await Promise.all(
+    ids.map(async (id) => {
+      try {
+        const stats = await queryStatisticsCollectionForQuantity(
+          id,
+          ['cumulativeSum'],
+          from,
+          { day: 1 },
+          {
+            filter: { date: { startDate: from, endDate: new Date(now) } },
+            unit: HK_QUANTITY[id]!.unit as never,
+          },
+        );
+        return stats
+          .map((s) => normalizeDailyStatistic(id, s))
+          .filter((m): m is NormalizedMetric => m !== null);
+      } catch {
+        return []; // tipo non autorizzato
+      }
+    }),
+  );
+  return healthDataRepository.upsertMetrics(db, results.flat());
+}

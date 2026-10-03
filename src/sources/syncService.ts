@@ -6,6 +6,7 @@ import { runProactiveCheck } from '@/proactive/notifier';
 import { useSettingsStore } from '@/store/settingsStore';
 
 import { generateDemoData, SOURCE_DEMO } from './demo/demoData';
+import { setTodayTotalsAt } from './freshness';
 import { platformHealthSource } from './platformHealth';
 import type { SyncProgress, SyncReport } from './syncTypes';
 
@@ -128,4 +129,36 @@ export async function loadDemoData(): Promise<void> {
 export async function clearDemoData(): Promise<void> {
   const db = await getDb();
   await healthDataRepository.clearSource(db, SOURCE_DEMO);
+}
+
+let refreshingToday: Promise<void> | null = null;
+
+/**
+ * Totali di oggi e di ieri letti subito dalla sorgente (pochi decimi di secondo), senza la
+ * sincronizzazione completa: prima di ogni risposta del coach i passi devono essere quelli veri.
+ */
+export function refreshTodayTotals(): Promise<void> {
+  const { settings } = useSettingsStore.getState();
+  if (settings.healthSourceConnectedAt === null) return Promise.resolve();
+  if (refreshingToday) return refreshingToday;
+  refreshingToday = (async () => {
+    const db = await getDb();
+    /* eslint-disable @typescript-eslint/no-require-imports -- moduli nativi caricati solo sulla loro piattaforma */
+    if (Platform.OS === 'ios') {
+      const { refreshTodayAppleHealth } =
+        require('./appleHealth/sync') as typeof import('./appleHealth/sync');
+      await refreshTodayAppleHealth(db);
+    } else {
+      const { refreshTodayHealthConnect } =
+        require('./healthConnect/sync') as typeof import('./healthConnect/sync');
+      await refreshTodayHealthConnect(db);
+    }
+    /* eslint-enable @typescript-eslint/no-require-imports */
+    setTodayTotalsAt(Date.now());
+  })()
+    .catch(() => undefined)
+    .finally(() => {
+      refreshingToday = null;
+    });
+  return refreshingToday;
 }

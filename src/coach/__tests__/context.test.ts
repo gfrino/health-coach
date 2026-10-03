@@ -107,6 +107,16 @@ describe('composeSystemPrompt', () => {
   });
 });
 
+describe('totali di oggi', () => {
+  it("indica l'ora di lettura e che i totali sono parziali", () => {
+    const at = new Date(2026, 8, 29, 18, 27).getTime();
+    const p = composeSystemPrompt({ coach, language: 'it', now, todayTotalsAt: at });
+    expect(p).toContain('read from the health app at 18:27');
+    expect(p).toContain('so far today');
+    expect(composeSystemPrompt({ coach, language: 'it', now })).not.toContain("TODAY'S TOTALS");
+  });
+});
+
 describe('ageFromBirthDate', () => {
   it("calcola l'età tenendo conto del compleanno", () => {
     expect(ageFromBirthDate('1980-09-29', now)).toBe(46);

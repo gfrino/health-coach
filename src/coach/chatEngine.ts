@@ -17,6 +17,7 @@ import { fileTypeOf } from '@/records/fileMeta';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS } from '@/lib/dates';
 import { loadProgramContext } from '@/programs/summary';
+import { getTodayTotalsAt } from '@/sources/freshness';
 
 import { composeSystemPrompt, recentHistory } from './context';
 import { buildHealthSnapshot } from './snapshot';
@@ -24,23 +25,28 @@ import { COACH_TOOLS, executeTool } from './tools';
 
 const MAX_TOOL_ROUNDS = 5;
 /**
- * Rete di sicurezza: la sincronizzazione avviene già all'apertura dell'app. Prima di rispondere
- * si aggiorna solo se l'ultima sync è vecchia (app aperta a lungo), senza far aspettare.
+ * Dati freschi prima di ogni risposta: i totali di oggi (passi, calorie…) si rileggono sempre
+ * con una query veloce, attesa al massimo qualche secondo; la sincronizzazione completa (sonno,
+ * frequenza cardiaca, allenamenti) parte in parallelo se l'ultima ha più di 2 minuti, e si
+ * aspetta solo un attimo.
  */
-const FRESH_DATA_MAX_WAIT_MS = 3000;
-const FRESH_DATA_MIN_INTERVAL_MS = 10 * 60 * 1000;
+const TODAY_MAX_WAIT_MS = 5000;
+const FULL_SYNC_MAX_WAIT_MS = 2500;
+const FULL_SYNC_MIN_INTERVAL_MS = 2 * 60 * 1000;
 
-/** Sincronizza Apple Salute / Health Connect se l'ultima sync ha più di 10 minuti. */
-async function refreshHealthData(): Promise<void> {
+const within = (p: Promise<unknown>, ms: number) =>
+  Promise.race([p, new Promise((resolve) => setTimeout(resolve, ms))]);
+
+/** Aggiorna i dati di salute prima di rispondere (usato da chat e voce). */
+export async function refreshHealthData(): Promise<void> {
   try {
     // Import pigro: il motore della chat resta indipendente dai moduli nativi di salute.
-    const { syncHealthData } =
+    const { refreshTodayTotals, syncHealthData } =
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       require('@/sources/syncService') as typeof import('@/sources/syncService');
-    await Promise.race([
-      syncHealthData({ minIntervalMs: FRESH_DATA_MIN_INTERVAL_MS }),
-      new Promise((resolve) => setTimeout(resolve, FRESH_DATA_MAX_WAIT_MS)),
-    ]);
+    const full = syncHealthData({ minIntervalMs: FULL_SYNC_MIN_INTERVAL_MS });
+    await within(refreshTodayTotals(), TODAY_MAX_WAIT_MS);
+    await within(full, FULL_SYNC_MAX_WAIT_MS);
   } catch {
     // Dati non aggiornati: si risponde con quelli già presenti.
   }
@@ -90,6 +96,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     journal,
     records,
     programs,
+    todayTotalsAt: getTodayTotalsAt(),
     now,
     compact: settings.ai.provider === 'device',
   });
@@ -369,6 +376,7 @@ export async function completeOnce(
 ): Promise<string> {
   const db = await getDb();
   const { provider, model, apiKey } = await resolveAI(settings);
+  await refreshHealthData();
   const system = await buildSystemPrompt(db, settings, new Date());
   const result = await provider.sendMessage({ system }, [{ role: 'user', content: instruction }], {
     apiKey,

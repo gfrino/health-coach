@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { AIError } from '@/ai/errors';
 import { toAIError } from '@/ai/errors';
-import { buildSystemPrompt, resolveAI, runCoachTurn } from '@/coach/chatEngine';
+import { buildSystemPrompt, refreshHealthData, resolveAI, runCoachTurn } from '@/coach/chatEngine';
 import { VOICE_RULE } from '@/coach/prompts';
 import { COACH_TOOLS, executeTool } from '@/coach/tools';
 import { conversationRepository, getDb } from '@/db';
@@ -126,6 +126,7 @@ export function useVoiceConversation(
       return { apiKey: '' };
     });
     if (!apiKey) return;
+    await refreshHealthData();
     const instructions = `${await buildSystemPrompt(db, settings, new Date())}\n\n${VOICE_RULE}`;
     const stored = convRef.current
       ? await conversationRepository.listMessages(db, convRef.current)

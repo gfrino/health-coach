@@ -186,3 +186,34 @@ export async function syncHealthConnect(
 
   return report;
 }
+
+/** Aggiornamento rapido dei totali di oggi e di ieri, prima di ogni risposta del coach. */
+export async function refreshTodayHealthConnect(db: Db): Promise<number> {
+  if (!(await initialize())) return 0;
+  const now = Date.now();
+  const readable = new Set(
+    (await getGrantedPermissions())
+      .filter((p) => p.accessType === 'read')
+      .map((p) => p.recordType as string),
+  );
+  const from = startOfDay(now - DAY_MS);
+  const results = await Promise.all(
+    HC_DAILY_AGGREGATES.filter((a) => readable.has(a.recordType)).map(async (a) => {
+      try {
+        const groups = await aggregateGroupByPeriod({
+          recordType: a.recordType as never,
+          timeRangeFilter: {
+            operator: 'between',
+            startTime: new Date(from).toISOString(),
+            endTime: new Date(now).toISOString(),
+          },
+          timeRangeSlicer: { period: 'DAYS', length: 1 },
+        });
+        return groups.flatMap((g) => normalizeHCDailyGroup(a.recordType, g as never));
+      } catch {
+        return [];
+      }
+    }),
+  );
+  return healthDataRepository.upsertMetrics(db, results.flat());
+}
