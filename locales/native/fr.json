@@ -1,10 +1,12 @@
 {
-  "CFBundleDisplayName": "Healthas",
-  "NSHealthShareUsageDescription": "Healthas lit vos données de santé (activité, sommeil, constantes, nutrition) pour vous montrer des tendances et vous donner des conseils personnalisés. Vos données restent sur votre iPhone.",
-  "NSFaceIDUsageDescription": "Utilisez Face ID pour déverrouiller Healthas.",
-  "NSPhotoLibraryUsageDescription": "Healthas accède à vos photos uniquement pour importer les comptes rendus que vous choisissez.",
-  "NSCameraUsageDescription": "Healthas utilise l'appareil photo uniquement pour photographier vos comptes rendus.",
-  "NSMicrophoneUsageDescription": "Healthas utilise le micro uniquement lorsque vous parlez à votre coach.",
-  "NSSpeechRecognitionUsageDescription": "Healthas transcrit votre voix pour que vous puissiez parler à votre coach. Quand c'est possible, la transcription se fait sur votre téléphone.",
-  "NSHealthUpdateUsageDescription": "Healthas n'écrit ni ne modifie jamais vos données dans Santé : il les lit uniquement pour vous donner des conseils personnalisés."
+  "ios": {
+    "CFBundleDisplayName": "AlbA",
+    "NSHealthShareUsageDescription": "AlbA lit vos données de santé (activité, sommeil, constantes, nutrition) pour vous montrer des tendances et vous donner des conseils personnalisés. Vos données restent sur votre iPhone.",
+    "NSFaceIDUsageDescription": "Utilisez Face ID pour déverrouiller AlbA.",
+    "NSPhotoLibraryUsageDescription": "AlbA accède à vos photos uniquement pour importer les comptes rendus que vous choisissez.",
+    "NSCameraUsageDescription": "AlbA utilise l'appareil photo uniquement pour photographier vos comptes rendus.",
+    "NSMicrophoneUsageDescription": "AlbA utilise le micro uniquement lorsque vous parlez à votre coach.",
+    "NSSpeechRecognitionUsageDescription": "AlbA transcrit votre voix pour que vous puissiez parler à votre coach. Quand c'est possible, la transcription se fait sur votre téléphone.",
+    "NSHealthUpdateUsageDescription": "AlbA n'écrit ni ne modifie jamais vos données dans Santé : il les lit uniquement pour vous donner des conseils personnalisés."
+  }
 }

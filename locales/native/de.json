@@ -1,10 +1,12 @@
 {
-  "CFBundleDisplayName": "Healthas",
-  "NSHealthShareUsageDescription": "Healthas liest deine Gesundheitsdaten (Aktivität, Schlaf, Vitalwerte, Ernährung), um dir Trends zu zeigen und dir persönliche Tipps zu geben. Deine Daten bleiben auf deinem iPhone.",
-  "NSFaceIDUsageDescription": "Verwende Face ID, um Healthas zu entsperren.",
-  "NSPhotoLibraryUsageDescription": "Healthas greift nur auf Fotos zu, um die von dir gewählten Befunde zu importieren.",
-  "NSCameraUsageDescription": "Healthas verwendet die Kamera nur, um deine Befunde zu fotografieren.",
-  "NSMicrophoneUsageDescription": "Healthas nutzt das Mikrofon nur, während du mit deinem Coach sprichst.",
-  "NSSpeechRecognitionUsageDescription": "Healthas wandelt deine Sprache in Text um, damit du mit deinem Coach sprechen kannst. Wenn möglich, geschieht das auf deinem Telefon.",
-  "NSHealthUpdateUsageDescription": "Healthas schreibt oder ändert deine Daten in Health nie: Es liest sie nur, um dir persönliche Tipps zu geben."
+  "ios": {
+    "CFBundleDisplayName": "AlbA",
+    "NSHealthShareUsageDescription": "AlbA liest deine Gesundheitsdaten (Aktivität, Schlaf, Vitalwerte, Ernährung), um dir Trends zu zeigen und dir persönliche Tipps zu geben. Deine Daten bleiben auf deinem iPhone.",
+    "NSFaceIDUsageDescription": "Verwende Face ID, um AlbA zu entsperren.",
+    "NSPhotoLibraryUsageDescription": "AlbA greift nur auf Fotos zu, um die von dir gewählten Befunde zu importieren.",
+    "NSCameraUsageDescription": "AlbA verwendet die Kamera nur, um deine Befunde zu fotografieren.",
+    "NSMicrophoneUsageDescription": "AlbA nutzt das Mikrofon nur, während du mit deinem Coach sprichst.",
+    "NSSpeechRecognitionUsageDescription": "AlbA wandelt deine Sprache in Text um, damit du mit deinem Coach sprechen kannst. Wenn möglich, geschieht das auf deinem Telefon.",
+    "NSHealthUpdateUsageDescription": "AlbA schreibt oder ändert deine Daten in Health nie: Es liest sie nur, um dir persönliche Tipps zu geben."
+  }
 }
