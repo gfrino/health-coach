@@ -342,7 +342,16 @@ export default function FoodScreen() {
                   : t('food.writeHealthNotConnected')
               }
               value={settings.food.writeToHealth}
-              onChange={(v) => update({ food: { ...settings.food, writeToHealth: v } })}
+              // Riaccendendolo, iOS può chiedere di nuovo il permesso al prossimo salvataggio.
+              onChange={(v) =>
+                void update({
+                  food: {
+                    ...settings.food,
+                    writeToHealth: v,
+                    ...(v ? { healthAskedAt: null } : {}),
+                  },
+                })
+              }
             />
           ) : null}
         </Card>

@@ -75,6 +75,8 @@ export type Proactivity = z.infer<typeof proactivitySchema>;
 export const foodSettingsSchema = z.object({
   calorieTarget: z.number().int().min(800).max(6000).nullable(),
   writeToHealth: z.boolean(),
+  /** Quando è stato chiesto il permesso di scrittura in Apple Salute: si chiede una volta sola. */
+  healthAskedAt: z.number().int().nullable().optional(),
 });
 
 export const ONBOARDING_FLOW_VERSION = 2;
