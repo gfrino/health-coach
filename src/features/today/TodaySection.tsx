@@ -247,6 +247,18 @@ export function TodaySection() {
       </MetricCard>
 
       <OtherMeasures />
+
+      {/* Solo sviluppo / build per gli screenshot: riallinea i dati di esempio a oggi. */}
+      {SHOW_DEMO_DATA ? (
+        <Button
+          label={t('today.loadDemo')}
+          variant="ghost"
+          onPress={async () => {
+            await loadDemoData();
+            reload();
+          }}
+        />
+      ) : null}
     </View>
   );
 }

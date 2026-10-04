@@ -409,6 +409,14 @@ export async function generateWelcome(
   return conversationId;
 }
 
+const LANGUAGE_NAMES = { it: 'Italian', en: 'English', de: 'German', fr: 'French' } as const;
+
+/** I modelli piccoli (sul telefono) a volte rispondono in inglese: la lingua va detta esplicitamente. */
+export function languageLine(settings: AppSettings): string {
+  const lang = LANGUAGE_NAMES[resolveLanguage(settings.language, deviceLanguageCodes())];
+  return `\n\nWrite everything (titles, descriptions, lists, steps) in ${lang}.`;
+}
+
 /** Una richiesta senza tool né cronologia (es. generare un programma in JSON). */
 export async function completeOnce(
   settings: AppSettings,
@@ -419,11 +427,15 @@ export async function completeOnce(
   const { provider, model, apiKey } = await resolveAI(settings);
   await refreshHealthData();
   const system = await buildSystemPrompt(db, settings, new Date());
-  const result = await provider.sendMessage({ system }, [{ role: 'user', content: instruction }], {
-    apiKey,
-    model,
-    signal,
-  });
+  const result = await provider.sendMessage(
+    { system },
+    [{ role: 'user', content: instruction + languageLine(settings) }],
+    {
+      apiKey,
+      model,
+      signal,
+    },
+  );
   if (result.stopReason === 'refusal' && !result.text) throw new AIError('refused');
   return result.text.trim();
 }
@@ -444,7 +456,7 @@ export async function generateCheckin(
     db,
     settings,
     system,
-    [{ role: 'user', content: instruction }],
+    [{ role: 'user', content: instruction + languageLine(settings) }],
     { signal },
   );
   if (!text) throw new AIError('unknown', 'Risposta vuota');

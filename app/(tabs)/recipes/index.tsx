@@ -106,7 +106,7 @@ export default function RecipesScreen() {
                       </AppText>
                       {r.description ? (
                         <AppText variant="callout" numberOfLines={2}>
-                          {r.description}
+                          {r.description.charAt(0).toLocaleUpperCase() + r.description.slice(1)}
                         </AppText>
                       ) : null}
                     </Pressable>
