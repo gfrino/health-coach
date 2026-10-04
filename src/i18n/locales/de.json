@@ -289,23 +289,23 @@
         "1": "Öffne die Anthropic Console und melde dich an oder erstelle ein Konto.",
         "2": "Füge unter Billing eine Zahlungsmethode oder Prepaid-Guthaben hinzu.",
         "3": "Gehe zu API Keys und tippe auf „Create Key“; gib ihm einen Namen, z. B. AlbA.",
-        "4": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Code wird automatisch eingefügt und geprüft."
+        "4": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Schlüssel wird automatisch eingefügt und geprüft."
       },
       "openai": {
         "1": "Öffne die OpenAI-Plattform und melde dich an oder erstelle ein Konto.",
         "2": "Füge unter Billing Guthaben hinzu: Ein ChatGPT-Abo gilt nicht für die API.",
         "3": "Gehe zu API keys und tippe auf „Create new secret key“.",
-        "4": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Code wird automatisch eingefügt und geprüft."
+        "4": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Schlüssel wird automatisch eingefügt und geprüft."
       },
       "gemini": {
         "1": "Öffne Google AI Studio und melde dich mit deinem Google-Konto an.",
         "2": "Tippe auf „Create API key“ und wähle oder erstelle ein Projekt.",
-        "3": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Code wird automatisch eingefügt und geprüft."
+        "3": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Schlüssel wird automatisch eingefügt und geprüft."
       }
     },
-    "openKeysPage": "Seite öffnen und Code erstellen",
+    "openKeysPage": "Deinen {{provider}}-Schlüssel holen",
     "billingNote": "Die KI-Nutzung rechnet der Anbieter nach Verbrauch über dein Konto ab. Dein Schlüssel bleibt auf diesem Telefon: Wir erhalten oder sehen ihn nie.",
-    "apiKey": "Zugangscode (API-Schlüssel)",
+    "apiKey": "API-Schlüssel",
     "keyHint": "Er wird im sicheren Schlüsselbund deines Telefons gespeichert.",
     "keySavedHint": "Ein Schlüssel ist bereits gespeichert. Füge nur einen neuen ein, wenn du ihn ersetzen möchtest.",
     "verify": "Prüfen und verbinden",
@@ -351,9 +351,9 @@
       "toggle": "Einen Online-KI-Dienst nutzen (leistungsfähiger)",
       "toggleHint": "Gemini, Claude oder ChatGPT mit deinem eigenen Konto: Du brauchst einen Zugangscode."
     },
-    "paste": "Kopierten Code einfügen",
-    "pasted": "Code in der Zwischenablage gefunden: wird geprüft…",
-    "pasteNothing": "In der Zwischenablage ist kein {{provider}}-Code. Tippe auf der Seite des Anbieters neben dem Schlüssel auf „Copy“ und kehre hierher zurück.",
+    "paste": "Kopierten Schlüssel einfügen",
+    "pasted": "Schlüssel in der Zwischenablage gefunden: wird geprüft…",
+    "pasteNothing": "In der Zwischenablage ist kein {{provider}}-Schlüssel. Tippe auf der Seite des Anbieters neben dem Schlüssel auf „Copy“ und kehre hierher zurück.",
     "errorDetail": "Details: {{detail}}"
   },
   "sources": {

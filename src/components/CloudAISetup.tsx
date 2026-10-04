@@ -185,7 +185,8 @@ export function CloudAISetup({
         {/* Primo passo: luce che gira intorno al pulsante finché non c'è un codice. */}
         <GlowBorder active={!activeKey}>
           <Button
-            label={t('ai.openKeysPage')}
+            // "OpenAI (ChatGPT)" → "OpenAI": il nome sulla pagina delle chiavi.
+            label={t('ai.openKeysPage', { provider: info.name.replace(/\s*\(.*\)$/, '') })}
             // Primo passo: ben visibile finché non c'è un codice.
             variant={activeKey ? 'secondary' : 'primary'}
             onPress={openKeysPage}

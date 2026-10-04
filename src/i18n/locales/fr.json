@@ -289,23 +289,23 @@
         "1": "Ouvrez la Console Anthropic et connectez-vous ou créez un compte.",
         "2": "Dans Billing, ajoutez un moyen de paiement ou du crédit prépayé.",
         "3": "Allez dans API Keys et touchez « Create Key » ; donnez-lui un nom, par exemple AlbA.",
-        "4": "Touchez « Copy » à côté de la clé et fermez la page : le code sera saisi et vérifié automatiquement."
+        "4": "Touchez « Copy » à côté de la clé et fermez la page : la clé sera saisie et vérifiée automatiquement."
       },
       "openai": {
         "1": "Ouvrez la plateforme OpenAI et connectez-vous ou créez un compte.",
         "2": "Dans Billing, ajoutez du crédit : l'abonnement ChatGPT ne couvre pas l'API.",
         "3": "Allez dans API keys et touchez « Create new secret key ».",
-        "4": "Touchez « Copy » à côté de la clé et fermez la page : le code sera saisi et vérifié automatiquement."
+        "4": "Touchez « Copy » à côté de la clé et fermez la page : la clé sera saisie et vérifiée automatiquement."
       },
       "gemini": {
         "1": "Ouvrez Google AI Studio et connectez-vous avec votre compte Google.",
         "2": "Touchez « Create API key » et choisissez ou créez un projet.",
-        "3": "Touchez « Copy » à côté de la clé et fermez la page : le code sera saisi et vérifié automatiquement."
+        "3": "Touchez « Copy » à côté de la clé et fermez la page : la clé sera saisie et vérifiée automatiquement."
       }
     },
-    "openKeysPage": "Ouvrir la page et créer le code",
+    "openKeysPage": "Obtenir votre clé {{provider}}",
     "billingNote": "L'utilisation de l'IA est facturée par le fournisseur sur ton compte, selon la consommation. Ta clé reste sur ce téléphone : nous ne la recevons ni ne la voyons jamais.",
-    "apiKey": "Code d'accès (clé API)",
+    "apiKey": "Clé API",
     "keyHint": "Elle est enregistrée dans le trousseau sécurisé de votre téléphone.",
     "keySavedHint": "Une clé est déjà enregistrée. Collez-en une nouvelle uniquement pour la remplacer.",
     "verify": "Vérifier et connecter",
@@ -349,11 +349,11 @@
     },
     "cloud": {
       "toggle": "Utiliser un service d'IA en ligne (plus puissant)",
-      "toggleHint": "Gemini, Claude ou ChatGPT avec votre propre compte : il faut un code d'accès."
+      "toggleHint": "Gemini, Claude ou ChatGPT avec votre propre compte : il faut une clé API."
     },
-    "paste": "Coller le code copié",
-    "pasted": "Code trouvé dans le presse-papiers : vérification…",
-    "pasteNothing": "Le presse-papiers ne contient pas de code {{provider}}. Sur la page du fournisseur, touchez « Copy » à côté de la clé, puis revenez ici.",
+    "paste": "Coller la clé copiée",
+    "pasted": "Clé trouvée dans le presse-papiers : vérification…",
+    "pasteNothing": "Le presse-papiers ne contient pas de clé {{provider}}. Sur la page du fournisseur, touchez « Copy » à côté de la clé, puis revenez ici.",
     "errorDetail": "Détails : {{detail}}"
   },
   "sources": {
@@ -681,7 +681,7 @@
       },
       "chatgpt_account": {
         "name": "ChatGPT avec votre compte",
-        "data": "Utilisez votre abonnement ChatGPT (y compris Team/Business) au lieu d'un code d'accès. En attente de l'approbation d'OpenAI."
+        "data": "Utilisez votre abonnement ChatGPT (y compris Team/Business) au lieu d'une clé API. En attente de l'approbation d'OpenAI."
       }
     },
     "lastSync": "Dernière synchronisation : {{when}}"
