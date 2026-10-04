@@ -25,6 +25,7 @@ const EXPECTED_TABLES = [
   'program_checks',
   'program_items',
   'programs',
+  'recipes',
   'settings',
   'sleep_sessions',
   'sync_state',

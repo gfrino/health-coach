@@ -22,7 +22,8 @@
     "settings": "Impostazioni",
     "integrations": "Integrazioni",
     "me": "Io",
-    "programs": "Programmi"
+    "programs": "Programmi",
+    "recipes": "Ricette"
   },
   "coach": {
     "emptyTitle": "Il tuo coach ti aspetta",
@@ -579,7 +580,8 @@
     "attachmentA11y": "Allegato: {{name}}",
     "removeAttachment": "Rimuovi {{name}}",
     "savingProgram": "Aggiorno il tuo programma…",
-    "savingMemory": "Me lo segno…"
+    "savingMemory": "Me lo segno…",
+    "savingRecipe": "Salvo la ricetta…"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",
@@ -681,7 +683,9 @@
     "integrations": "Servizi",
     "settings": "Opzioni",
     "me": "Io",
-    "programs": "Programmi"
+    "programs": "Programmi",
+    "journal": "Diario",
+    "recipes": "Ricette"
   },
   "voice": {
     "talk": "Parla",
@@ -872,5 +876,72 @@
     "clear": "Elimina tutti i ricordi",
     "clearTitle": "Eliminare tutti i ricordi?",
     "clearBody": "{{name}} dimenticherà ciò che ha imparato su di te e i riassunti delle conversazioni passate. Chat, diario e dati restano."
+  },
+  "sidebar": {
+    "open": "Apri il menu",
+    "close": "Chiudi il menu",
+    "subtitle": "Il tuo coach {{name}}"
+  },
+  "recipes": {
+    "new": "Nuova ricetta",
+    "emptyTitle": "Ancora nessuna ricetta",
+    "emptyBody": "Il coach può crearti ricette su misura: la tua dieta, le intolleranze, gli obiettivi e i gusti. Puoi chiederle anche in chat o scriverle tu.",
+    "noneInFilter": "Ancora nessuna ricetta qui.",
+    "favorite": "Preferita",
+    "filters": {
+      "all": "Tutte",
+      "favorites": "Preferite",
+      "breakfast": "Colazione",
+      "lunch": "Pranzo",
+      "dinner": "Cena",
+      "snack": "Spuntino",
+      "dessert": "Dolce"
+    },
+    "meals": {
+      "breakfast": "Colazione",
+      "lunch": "Pranzo",
+      "dinner": "Cena",
+      "snack": "Spuntino",
+      "dessert": "Dolce",
+      "any": "Qualsiasi"
+    },
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "servingsCount_one": "{{count}} porzione",
+    "servingsCount_other": "{{count}} porzioni",
+    "cookedTimes_one": "cucinata una volta",
+    "cookedTimes_other": "cucinata {{count}} volte",
+    "newIntro": "{{name}} crea la ricetta per te, rispettando dieta, intolleranze, obiettivi e gusti. Dopo puoi cambiare tutto.",
+    "newIntroNoAI": "Scrivi la tua ricetta. Per farla creare dal coach, scegli un'AI nelle Opzioni.",
+    "wish": "Cosa ti va di cucinare? (facoltativo)",
+    "wishPlaceholder": "Es. qualcosa con i ceci, una colazione calda veloce…",
+    "meal": "Pasto",
+    "time": "Tempo",
+    "anyTime": "Senza limite",
+    "servings": "Porzioni",
+    "generate": "Creala con {{name}}",
+    "createManual": "La scrivo io",
+    "generating": "{{name}} sta preparando la tua ricetta…",
+    "generateFailed": "Non è stato possibile creare la ricetta. Riprova o scrivila tu.",
+    "untitled": "Nuova ricetta",
+    "notFound": "Ricetta non trovata",
+    "editTitle": "Modifica ricetta",
+    "titleLabel": "Titolo",
+    "descriptionLabel": "Descrizione",
+    "minutesLabel": "Minuti",
+    "ingredients": "Ingredienti",
+    "steps": "Preparazione",
+    "onePerLine": "Uno per riga",
+    "noIngredients": "Ancora nessun ingrediente: tocca Modifica.",
+    "noSteps": "Ancora nessun passaggio: tocca Modifica.",
+    "byCoach": "creata dal coach",
+    "cooked": "L'ho cucinata",
+    "cookedInfo_one": "Cucinata una volta, l'ultima il {{date}}",
+    "cookedInfo_other": "Cucinata {{count}} volte, l'ultima il {{date}}",
+    "askCoach": "Parlane con il coach",
+    "askCoachPrompt": "Parliamo della mia ricetta \"{{title}}\": come posso adattarla o variarla per me?",
+    "delete": "Elimina ricetta",
+    "deleteTitle": "Eliminare la ricetta?",
+    "deleteBody": "La ricetta verrà eliminata da questo telefono."
   }
 }

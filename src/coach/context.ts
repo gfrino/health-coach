@@ -100,6 +100,8 @@ export interface CoachContextInput {
   }[];
   /** Programmi attivi con le azioni e le spunte di oggi. */
   programs?: ProgramContext[];
+  /** Ricette salvate (titolo, pasto, preferita, quante volte cucinata). */
+  recipes?: { id: string; title: string; meal: string; favorite: boolean; cooked: number }[];
   /** Altre misure di salute presenti (VO2 max, grasso corporeo, acqua…) e ciclo mestruale. */
   extras?: ExtraMeasure[];
   cycle?: CycleInfo | null;
@@ -262,6 +264,25 @@ ${rule}`;
 const PROGRAM_RULE = `PROGRAMS
 When the user asks for a plan, a routine or a program (or agrees to one you proposed), create it with create_program: a short title, the goal, 3–7 concrete, doable actions (daily habits or one-time steps), each with a one-line how-to. Adapt it to their data, conditions, diet and preferences. To change an existing program (add, edit or remove actions, rename, mark it completed) use update_program with ids from ACTIVE PROGRAMS. Tell the user the program is in the Programs tab, where they can tick actions and edit it. When relevant, encourage progress on their active programs.`;
 
+const RECIPE_RULE = `RECIPES
+When the user asks for a recipe or a meal idea they may want to keep, save it with create_recipe (they find it in the Recipes tab). Every recipe must respect their allergies and intolerances, diet and approach, conditions, medications and tastes (see what you remember), and suit their goals and lab results. When suggesting meals, prefer their favourite and most cooked recipes from SAVED RECIPES.`;
+
+export function recipesSection(
+  recipes: CoachContextInput['recipes'],
+  compact: boolean | undefined,
+): string | null {
+  if (!recipes?.length) return null;
+  const lines = recipes.slice(0, compact ? 6 : 20).map((r) => {
+    const bits = [
+      r.meal !== 'any' ? r.meal : null,
+      r.favorite ? 'favourite' : null,
+      r.cooked ? `cooked ${r.cooked}×` : null,
+    ].filter(Boolean);
+    return `- ${compact ? '' : `[${r.id}] `}${r.title}${bits.length ? ` (${bits.join(', ')})` : ''}`;
+  });
+  return `SAVED RECIPES (in the Recipes tab)\n${lines.join('\n')}`;
+}
+
 export function programsSection(programs: ProgramContext[] | undefined, compact?: boolean) {
   if (!programs?.length) return null;
   const lines = programs.map((p) => {
@@ -312,11 +333,13 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     recordsSection(input.records, input.compact),
     journalSection(input.journal),
     programsSection(input.programs, input.compact),
+    recipesSection(input.recipes, input.compact),
     dataAvailabilitySection(input),
     ANSWER_GUIDE,
     // Il modello sul telefono non ha tool: niente regole sul diario.
     input.compact ? null : JOURNAL_RULE,
     input.compact ? null : PROGRAM_RULE,
+    input.compact ? null : RECIPE_RULE,
     input.compact ? null : MEMORY_RULE,
     (input.memoryFacts?.length ?? 0) < 8 ? GETTING_TO_KNOW : null,
     todayTotalsLine(input.todayTotalsAt),

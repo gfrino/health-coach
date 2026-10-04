@@ -22,7 +22,8 @@
     "settings": "Settings",
     "integrations": "Integrations",
     "me": "Me",
-    "programs": "Programs"
+    "programs": "Programs",
+    "recipes": "Recipes"
   },
   "coach": {
     "emptyTitle": "Your coach is waiting",
@@ -579,7 +580,8 @@
     "attachmentA11y": "Attachment: {{name}}",
     "removeAttachment": "Remove {{name}}",
     "savingProgram": "Updating your program…",
-    "savingMemory": "Noting this…"
+    "savingMemory": "Noting this…",
+    "savingRecipe": "Saving the recipe…"
   },
   "integrations": {
     "healthTitle": "Phone health data",
@@ -681,7 +683,9 @@
     "integrations": "Services",
     "settings": "Settings",
     "me": "Me",
-    "programs": "Programs"
+    "programs": "Programs",
+    "journal": "Journal",
+    "recipes": "Recipes"
   },
   "voice": {
     "talk": "Talk",
@@ -872,5 +876,72 @@
     "clear": "Delete all memories",
     "clearTitle": "Delete all memories?",
     "clearBody": "{{name}} will forget what it learned about you and the summaries of past conversations. Your chats, journal and data stay."
+  },
+  "sidebar": {
+    "open": "Open menu",
+    "close": "Close menu",
+    "subtitle": "Your coach {{name}}"
+  },
+  "recipes": {
+    "new": "New recipe",
+    "emptyTitle": "No recipes yet",
+    "emptyBody": "Your coach can create recipes made for you: your diet, intolerances, goals and tastes. You can also ask for one in the chat or write your own.",
+    "noneInFilter": "No recipes here yet.",
+    "favorite": "Favourite",
+    "filters": {
+      "all": "All",
+      "favorites": "Favourites",
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack",
+      "dessert": "Dessert"
+    },
+    "meals": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack",
+      "dessert": "Dessert",
+      "any": "Any time"
+    },
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "servingsCount_one": "{{count}} serving",
+    "servingsCount_other": "{{count}} servings",
+    "cookedTimes_one": "cooked once",
+    "cookedTimes_other": "cooked {{count}} times",
+    "newIntro": "{{name}} creates the recipe for you, respecting your diet, intolerances, goals and tastes. You can change everything afterwards.",
+    "newIntroNoAI": "Write your recipe. To have your coach create it, choose an AI in Settings.",
+    "wish": "What would you like to cook? (optional)",
+    "wishPlaceholder": "E.g. something with chickpeas, a quick warm breakfast…",
+    "meal": "Meal",
+    "time": "Time",
+    "anyTime": "No limit",
+    "servings": "Servings",
+    "generate": "Create it with {{name}}",
+    "createManual": "Write it myself",
+    "generating": "{{name}} is preparing your recipe…",
+    "generateFailed": "The recipe couldn't be created. Try again or write it yourself.",
+    "untitled": "New recipe",
+    "notFound": "Recipe not found",
+    "editTitle": "Edit recipe",
+    "titleLabel": "Title",
+    "descriptionLabel": "Description",
+    "minutesLabel": "Minutes",
+    "ingredients": "Ingredients",
+    "steps": "Steps",
+    "onePerLine": "One per line",
+    "noIngredients": "No ingredients yet: tap Edit.",
+    "noSteps": "No steps yet: tap Edit.",
+    "byCoach": "by your coach",
+    "cooked": "I cooked it",
+    "cookedInfo_one": "Cooked once, last on {{date}}",
+    "cookedInfo_other": "Cooked {{count}} times, last on {{date}}",
+    "askCoach": "Talk about it with your coach",
+    "askCoachPrompt": "Let's talk about my recipe \"{{title}}\": how can I adapt or vary it for me?",
+    "delete": "Delete recipe",
+    "deleteTitle": "Delete the recipe?",
+    "deleteBody": "The recipe will be deleted from this phone."
   }
 }

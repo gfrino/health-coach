@@ -10,7 +10,7 @@ import { useTheme } from '@/theme';
 
 import { emojiFor, ENERGY_EMOJI, MOOD_EMOJI } from './scale';
 
-const openEntry = (id: string) => router.push({ pathname: '/me/journal/[id]', params: { id } });
+const openEntry = (id: string) => router.push({ pathname: '/journal/[id]', params: { id } });
 export const newJournalEntry = () => openEntry('new');
 
 /** Diario: voci scritte dall'utente o annotate dal coach durante la chat. */

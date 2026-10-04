@@ -18,3 +18,4 @@ export * as journalRepository from './repositories/journalRepository';
 export * as notificationRepository from './repositories/notificationRepository';
 export * as programRepository from './repositories/programRepository';
 export * as memoryRepository from './repositories/memoryRepository';
+export * as recipeRepository from './repositories/recipeRepository';

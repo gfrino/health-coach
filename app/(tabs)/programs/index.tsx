@@ -25,6 +25,7 @@ export default function ProgramsScreen() {
     <>
       <Stack.Screen options={{ headerShown: false, title: t('tabs.programs') }} />
       <Screen
+        menu
         title={t('tabs.programs')}
         titleAction={
           <Pressable

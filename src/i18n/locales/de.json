@@ -22,7 +22,8 @@
     "settings": "Einstellungen",
     "integrations": "Integrationen",
     "me": "Ich",
-    "programs": "Programme"
+    "programs": "Programme",
+    "recipes": "Rezepte"
   },
   "coach": {
     "emptyTitle": "Dein Coach wartet auf dich",
@@ -579,7 +580,8 @@
     "attachmentA11y": "Anhang: {{name}}",
     "removeAttachment": "{{name}} entfernen",
     "savingProgram": "Dein Programm wird aktualisiert…",
-    "savingMemory": "Ich merke es mir…"
+    "savingMemory": "Ich merke es mir…",
+    "savingRecipe": "Rezept wird gespeichert…"
   },
   "integrations": {
     "healthTitle": "Gesundheitsdaten des Telefons",
@@ -681,7 +683,9 @@
     "integrations": "Dienste",
     "settings": "Optionen",
     "me": "Ich",
-    "programs": "Programme"
+    "programs": "Programme",
+    "journal": "Tagebuch",
+    "recipes": "Rezepte"
   },
   "voice": {
     "talk": "Sprechen",
@@ -872,5 +876,72 @@
     "clear": "Alle Erinnerungen löschen",
     "clearTitle": "Alle Erinnerungen löschen?",
     "clearBody": "{{name}} vergisst, was er über dich gelernt hat, und die Zusammenfassungen früherer Gespräche. Chats, Tagebuch und Daten bleiben."
+  },
+  "sidebar": {
+    "open": "Menü öffnen",
+    "close": "Menü schließen",
+    "subtitle": "Dein Coach {{name}}"
+  },
+  "recipes": {
+    "new": "Neues Rezept",
+    "emptyTitle": "Noch keine Rezepte",
+    "emptyBody": "Dein Coach kann Rezepte für dich erstellen: passend zu Ernährung, Unverträglichkeiten, Zielen und Geschmack. Du kannst auch im Chat danach fragen oder eigene schreiben.",
+    "noneInFilter": "Hier noch keine Rezepte.",
+    "favorite": "Favorit",
+    "filters": {
+      "all": "Alle",
+      "favorites": "Favoriten",
+      "breakfast": "Frühstück",
+      "lunch": "Mittagessen",
+      "dinner": "Abendessen",
+      "snack": "Snack",
+      "dessert": "Dessert"
+    },
+    "meals": {
+      "breakfast": "Frühstück",
+      "lunch": "Mittagessen",
+      "dinner": "Abendessen",
+      "snack": "Snack",
+      "dessert": "Dessert",
+      "any": "Beliebig"
+    },
+    "minutes_one": "{{count}} Min.",
+    "minutes_other": "{{count}} Min.",
+    "servingsCount_one": "{{count}} Portion",
+    "servingsCount_other": "{{count}} Portionen",
+    "cookedTimes_one": "einmal gekocht",
+    "cookedTimes_other": "{{count}}-mal gekocht",
+    "newIntro": "{{name}} erstellt das Rezept für dich, passend zu Ernährung, Unverträglichkeiten, Zielen und Geschmack. Danach kannst du alles ändern.",
+    "newIntroNoAI": "Schreibe dein Rezept. Damit dein Coach es erstellt, wähle in den Einstellungen eine KI.",
+    "wish": "Worauf hast du Lust? (optional)",
+    "wishPlaceholder": "Z. B. etwas mit Kichererbsen, ein schnelles warmes Frühstück…",
+    "meal": "Mahlzeit",
+    "time": "Zeit",
+    "anyTime": "Ohne Limit",
+    "servings": "Portionen",
+    "generate": "Mit {{name}} erstellen",
+    "createManual": "Selbst schreiben",
+    "generating": "{{name}} bereitet dein Rezept vor…",
+    "generateFailed": "Das Rezept konnte nicht erstellt werden. Versuche es erneut oder schreibe es selbst.",
+    "untitled": "Neues Rezept",
+    "notFound": "Rezept nicht gefunden",
+    "editTitle": "Rezept bearbeiten",
+    "titleLabel": "Titel",
+    "descriptionLabel": "Beschreibung",
+    "minutesLabel": "Minuten",
+    "ingredients": "Zutaten",
+    "steps": "Zubereitung",
+    "onePerLine": "Eine pro Zeile",
+    "noIngredients": "Noch keine Zutaten: tippe auf Bearbeiten.",
+    "noSteps": "Noch keine Schritte: tippe auf Bearbeiten.",
+    "byCoach": "vom Coach erstellt",
+    "cooked": "Habe ich gekocht",
+    "cookedInfo_one": "Einmal gekocht, zuletzt am {{date}}",
+    "cookedInfo_other": "{{count}}-mal gekocht, zuletzt am {{date}}",
+    "askCoach": "Mit dem Coach besprechen",
+    "askCoachPrompt": "Lass uns über mein Rezept \"{{title}}\" sprechen: Wie kann ich es für mich anpassen oder abwandeln?",
+    "delete": "Rezept löschen",
+    "deleteTitle": "Rezept löschen?",
+    "deleteBody": "Das Rezept wird von diesem Telefon gelöscht."
   }
 }

@@ -10,6 +10,7 @@ import {
   labReportRepository,
   memoryRepository,
   profileRepository,
+  recipeRepository,
   type Db,
 } from '@/db';
 import type { MessageAttachment, StoredMessage } from '@/db/repositories/conversationRepository';
@@ -80,6 +81,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     latest,
     extras,
     cycle,
+    recipeList,
   ] = await Promise.all([
     profileRepository.loadProfileContext(db),
     memoryRepository.listFacts(db),
@@ -91,6 +93,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     labReportRepository.latestResults(db),
     loadExtraMeasures(db, now),
     loadCycle(db, now),
+    recipeRepository.listRecipes(db),
   ]);
   const records = reports.map((r) => ({
     id: r.id,
@@ -127,6 +130,13 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     programs,
     extras,
     cycle,
+    recipes: recipeList.map((r) => ({
+      id: r.id,
+      title: r.title,
+      meal: r.meal,
+      favorite: r.favorite,
+      cooked: r.cookedCount,
+    })),
     todayTotalsAt: getTodayTotalsAt(),
     now,
     compact,

@@ -5,16 +5,15 @@ import { Pressable, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Icon, Screen, SegmentedControl } from '@/components';
-import { JournalSection, newJournalEntry } from '@/features/journal/JournalSection';
 import { RecordsSection, useAddReport } from '@/features/RecordsSection';
 import { TodaySection } from '@/features/today/TodaySection';
 import { syncHealthData, useSyncStore } from '@/sources/syncService';
 import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/theme';
 
-type Section = 'today' | 'journal' | 'records';
+type Section = 'today' | 'records';
 
-/** Tab "Io": Oggi, Diario e Cartella salute in un'unica sezione personale. */
+/** "Io" (dal menu laterale): Oggi e Cartella salute. Il Diario ha una tab propria. */
 export default function MeScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -23,7 +22,10 @@ export default function MeScreen() {
   const [reloadKey, setReloadKey] = useState(0);
   // Spinner solo per l'aggiornamento chiesto dall'utente; quello automatico è silenzioso.
   const refreshing = useSyncStore((st) => st.syncing && st.manual);
-  const current = params.section && params.section !== section ? params.section : section;
+  // "journal" (vecchi link): il diario ora è una tab; qui si mostra Oggi.
+  const fromParams =
+    params.section === 'records' || params.section === 'today' ? params.section : null;
+  const current = fromParams && fromParams !== section ? fromParams : section;
 
   const add = useAddReport((ids) => {
     setReloadKey((k) => k + 1);
@@ -40,19 +42,17 @@ export default function MeScreen() {
     <>
       <Stack.Screen options={{ headerShown: false, title: t('tabs.me') }} />
       <Screen
+        menu
         title={t('tabs.me')}
         titleAction={
-          current !== 'today' ? (
+          current === 'records' ? (
             <Pressable
               onPress={() => {
                 haptic.tap();
-                if (current === 'records') add();
-                else newJournalEntry();
+                add();
               }}
               accessibilityRole="button"
-              accessibilityLabel={
-                current === 'records' ? t('records.addTitle') : t('journal.newTitle')
-              }
+              accessibilityLabel={t('records.addTitle')}
               hitSlop={10}
               style={{
                 width: 44,
@@ -82,17 +82,10 @@ export default function MeScreen() {
           onChange={select}
           segments={[
             { value: 'today', label: t('tabs.today') },
-            { value: 'journal', label: t('tabs.journal') },
             { value: 'records', label: t('tabs.records') },
           ]}
         />
-        {current === 'today' ? (
-          <TodaySection />
-        ) : current === 'journal' ? (
-          <JournalSection />
-        ) : (
-          <RecordsSection reloadKey={reloadKey} />
-        )}
+        {current === 'today' ? <TodaySection /> : <RecordsSection reloadKey={reloadKey} />}
       </Screen>
     </>
   );

@@ -6,9 +6,11 @@ import {
   labReportRepository,
   memoryRepository,
   programRepository,
+  recipeRepository,
   type Db,
 } from '@/db';
 import { PROGRAM_CATEGORIES } from '@/db/repositories/programRepository';
+import { RECIPE_MEALS } from '@/db/repositories/recipeRepository';
 import { parseProgramItems } from '@/programs/parse';
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
 import { DAY_MS, localIsoDate } from '@/lib/dates';
@@ -189,6 +191,52 @@ export const COACH_TOOLS: ToolDefinition[] = [
         fact_id: { type: 'string', description: 'Id of an existing fact to update or delete.' },
         delete: { type: 'boolean', description: 'true to delete the fact with fact_id.' },
       },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'create_recipe',
+    description:
+      "Save a recipe in the user's Recipes tab. Use it when the user asks for a recipe or a meal idea they want to keep. It MUST respect their allergies and intolerances, diet, conditions and tastes. Metric quantities, in the user's language.",
+    parameters: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        description: { type: 'string', description: 'One sentence on why it suits the user.' },
+        meal: { type: 'string', enum: [...RECIPE_MEALS] },
+        servings: { type: 'integer', minimum: 1, maximum: 20 },
+        prep_minutes: { type: 'integer', minimum: 1, maximum: 600 },
+        ingredients: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'One per item, with quantity, e.g. "200 g chickpeas".',
+        },
+        steps: { type: 'array', items: { type: 'string' } },
+        tags: { type: 'array', items: { type: 'string' }, maxItems: 4 },
+      },
+      required: ['title', 'ingredients', 'steps'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'update_recipe',
+    description:
+      'Change one of the saved recipes (ids from SAVED RECIPES): any field you send replaces the old one; favorite marks it as a favourite.',
+    parameters: {
+      type: 'object',
+      properties: {
+        recipe_id: { type: 'string' },
+        title: { type: 'string' },
+        description: { type: 'string' },
+        meal: { type: 'string', enum: [...RECIPE_MEALS] },
+        servings: { type: 'integer', minimum: 1, maximum: 20 },
+        prep_minutes: { type: 'integer', minimum: 1, maximum: 600 },
+        ingredients: { type: 'array', items: { type: 'string' } },
+        steps: { type: 'array', items: { type: 'string' } },
+        tags: { type: 'array', items: { type: 'string' } },
+        favorite: { type: 'boolean' },
+      },
+      required: ['recipe_id'],
       additionalProperties: false,
     },
   },
@@ -375,6 +423,48 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
           return ok({ updated: true, fact_id: id });
         }
         return ok({ saved: true, fact_id: await memoryRepository.addFact(db, args.fact) });
+      }
+      case 'create_recipe': {
+        if (typeof args.title !== 'string' || !args.title.trim())
+          throw new ToolInputError('"title" is required');
+        const ingredients = recipeRepository.cleanLines(args.ingredients);
+        const steps = recipeRepository.cleanLines(args.steps, 40, 600);
+        if (!ingredients.length || !steps.length)
+          throw new ToolInputError('"ingredients" and "steps" need at least one line');
+        const id = await recipeRepository.createRecipe(
+          db,
+          {
+            title: args.title,
+            description: typeof args.description === 'string' ? args.description : null,
+            meal: recipeRepository.asMeal(args.meal),
+            servings: typeof args.servings === 'number' ? args.servings : null,
+            prepMinutes: typeof args.prep_minutes === 'number' ? args.prep_minutes : null,
+            ingredients,
+            steps,
+            tags: recipeRepository.cleanLines(args.tags, 4, 40),
+          },
+          'coach',
+        );
+        return ok({ created: true, recipe_id: id, note: 'Shown in the Recipes tab.' });
+      }
+      case 'update_recipe': {
+        const id = typeof args.recipe_id === 'string' ? args.recipe_id : '';
+        if (!id || !(await recipeRepository.getRecipe(db, id)))
+          throw new ToolInputError('recipe not found: use an id from SAVED RECIPES');
+        const str = (v: unknown) => (typeof v === 'string' ? v : undefined);
+        const n = (v: unknown) => (typeof v === 'number' ? v : undefined);
+        await recipeRepository.updateRecipe(db, id, {
+          title: str(args.title),
+          description: str(args.description),
+          meal: args.meal !== undefined ? recipeRepository.asMeal(args.meal) : undefined,
+          servings: n(args.servings),
+          prepMinutes: n(args.prep_minutes),
+          ingredients: Array.isArray(args.ingredients) ? (args.ingredients as string[]) : undefined,
+          steps: Array.isArray(args.steps) ? (args.steps as string[]) : undefined,
+          tags: Array.isArray(args.tags) ? (args.tags as string[]) : undefined,
+          favorite: typeof args.favorite === 'boolean' ? args.favorite : undefined,
+        });
+        return ok({ updated: true, recipe_id: id });
       }
       default:
         return { content: JSON.stringify({ error: `unknown tool: ${call.name}` }), isError: true };

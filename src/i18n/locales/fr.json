@@ -22,7 +22,8 @@
     "settings": "Réglages",
     "integrations": "Intégrations",
     "me": "Moi",
-    "programs": "Programmes"
+    "programs": "Programmes",
+    "recipes": "Recettes"
   },
   "coach": {
     "emptyTitle": "Votre coach vous attend",
@@ -579,7 +580,8 @@
     "attachmentA11y": "Pièce jointe : {{name}}",
     "removeAttachment": "Retirer {{name}}",
     "savingProgram": "Mise à jour de ton programme…",
-    "savingMemory": "Je le note…"
+    "savingMemory": "Je le note…",
+    "savingRecipe": "J'enregistre la recette…"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",
@@ -681,7 +683,9 @@
     "integrations": "Services",
     "settings": "Réglages",
     "me": "Moi",
-    "programs": "Programmes"
+    "programs": "Programmes",
+    "journal": "Journal",
+    "recipes": "Recettes"
   },
   "voice": {
     "talk": "Parler",
@@ -872,5 +876,72 @@
     "clear": "Supprimer tous les souvenirs",
     "clearTitle": "Supprimer tous les souvenirs ?",
     "clearBody": "{{name}} oubliera ce qu'il a appris sur toi et les résumés des conversations passées. Tes chats, ton journal et tes données restent."
+  },
+  "sidebar": {
+    "open": "Ouvrir le menu",
+    "close": "Fermer le menu",
+    "subtitle": "Ton coach {{name}}"
+  },
+  "recipes": {
+    "new": "Nouvelle recette",
+    "emptyTitle": "Pas encore de recettes",
+    "emptyBody": "Ton coach peut créer des recettes faites pour toi : ton régime, tes intolérances, tes objectifs et tes goûts. Tu peux aussi en demander une dans le chat ou écrire les tiennes.",
+    "noneInFilter": "Pas encore de recettes ici.",
+    "favorite": "Favorite",
+    "filters": {
+      "all": "Toutes",
+      "favorites": "Favorites",
+      "breakfast": "Petit-déjeuner",
+      "lunch": "Déjeuner",
+      "dinner": "Dîner",
+      "snack": "Collation",
+      "dessert": "Dessert"
+    },
+    "meals": {
+      "breakfast": "Petit-déjeuner",
+      "lunch": "Déjeuner",
+      "dinner": "Dîner",
+      "snack": "Collation",
+      "dessert": "Dessert",
+      "any": "Quand tu veux"
+    },
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "servingsCount_one": "{{count}} portion",
+    "servingsCount_other": "{{count}} portions",
+    "cookedTimes_one": "cuisinée une fois",
+    "cookedTimes_other": "cuisinée {{count}} fois",
+    "newIntro": "{{name}} crée la recette pour toi, en respectant ton régime, tes intolérances, tes objectifs et tes goûts. Ensuite tu peux tout modifier.",
+    "newIntroNoAI": "Écris ta recette. Pour que ton coach la crée, choisis une IA dans les Réglages.",
+    "wish": "Qu'as-tu envie de cuisiner ? (facultatif)",
+    "wishPlaceholder": "P. ex. quelque chose avec des pois chiches, un petit-déjeuner chaud rapide…",
+    "meal": "Repas",
+    "time": "Temps",
+    "anyTime": "Sans limite",
+    "servings": "Portions",
+    "generate": "La créer avec {{name}}",
+    "createManual": "Je l'écris moi-même",
+    "generating": "{{name}} prépare ta recette…",
+    "generateFailed": "La recette n'a pas pu être créée. Réessaie ou écris-la toi-même.",
+    "untitled": "Nouvelle recette",
+    "notFound": "Recette introuvable",
+    "editTitle": "Modifier la recette",
+    "titleLabel": "Titre",
+    "descriptionLabel": "Description",
+    "minutesLabel": "Minutes",
+    "ingredients": "Ingrédients",
+    "steps": "Préparation",
+    "onePerLine": "Un par ligne",
+    "noIngredients": "Pas encore d'ingrédients : touche Modifier.",
+    "noSteps": "Pas encore d'étapes : touche Modifier.",
+    "byCoach": "créée par ton coach",
+    "cooked": "Je l'ai cuisinée",
+    "cookedInfo_one": "Cuisinée une fois, la dernière le {{date}}",
+    "cookedInfo_other": "Cuisinée {{count}} fois, la dernière le {{date}}",
+    "askCoach": "En parler avec ton coach",
+    "askCoachPrompt": "Parlons de ma recette « {{title}} » : comment l'adapter ou la varier pour moi ?",
+    "delete": "Supprimer la recette",
+    "deleteTitle": "Supprimer la recette ?",
+    "deleteBody": "La recette sera supprimée de ce téléphone."
   }
 }

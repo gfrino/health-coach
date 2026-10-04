@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AppText } from '@/components';
+import { AppText, MenuButton } from '@/components';
 import { ChatView } from '@/components/chat/ChatView';
 import { summarizePendingConversations } from '@/coach/memory';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -55,11 +55,15 @@ export default function CoachScreen() {
         options={{
           title: coachName,
           headerLargeTitle: false,
-          headerLeft: () => headerButton(t('chat.history'), () => router.push('/coach/history')),
-          headerRight: () =>
-            headerButton(t('chat.new'), () =>
-              router.setParams({ c: undefined, new: String(Date.now()) }),
-            ),
+          headerLeft: () => <MenuButton />,
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {headerButton(t('chat.history'), () => router.push('/coach/history'))}
+              {headerButton(t('chat.new'), () =>
+                router.setParams({ c: undefined, new: String(Date.now()) }),
+              )}
+            </View>
+          ),
         }}
       />
       <View style={{ flex: 1, backgroundColor: colors.background, paddingBottom: spacing.xs }}>

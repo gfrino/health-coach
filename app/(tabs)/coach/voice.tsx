@@ -65,11 +65,13 @@ export default function VoiceScreen() {
         ? t('chat.savingProgram')
         : v.tool === 'remember'
           ? t('chat.savingMemory')
-          : v.tool
-            ? t('chat.readingData')
-            : v.state === 'idle' && v.voiceError
-              ? t(`voice.errors.${v.voiceError}`)
-              : t(`voiceMode.state.${v.state}`);
+          : v.tool === 'create_recipe' || v.tool === 'update_recipe'
+            ? t('chat.savingRecipe')
+            : v.tool
+              ? t('chat.readingData')
+              : v.state === 'idle' && v.voiceError
+                ? t(`voice.errors.${v.voiceError}`)
+                : t(`voiceMode.state.${v.state}`);
 
   const canTap = v.engine === 'loop' && !v.error;
 

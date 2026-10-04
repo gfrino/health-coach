@@ -60,6 +60,11 @@ export const icons = {
   edit: { ios: 'pencil', android: 'edit' },
   circle: { ios: 'circle', android: 'radio_button_unchecked' },
   calm: { ios: 'wind', android: 'self_improvement' },
+  menu: { ios: 'line.3.horizontal', android: 'menu' },
+  recipes: { ios: 'fork.knife', android: 'restaurant' },
+  heartOutline: { ios: 'heart', android: 'favorite_border' },
+  clock: { ios: 'clock', android: 'schedule' },
+  people: { ios: 'person.2', android: 'group' },
 } satisfies Record<string, IconName>;
 
 export type AppIconName = keyof typeof icons;

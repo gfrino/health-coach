@@ -11,6 +11,7 @@ import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme';
 
 import { AppText } from './AppText';
+import { MenuButton } from './Sidebar';
 
 interface Props {
   children: ReactNode;
@@ -23,6 +24,8 @@ interface Props {
   /** Titolo grande nel contenuto (schermate principali delle tab, senza header nativo). */
   title?: string;
   titleAction?: ReactNode;
+  /** Pulsante del menu laterale prima del titolo (schermate principali). */
+  menu?: boolean;
 }
 
 export function Screen({
@@ -34,6 +37,7 @@ export function Screen({
   refreshControl,
   title,
   titleAction,
+  menu,
 }: Props) {
   const { colors, spacing } = useTheme();
   const padding = { padding: spacing.lg, gap: spacing.lg };
@@ -47,6 +51,11 @@ export function Screen({
         gap: spacing.md,
       }}
     >
+      {menu ? (
+        <View style={{ marginLeft: -spacing.sm }}>
+          <MenuButton />
+        </View>
+      ) : null}
       <AppText variant="largeTitle" style={{ flex: 1 }}>
         {title}
       </AppText>
