@@ -24,6 +24,7 @@ export function ReportFindings({ reportId }: { reportId: string }) {
   const { colors, spacing } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const running = useExtractionStore((s) => !!s.running[reportId]);
+  const failure = useExtractionStore((s) => s.failures[reportId]);
   const version = useExtractionStore((s) => s.version);
   const [report, setReport] = useState<LabReport | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
@@ -58,7 +59,9 @@ export function ReportFindings({ reportId }: { reportId: string }) {
     void extractReport(settings, reportId);
   };
 
-  if (running || report.extractionStatus === 'pending') {
+  // "pending" senza una lettura in corso = lettura interrotta (app chiusa, richiesta bloccata):
+  // niente rotella infinita, si propone di riprovare.
+  if (running) {
     return (
       <Card tone="soft">
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
@@ -71,8 +74,17 @@ export function ReportFindings({ reportId }: { reportId: string }) {
     );
   }
 
-  if (report.extractionStatus === 'none' || report.extractionStatus === 'failed') {
-    const failed = report.extractionStatus === 'failed';
+  if (
+    report.extractionStatus === 'none' ||
+    report.extractionStatus === 'failed' ||
+    report.extractionStatus === 'pending'
+  ) {
+    const failed = report.extractionStatus !== 'none';
+    const reason = !failure
+      ? null
+      : failure.code === 'timeout' || failure.code === 'unparseable' || failure.code === 'unreadable'
+        ? t(`records.extractionError.${failure.code}`)
+        : t(`ai.errors.${failure.code}` as 'ai.errors.unknown');
     return (
       <Card tone={failed ? 'warning' : 'soft'}>
         <AppText variant="headline">{t('records.extractionTitle')}</AppText>
@@ -80,9 +92,14 @@ export function ReportFindings({ reportId }: { reportId: string }) {
           {!hasAI
             ? t('records.extractionNoAI')
             : failed
-              ? t('records.extractionFailed')
+              ? (reason ?? t('records.extractionFailed'))
               : t('records.extractionNone', { name: settings.coach.name })}
         </AppText>
+        {failed && failure?.detail ? (
+          <AppText variant="caption" tone="textMuted" selectable>
+            {t('records.extractionErrorDetail', { detail: failure.detail })}
+          </AppText>
+        ) : null}
         {hasAI ? (
           <Button
             label={failed ? t('common.retry') : t('records.extractionRead')}

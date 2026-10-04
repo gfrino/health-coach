@@ -49,6 +49,7 @@ export function deviceExtractionInstruction(language: string): string {
     `SUMMARY: one sentence in ${language} saying what kind of document this is. Do not judge the values.`,
     'VALUES:',
     'name | value | unit | reference range as written',
+    'The value is the number only, with a dot for decimals and no thousands separators (1930, not 1,930).',
     'Write one line per measured value, copied exactly from the document. Never invent values.',
   ].join('\n');
 }
@@ -108,14 +109,26 @@ export function parseDeviceExtraction(text: string): ParsedExtraction | null {
   };
 }
 
-const num = (v: unknown): number | null => {
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-  if (typeof v === 'string') {
-    const n = Number(v.replace(',', '.').trim());
-    return v.trim() && Number.isFinite(n) ? n : null;
-  }
-  return null;
-};
+/**
+ * Numero dal testo, con i separatori delle migliaia quando non sono ambigui:
+ * "9,676" e "1'930" → migliaia; "3,5" → 3.5; "1,020" resta 1.02 (può essere un decimale,
+ * es. il peso specifico delle urine); "1.234.567" e "1.930,5" → migliaia con punto.
+ */
+export function parseNumber(v: unknown): number | null {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  if (typeof v !== 'string') return null;
+  let t = v.trim().replace(/[\s'’]/g, '');
+  if (!t) return null;
+  const comma = /^-?(\d{1,3})((?:,\d{3})+)(\.\d+)?$/.exec(t);
+  const dot = /^-?\d{1,3}((?:\.\d{3})+)(,\d+)?$/.exec(t);
+  if (comma && (comma[2]!.length > 4 || comma[3] || !['0', '1'].includes(comma[1]!)))
+    t = t.replace(/,/g, '');
+  else if (dot && (dot[1]!.length > 4 || dot[2])) t = t.replace(/\./g, '').replace(',', '.');
+  else t = t.replace(',', '.');
+  const n = Number(t);
+  return Number.isFinite(n) ? n : null;
+}
+const num = parseNumber;
 const str = (v: unknown, max: number): string | null =>
   typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null;
 
@@ -155,9 +168,27 @@ export function parseExtraction(text: string): ParsedExtraction | null {
 }
 
 /** Referti in lettura (per l'interfaccia) e contatore per ricaricare i dati dopo. */
-export const useExtractionStore = create<{ running: Record<string, true>; version: number }>(
-  () => ({ running: {}, version: 0 }),
-);
+export const useExtractionStore = create<{
+  running: Record<string, true>;
+  version: number;
+  /** Perché l'ultima lettura non è riuscita (mostrato all'utente, utile per capire il problema). */
+  failures: Record<string, ExtractionFailure>;
+}>(() => ({ running: {}, version: 0, failures: {} }));
+
+export interface ExtractionFailure {
+  /** Codice AIError, oppure 'timeout' / 'unparseable' / 'unreadable'. */
+  code: string;
+  detail?: string;
+}
+
+function setFailure(reportId: string, failure: ExtractionFailure | null) {
+  useExtractionStore.setState((s) => {
+    const failures = { ...s.failures };
+    if (failure) failures[reportId] = failure;
+    else delete failures[reportId];
+    return { failures };
+  });
+}
 
 /** Tempo massimo per leggere un referto. */
 const EXTRACTION_TIMEOUT_MS = 90_000;
@@ -172,7 +203,10 @@ export async function extractReport(
   if (!settings.ai.provider || !settings.ai.model) return 'no_ai';
   if (useExtractionStore.getState().running[reportId]) return 'ok';
   useExtractionStore.setState((s) => ({ running: { ...s.running, [reportId]: true } }));
+  setFailure(reportId, null);
   const db = await getDb();
+  const timeout = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const report = await labReportRepository.getReport(db, reportId);
     if (!report) return 'failed';
@@ -194,6 +228,7 @@ export async function extractReport(
       );
     if (!content.images.length && !content.documents.length && !content.texts.length) {
       await labReportRepository.setExtractionStatus(db, reportId, 'failed');
+      setFailure(reportId, { code: 'unreadable' });
       return 'unreadable';
     }
     const language = LANGUAGE_NAMES[resolveLanguage(settings.language, deviceLanguageCodes())];
@@ -202,8 +237,7 @@ export async function extractReport(
         `--- Document "${d.name}" ---\n${device ? d.text.slice(0, DEVICE_MAX_CHARS) : d.text}\n--- End of document ---`,
     );
     // Mai una rotella infinita: oltre il limite la lettura risulta non riuscita (si può riprovare).
-    const timeout = new AbortController();
-    const timer = setTimeout(() => timeout.abort(), EXTRACTION_TIMEOUT_MS);
+    timer = setTimeout(() => timeout.abort(), EXTRACTION_TIMEOUT_MS);
     const result = await provider.sendMessage(
       {
         system:
@@ -222,21 +256,32 @@ export async function extractReport(
       ],
       // Copiare valori è un compito semplice: poco ragionamento, risposta in pochi secondi.
       { apiKey, model, quick: true, maxOutputTokens: 12000, signal: timeout.signal },
-    ).finally(() => clearTimeout(timer));
+    );
     const parsed = device ? parseDeviceExtraction(result.text) : parseExtraction(result.text);
     if (!parsed) {
       if (__DEV__) console.warn(`[referti] risposta non leggibile: ${JSON.stringify(result.text)}`);
       await labReportRepository.setExtractionStatus(db, reportId, 'failed');
+      setFailure(reportId, {
+        code: 'unparseable',
+        detail: `${result.stopReason} · ${result.text.slice(0, 120)}`,
+      });
       return 'failed';
     }
     await labReportRepository.saveExtraction(db, reportId, parsed);
     return 'ok';
   } catch (e) {
     const err = toAIError(e);
-    console.warn(`[referti] lettura non riuscita: ${err.code}`);
+    console.warn(`[referti] lettura non riuscita: ${err.code} ${err.message}`);
+    setFailure(
+      reportId,
+      timeout.signal.aborted
+        ? { code: 'timeout' }
+        : { code: err.code, detail: err.message.slice(0, 200) },
+    );
     await labReportRepository.setExtractionStatus(db, reportId, 'failed').catch(() => undefined);
     return 'failed';
   } finally {
+    clearTimeout(timer);
     useExtractionStore.setState((s) => {
       const running = { ...s.running };
       delete running[reportId];

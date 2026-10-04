@@ -168,6 +168,12 @@
     "askCoachPrompt": "Lass uns meinen Befund \"{{title}}\" gemeinsam ansehen: Was steht darin und worauf sollte ich achten?",
     "extractionReading": "{{name}} liest das Dokument…",
     "extractionFailed": "Das Dokument konnte nicht gelesen werden. Versuche es erneut; für Fotos und Scans kannst du auch eine Online-KI in den Einstellungen wählen.",
+    "extractionError": {
+      "timeout": "Das Lesen hat zu lange gedauert. Versuche es erneut: Beim zweiten Mal geht es meist schneller.",
+      "unparseable": "Die KI hat in einem Format geantwortet, das die App nicht lesen kann. Versuche es erneut.",
+      "unreadable": "Der Text dieser Datei konnte nicht ausgelesen werden. Für Fotos und Scans probiere eine Online-KI in den Einstellungen."
+    },
+    "extractionErrorDetail": "Technisches Detail: {{detail}}",
     "extractionNone": "{{name}} hat dieses Dokument noch nicht gelesen.",
     "extractionNoAI": "Wähle in den Einstellungen eine KI, damit dein Coach deine Befunde lesen kann.",
     "extractionRead": "Vom Coach lesen lassen",

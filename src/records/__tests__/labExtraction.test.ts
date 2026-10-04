@@ -2,7 +2,7 @@ import { migrate } from '@/db/migrate';
 import * as labReportRepository from '@/db/repositories/labReportRepository';
 import { createTestDb } from '@/test/nodeSqliteDb';
 
-import { parseDeviceExtraction, parseExtraction, parseRange } from '../labExtraction';
+import { parseDeviceExtraction, parseExtraction, parseNumber, parseRange } from '../labExtraction';
 
 let mockSeq = 0;
 jest.mock('@/db/ids', () => ({ newId: () => `id-${++mockSeq}` }));
@@ -169,5 +169,25 @@ describe('lettura dei referti', () => {
       results: [],
     });
     expect(await labReportRepository.listResults(db, id1)).toEqual([]);
+  });
+});
+
+describe('parseNumber', () => {
+  it('riconosce i separatori delle migliaia non ambigui', () => {
+    expect(parseNumber('9,676')).toBe(9676);
+    expect(parseNumber("1'930")).toBe(1930);
+    expect(parseNumber('1,234,567')).toBe(1234567);
+    expect(parseNumber('1.234.567')).toBe(1234567);
+    expect(parseNumber('1.930,5')).toBe(1930.5);
+    expect(parseNumber('2,500.75')).toBe(2500.75);
+  });
+  it('mantiene i decimali', () => {
+    expect(parseNumber('3,5')).toBe(3.5);
+    expect(parseNumber('14.2')).toBe(14.2);
+    expect(parseNumber('1,020')).toBe(1.02);
+    expect(parseNumber('1.020')).toBe(1.02);
+    expect(parseNumber('0,125')).toBe(0.125);
+    expect(parseNumber('abc')).toBeNull();
+    expect(parseNumber('')).toBeNull();
   });
 });

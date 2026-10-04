@@ -168,6 +168,12 @@
     "askCoachPrompt": "Guardiamo insieme il mio referto \"{{title}}\": cosa dice e a cosa dovrei fare attenzione?",
     "extractionReading": "{{name}} sta leggendo il documento…",
     "extractionFailed": "Non è stato possibile leggere il documento. Riprova; per foto e scansioni puoi anche scegliere un'AI online nelle Opzioni.",
+    "extractionError": {
+      "timeout": "La lettura ci ha messo troppo. Riprova: di solito la seconda volta è più veloce.",
+      "unparseable": "L'AI ha risposto in un formato che l'app non riesce a leggere. Riprova.",
+      "unreadable": "Non è stato possibile estrarre il testo da questo file. Per foto e scansioni prova un'AI online nelle Opzioni."
+    },
+    "extractionErrorDetail": "Dettaglio tecnico: {{detail}}",
     "extractionNone": "{{name}} non ha ancora letto questo documento.",
     "extractionNoAI": "Scegli un'AI nelle Opzioni perché il coach possa leggere i tuoi referti.",
     "extractionRead": "Fallo leggere al coach",

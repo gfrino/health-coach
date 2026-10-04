@@ -168,6 +168,12 @@
     "askCoachPrompt": "Regardons ensemble mon compte rendu « {{title}} » : que dit-il et à quoi devrais-je faire attention ?",
     "extractionReading": "{{name}} lit le document…",
     "extractionFailed": "Le document n'a pas pu être lu. Réessaie ; pour les photos et les scans, tu peux aussi choisir une IA en ligne dans les Réglages.",
+    "extractionError": {
+      "timeout": "La lecture a pris trop de temps. Réessaie : la deuxième fois est généralement plus rapide.",
+      "unparseable": "L'IA a répondu dans un format que l'app ne sait pas lire. Réessaie.",
+      "unreadable": "Le texte de ce fichier n'a pas pu être extrait. Pour les photos et les scans, essaie une IA en ligne dans les Réglages."
+    },
+    "extractionErrorDetail": "Détail technique : {{detail}}",
     "extractionNone": "{{name}} n'a pas encore lu ce document.",
     "extractionNoAI": "Choisis une IA dans les Réglages pour que ton coach puisse lire tes résultats.",
     "extractionRead": "Le faire lire par ton coach",

@@ -168,6 +168,12 @@
     "askCoachPrompt": "Let's look at my report \"{{title}}\" together: what does it say and what should I keep an eye on?",
     "extractionReading": "{{name}} is reading the document…",
     "extractionFailed": "The document couldn't be read. Try again; for photos and scans you can also choose an online AI in Settings.",
+    "extractionError": {
+      "timeout": "Reading took too long. Try again: the second time is usually faster.",
+      "unparseable": "The AI replied in a format the app can't read. Try again.",
+      "unreadable": "The text in this file couldn't be extracted. For photos and scans, try an online AI in Settings."
+    },
+    "extractionErrorDetail": "Technical detail: {{detail}}",
     "extractionNone": "{{name}} hasn't read this document yet.",
     "extractionNoAI": "Choose an AI in Settings so your coach can read your reports.",
     "extractionRead": "Read it with your coach",
