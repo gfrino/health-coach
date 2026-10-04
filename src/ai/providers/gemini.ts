@@ -207,7 +207,10 @@ export const geminiProvider: AIProvider = {
         systemInstruction: { parts: [{ text: context.system }] },
         contents: toGeminiContents(messages, options.model),
         tools: toGeminiTools(context.tools),
-        generationConfig: { maxOutputTokens: options.maxOutputTokens ?? 16000 },
+        generationConfig: {
+          maxOutputTokens: options.maxOutputTokens ?? 16000,
+          ...(options.quick ? { thinkingConfig: { thinkingLevel: 'low' } } : {}),
+        },
       }),
     });
     if (!res.body) throw new AIError('network', 'Risposta senza body');

@@ -159,6 +159,9 @@ export const useExtractionStore = create<{ running: Record<string, true>; versio
   () => ({ running: {}, version: 0 }),
 );
 
+/** Tempo massimo per leggere un referto. */
+const EXTRACTION_TIMEOUT_MS = 90_000;
+
 export type ExtractionOutcome = 'ok' | 'no_ai' | 'unreadable' | 'failed';
 
 /** Legge il referto e salva valori e riassunto. Una sola lettura alla volta per referto. */
@@ -183,7 +186,7 @@ export async function extractReport(
     const device = provider.id === 'device';
     const content = await loadAttachmentContent(
       [{ reportId, title: report.title, mimeType: report.mimeType ?? '' }],
-      { vision: provider.supportsVision(model), pdf: !device },
+      { vision: provider.supportsVision(model), pdf: !device, preferText: 'all' },
     );
     if (__DEV__)
       console.warn(
@@ -198,6 +201,9 @@ export async function extractReport(
       (d) =>
         `--- Document "${d.name}" ---\n${device ? d.text.slice(0, DEVICE_MAX_CHARS) : d.text}\n--- End of document ---`,
     );
+    // Mai una rotella infinita: oltre il limite la lettura risulta non riuscita (si può riprovare).
+    const timeout = new AbortController();
+    const timer = setTimeout(() => timeout.abort(), EXTRACTION_TIMEOUT_MS);
     const result = await provider.sendMessage(
       {
         system:
@@ -214,8 +220,9 @@ export async function extractReport(
           documents: content.documents.length ? content.documents : undefined,
         },
       ],
-      { apiKey, model },
-    );
+      // Copiare valori è un compito semplice: poco ragionamento, risposta in pochi secondi.
+      { apiKey, model, quick: true, maxOutputTokens: 12000, signal: timeout.signal },
+    ).finally(() => clearTimeout(timer));
     const parsed = device ? parseDeviceExtraction(result.text) : parseExtraction(result.text);
     if (!parsed) {
       if (__DEV__) console.warn(`[referti] risposta non leggibile: ${JSON.stringify(result.text)}`);

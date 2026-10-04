@@ -226,6 +226,7 @@ export const openaiProvider: AIProvider = {
       store: false,
       include: isReasoningModel(options.model) ? ['reasoning.encrypted_content'] : undefined,
       max_output_tokens: options.maxOutputTokens ?? 16000,
+      reasoning: options.quick && isReasoningModel(options.model) ? { effort: 'low' } : undefined,
       tools: context.tools?.length
         ? context.tools.map((t) => ({
             type: 'function',

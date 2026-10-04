@@ -232,6 +232,8 @@ async function documentMessage(
   const content = await loadAttachmentContent(attachments, {
     vision: provider.supportsVision(model),
     pdf: provider.id !== 'device',
+    // PDF: il testo letto sul telefono basta e la risposta arriva molto prima.
+    preferText: 'pdf',
   });
   const parts = [
     `Contents of the requested document(s) from the user's health records: ${attachments.map((a) => `"${a.title}"`).join(', ')}.`,
@@ -268,6 +270,8 @@ async function buildHistory(
   const content = await loadAttachmentContent(lastStored.attachments, {
     vision: provider.supportsVision(model),
     pdf: provider.id !== 'device',
+    // PDF: il testo letto sul telefono basta e la risposta arriva molto prima.
+    preferText: 'pdf',
   });
   const extra = [
     ...content.texts.map((d) => `--- Document "${d.name}" ---\n${d.text}\n--- End of document ---`),

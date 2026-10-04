@@ -8,6 +8,8 @@ import { extractDocumentText } from './documentText';
 
 /** Lato lungo massimo delle foto inviate all'AI: leggibili, ma leggere da trasmettere. */
 const MAX_IMAGE_SIDE = 1600;
+/** Testo letto sul telefono sufficiente per non inviare il file intero all'AI. */
+const MIN_DEVICE_TEXT = 200;
 /** Oltre questa dimensione il PDF non viene inviato (limiti dei provider e memoria). */
 const MAX_PDF_BYTES = 15 * 1024 * 1024;
 
@@ -63,10 +65,13 @@ async function pushDeviceText(
 
 /**
  * Prepara gli allegati per il modello. `vision`/`pdf`: cosa sa leggere il modello in uso.
+ * `preferText`: prima si legge il testo sul telefono (PDFKit, OCR di Vision) e, se basta, si invia
+ * solo quello: più veloce e meno dati in uscita. Il file intero solo se il testo non c'è.
+ * 'pdf' = solo per i PDF, 'all' = anche per le foto.
  */
 export async function loadAttachmentContent(
   attachments: MessageAttachment[],
-  caps: { vision: boolean; pdf: boolean },
+  caps: { vision: boolean; pdf: boolean; preferText?: 'pdf' | 'all' },
 ): Promise<AttachmentContent> {
   const db = await getDb();
   const out: AttachmentContent = { images: [], documents: [], texts: [], unreadable: [] };
@@ -74,10 +79,19 @@ export async function loadAttachmentContent(
     const file = await labReportRepository.getReportFile(db, a.reportId);
     if (!file) continue;
     try {
-      if (file.mimeType.startsWith('image/')) {
+      const isPdf = file.mimeType === 'application/pdf';
+      const isImage = file.mimeType.startsWith('image/');
+      if ((isPdf && caps.preferText) || (isImage && caps.preferText === 'all')) {
+        const text = await readTextOnDevice(file);
+        if (text && text.length >= MIN_DEVICE_TEXT) {
+          out.texts.push({ name: a.title, text });
+          continue;
+        }
+      }
+      if (isImage) {
         if (caps.vision) out.images.push(await resizeImage(file.mimeType, file.data));
         else await pushDeviceText(out, a.title, file);
-      } else if (file.mimeType === 'application/pdf') {
+      } else if (isPdf) {
         if (caps.pdf && file.data.byteLength <= MAX_PDF_BYTES) {
           out.documents.push({
             mimeType: 'application/pdf',

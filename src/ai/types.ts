@@ -61,6 +61,8 @@ export interface SendOptions {
   apiKey: string;
   model: string;
   maxOutputTokens?: number;
+  /** Compito semplice (es. copiare i valori di un referto): poco ragionamento, risposta rapida. */
+  quick?: boolean;
   signal?: AbortSignal;
   /** Testo generato in streaming, un pezzo alla volta. */
   onToken?: (delta: string) => void;
