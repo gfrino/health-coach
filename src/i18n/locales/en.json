@@ -1023,6 +1023,12 @@
     "fiberG": "Fibre (g)",
     "sugarG": "Sugar (g)",
     "saturatedFatG": "Saturated fat (g)",
-    "sodiumG": "Sodium (mg)"
+    "sodiumG": "Sodium (mg)",
+    "photoCamera": "📷 Take photo",
+    "photoLibrary": "🖼️ From gallery",
+    "photoReading": "{{name}} is looking at your plate…",
+    "photoNotSaved": "The photo is only used for the estimate: it isn't saved.",
+    "photoNeedsOnlineAI": "Recognising food from photos needs an online AI (Services → AI provider). For now you can write what you ate.",
+    "cameraDenied": "Allow camera access in your phone's Settings."
   }
 }

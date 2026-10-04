@@ -1,3 +1,4 @@
+import type { ImagePart } from '@/ai/types';
 import type { AppSettings } from '@/config/settingsSchema';
 import { deviceLanguageCodes, resolveLanguage } from '@/i18n';
 import { parseNumber } from '@/records/labExtraction';
@@ -24,18 +25,28 @@ export interface FoodEstimate {
   sodium: number | null;
 }
 
-export function estimateInstruction(language: string, text: string): string {
+export function estimateInstruction(language: string, text: string, fromPhoto = false): string {
   return [
-    'Estimate the nutrition of what the user ate. Reply in EXACTLY this format, one line per food, nothing else:',
+    fromPhoto
+      ? 'Look at the photo of what the user ate. Identify each food and drink you can see and estimate its portion from the photo (plate size, typical servings). Reply in EXACTLY this format, one line per food, nothing else:'
+      : 'Estimate the nutrition of what the user ate. Reply in EXACTLY this format, one line per food, nothing else:',
     'name | quantity | kcal | protein g | carbs g | fat g | fiber g | sugar g | saturated fat g | sodium mg',
     `- name: short, in ${language}, starting with a capital letter.`,
     '- quantity: the amount as the user said it; if they gave none, a typical portion you assume (e.g. "1 slice, 30 g").',
     '- Numbers only (no units), with a dot for decimals and no thousands separators. Use typical values for that food and quantity.',
     '- One line for EVERY food and EVERY drink the user mentions (e.g. a coffee or a juice gets its own line). Do not split a single dish into its ingredients.',
-    '- If the text mentions no food or drink, reply: NONE',
+    fromPhoto
+      ? '- If the photo shows no food or drink, reply: NONE'
+      : '- If the text mentions no food or drink, reply: NONE',
     '',
-    `What the user ate: ${text.trim().slice(0, 600)}`,
-  ].join('\n');
+    fromPhoto
+      ? text.trim()
+        ? `The user added this note, which wins over what you see: ${text.trim().slice(0, 600)}`
+        : ''
+      : `What the user ate: ${text.trim().slice(0, 600)}`,
+  ]
+    .join('\n')
+    .trim();
 }
 
 /** Numero da una cella: "182 kcal", "~90", "circa 12,5 g", "80-100" (media). */
@@ -81,7 +92,19 @@ export function parseFoodEstimate(reply: string): FoodEstimate[] {
   return out;
 }
 
-export async function estimateFood(settings: AppSettings, text: string): Promise<FoodEstimate[]> {
+/** L'AI scelta sa guardare le foto? (L'AI del telefono no: serve un servizio online.) */
+export async function canReadFoodPhotos(settings: AppSettings): Promise<boolean> {
+  if (!settings.ai.provider || !settings.ai.model) return false;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getProvider } = require('@/ai/registry') as typeof import('@/ai/registry');
+  return getProvider(settings.ai.provider).supportsVision(settings.ai.model);
+}
+
+export async function estimateFood(
+  settings: AppSettings,
+  text: string,
+  photo?: ImagePart,
+): Promise<FoodEstimate[]> {
   // Import pigro: evita il ciclo chatEngine → … → food.
   const { resolveAI } =
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -90,7 +113,13 @@ export async function estimateFood(settings: AppSettings, text: string): Promise
   const language = LANGUAGE_NAMES[resolveLanguage(settings.language, deviceLanguageCodes())];
   const res = await provider.sendMessage(
     { system: 'You are a precise nutrition assistant. You estimate, you never refuse.' },
-    [{ role: 'user', content: estimateInstruction(language, text) }],
+    [
+      {
+        role: 'user',
+        content: estimateInstruction(language, text, !!photo),
+        images: photo ? [photo] : undefined,
+      },
+    ],
     { apiKey, model, quick: true, maxOutputTokens: 2000 },
   );
   if (__DEV__)

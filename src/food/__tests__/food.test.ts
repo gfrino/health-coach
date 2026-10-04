@@ -1,7 +1,7 @@
 import { foodSection } from '@/coach/context';
 
 import { eatenAtFor, shiftDay } from '../days';
-import { parseFoodEstimate } from '../estimate';
+import { estimateInstruction, parseFoodEstimate } from '../estimate';
 import { estimateTarget, MIN_TARGET } from '../target';
 
 jest.mock('@/db', () => ({}));
@@ -133,5 +133,16 @@ describe('diario alimentare nel prompt del coach', () => {
   it('versione corta per il telefono e niente sezione senza dati', () => {
     expect(foodSection(food, true)).not.toContain('[f1]');
     expect(foodSection(null)).toBeNull();
+  });
+});
+
+describe('stima da foto', () => {
+  it('chiede di guardare la foto e usa la frase come nota', () => {
+    const photo = estimateInstruction('Italian', 'ne ho mangiato metà', true);
+    expect(photo).toContain('Look at the photo');
+    expect(photo).toContain('If the photo shows no food');
+    expect(photo).toContain('note, which wins over what you see: ne ho mangiato metà');
+    expect(estimateInstruction('Italian', '', true)).not.toContain('note');
+    expect(estimateInstruction('Italian', 'una mela')).toContain('What the user ate: una mela');
   });
 });

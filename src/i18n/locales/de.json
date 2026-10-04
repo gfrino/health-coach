@@ -1023,6 +1023,12 @@
     "fiberG": "Ballaststoffe (g)",
     "sugarG": "Zucker (g)",
     "saturatedFatG": "Gesättigte Fette (g)",
-    "sodiumG": "Natrium (mg)"
+    "sodiumG": "Natrium (mg)",
+    "photoCamera": "📷 Foto machen",
+    "photoLibrary": "🖼️ Aus der Galerie",
+    "photoReading": "{{name}} schaut sich deinen Teller an…",
+    "photoNotSaved": "Das Foto dient nur der Schätzung: Es wird nicht gespeichert.",
+    "photoNeedsOnlineAI": "Um Essen auf Fotos zu erkennen, brauchst du eine Online-KI (Dienste → KI-Anbieter). Bis dahin kannst du aufschreiben, was du gegessen hast.",
+    "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen deines Telefons."
   }
 }

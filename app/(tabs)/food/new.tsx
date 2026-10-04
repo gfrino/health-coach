@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Stack } from 'expo-router/stack';
 import { useEffect, useState } from 'react';
-import { Keyboard, Pressable, View } from 'react-native';
+import { Image, Keyboard, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Button, Card, ChipGroup, Icon, Screen, TextField } from '@/components';
@@ -15,7 +15,8 @@ import {
   type FoodMeal,
 } from '@/db/repositories/foodRepository';
 import { eatenAtFor } from '@/food/days';
-import { estimateFood } from '@/food/estimate';
+import { canReadFoodPhotos, estimateFood } from '@/food/estimate';
+import { pickFoodPhoto } from '@/food/photo';
 import {
   FoodItemFields,
   emptyDraft,
@@ -50,7 +51,9 @@ export default function NewFoodScreen() {
   /** Alimento aperto per la modifica (gli altri restano una riga semplice). */
   const [open, setOpen] = useState<number | null>(null);
   const [recent, setRecent] = useState<FoodEntry[]>([]);
-  const [busy, setBusy] = useState<'ai' | 'save' | null>(null);
+  const [busy, setBusy] = useState<'ai' | 'photo' | 'save' | null>(null);
+  /** Anteprima dell'ultima foto analizzata (solo a schermo: la foto non viene salvata). */
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,13 +62,24 @@ export default function NewFoodScreen() {
       .then(setRecent);
   }, []);
 
-  const estimate = async () => {
-    if (!text.trim()) return;
-    setBusy('ai');
+  /** Dalla frase scritta, oppure dalla foto (con la frase come nota, es. "ne ho mangiato metà"). */
+  const estimate = async (source?: 'camera' | 'library') => {
+    if (!source && !text.trim()) return;
     setNotice(null);
     Keyboard.dismiss();
+    if (source && !(await canReadFoodPhotos(settings))) {
+      setNotice(t('food.photoNeedsOnlineAI'));
+      return;
+    }
     try {
-      const found = await estimateFood(settings, text);
+      let photo = null;
+      if (source) {
+        photo = await pickFoodPhoto(source);
+        if (!photo) return;
+        setPhotoUri(photo.uri);
+      }
+      setBusy(source ? 'photo' : 'ai');
+      const found = await estimateFood(settings, text, photo?.image);
       if (!found.length) setNotice(t('food.estimateNone'));
       else {
         haptic.success();
@@ -74,6 +88,10 @@ export default function NewFoodScreen() {
       }
     } catch (e) {
       haptic.error();
+      if (e instanceof Error && e.message === 'permission_denied') {
+        setNotice(t('food.cameraDenied'));
+        return;
+      }
       const err = toAIError(e);
       setNotice(
         err.code !== 'unknown'
@@ -137,6 +155,41 @@ export default function NewFoodScreen() {
               loading={busy === 'ai'}
               disabled={!text.trim() || busy !== null}
             />
+            {/* Oppure una foto del piatto: la guarda l'AI, non viene salvata. */}
+            <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+              <View style={{ flex: 1 }}>
+                <Button
+                  label={t('food.photoCamera')}
+                  variant="secondary"
+                  onPress={() => void estimate('camera')}
+                  disabled={busy !== null}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button
+                  label={t('food.photoLibrary')}
+                  variant="secondary"
+                  onPress={() => void estimate('library')}
+                  disabled={busy !== null}
+                />
+              </View>
+            </View>
+            {busy === 'photo' || photoUri ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+                {photoUri ? (
+                  <Image
+                    source={{ uri: photoUri }}
+                    style={{ width: 56, height: 56, borderRadius: radius.md }}
+                    accessibilityIgnoresInvertColors
+                  />
+                ) : null}
+                <AppText variant="callout" tone="textMuted" style={{ flex: 1 }}>
+                  {busy === 'photo'
+                    ? t('food.photoReading', { name: settings.coach.name })
+                    : t('food.photoNotSaved')}
+                </AppText>
+              </View>
+            ) : null}
             {notice ? (
               <AppText variant="callout" tone="textMuted">
                 {notice}
