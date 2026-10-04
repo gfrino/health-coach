@@ -24,6 +24,7 @@ import { Icon } from './Icon';
 /** Apple Health (iOS) / Health Connect (Android): stato, spiegazione dei dati, collegamento. */
 export function HealthSourceCard({ showCategories = true }: { showCategories?: boolean }) {
   const { t, i18n } = useTranslation();
+  const coachName = useSettingsStore((s) => s.settings.coach.name);
   const { colors, spacing } = useTheme();
   const connectedAt = useSettingsStore((s) => s.settings.healthSourceConnectedAt);
   const update = useSettingsStore((s) => s.update);
@@ -81,7 +82,7 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
         {connected ? <Icon name="checkCircle" color={colors.success} /> : null}
       </View>
       <AppText variant="callout" tone="textMuted">
-        {t('sources.readOnly')}
+        {t('sources.readOnly', { name: coachName })}
       </AppText>
 
       {availability === 'needsInstall' ? (

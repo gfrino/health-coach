@@ -155,7 +155,7 @@
     "delete": "Supprimer le compte rendu",
     "deleteTitle": "Supprimer le compte rendu ?",
     "deleteBody": "Le fichier sera définitivement supprimé de ce téléphone.",
-    "sharedNoFile": "AlbA n'a reçu qu'un texte ou un lien, sans fichier. Partage le PDF ou une photo du rapport.",
+    "sharedNoFile": "{{name}} n'a reçu qu'un texte ou un lien, sans fichier. Partage le PDF ou une photo du compte rendu.",
     "kinds": {
       "all": "Tous ({{count}})",
       "pdf": "PDF",
@@ -304,7 +304,7 @@
       }
     },
     "openKeysPage": "Ouvrir la page et créer le code",
-    "billingNote": "L'utilisation de l'IA est facturée par le fournisseur sur votre compte, selon la consommation. AlbA ne reçoit ni ne voit jamais votre clé.",
+    "billingNote": "L'utilisation de l'IA est facturée par le fournisseur sur ton compte, selon la consommation. Ta clé reste sur ce téléphone : nous ne la recevons ni ne la voyons jamais.",
     "apiKey": "Code d'accès (clé API)",
     "keyHint": "Elle est enregistrée dans le trousseau sécurisé de votre téléphone.",
     "keySavedHint": "Une clé est déjà enregistrée. Collez-en une nouvelle uniquement pour la remplacer.",
@@ -360,7 +360,7 @@
     "title": "Connectez vos données",
     "subtitle": "Le coach lit vos données depuis {{source}}. Vous choisissez, type par type, ce que vous partagez.",
     "skip": "Passer pour l'instant",
-    "readOnly": "Lecture seule : AlbA n'écrit et ne modifie rien.",
+    "readOnly": "Lecture seule : {{name}} n'écrit et ne modifie rien.",
     "categories": {
       "activity": {
         "title": "Activité",
@@ -889,7 +889,7 @@
   "sidebar": {
     "open": "Ouvrir le menu",
     "close": "Fermer le menu",
-    "subtitle": "Ton coach {{name}}"
+    "subtitle": "Ton coach santé"
   },
   "recipes": {
     "new": "Nouvelle recette",

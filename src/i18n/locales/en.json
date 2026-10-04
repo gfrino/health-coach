@@ -155,7 +155,7 @@
     "delete": "Delete report",
     "deleteTitle": "Delete the report?",
     "deleteBody": "The file will be permanently deleted from this phone.",
-    "sharedNoFile": "AlbA only received text or a link, no file. Share the PDF or a photo of the report.",
+    "sharedNoFile": "{{name}} only received text or a link, no file. Share the PDF or a photo of the report.",
     "kinds": {
       "all": "All ({{count}})",
       "pdf": "PDF",
@@ -304,7 +304,7 @@
       }
     },
     "openKeysPage": "Open the page and create the code",
-    "billingNote": "AI usage is billed by the provider to your account, based on consumption. AlbA never receives or sees your key.",
+    "billingNote": "AI usage is billed by the provider to your account, based on consumption. Your key stays on this phone: we never receive or see it.",
     "apiKey": "Access code (API key)",
     "keyHint": "It is stored in your phone's secure keychain.",
     "keySavedHint": "A key is already saved. Paste a new one only if you want to replace it.",
@@ -360,7 +360,7 @@
     "title": "Connect your data",
     "subtitle": "The coach reads your data from {{source}}. You can choose, type by type, what to share.",
     "skip": "Skip for now",
-    "readOnly": "Read-only: AlbA never writes or changes anything.",
+    "readOnly": "Read-only: {{name}} never writes or changes anything.",
     "categories": {
       "activity": {
         "title": "Activity",
@@ -889,7 +889,7 @@
   "sidebar": {
     "open": "Open menu",
     "close": "Close menu",
-    "subtitle": "Your coach {{name}}"
+    "subtitle": "Your health coach"
   },
   "recipes": {
     "new": "New recipe",

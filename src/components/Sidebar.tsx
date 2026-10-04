@@ -96,11 +96,12 @@ export function Sidebar() {
           }}
         >
           <View style={{ paddingHorizontal: spacing.sm, marginBottom: spacing.lg }}>
+            {/* Dentro l'app il nome è quello scelto per il coach; AlbA resta su icona e store. */}
             <AppText variant="title" style={{ color: colors.primary }}>
-              AlbA
+              {coachName}
             </AppText>
             <AppText variant="caption" tone="textMuted">
-              {t('sidebar.subtitle', { name: coachName })}
+              {t('sidebar.subtitle')}
             </AppText>
           </View>
           {ITEMS.map((it) => {

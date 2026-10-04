@@ -155,7 +155,7 @@
     "delete": "Befund löschen",
     "deleteTitle": "Befund löschen?",
     "deleteBody": "Die Datei wird endgültig von diesem Telefon gelöscht.",
-    "sharedNoFile": "AlbA hat nur einen Text oder Link erhalten, keine Datei. Teile das PDF oder ein Foto des Befunds.",
+    "sharedNoFile": "{{name}} hat nur einen Text oder Link erhalten, keine Datei. Teile das PDF oder ein Foto des Befunds.",
     "kinds": {
       "all": "Alle ({{count}})",
       "pdf": "PDF",
@@ -304,7 +304,7 @@
       }
     },
     "openKeysPage": "Seite öffnen und Code erstellen",
-    "billingNote": "Die KI-Nutzung rechnet der Anbieter nach Verbrauch über dein Konto ab. AlbA erhält und sieht deinen Schlüssel nie.",
+    "billingNote": "Die KI-Nutzung rechnet der Anbieter nach Verbrauch über dein Konto ab. Dein Schlüssel bleibt auf diesem Telefon: Wir erhalten oder sehen ihn nie.",
     "apiKey": "Zugangscode (API-Schlüssel)",
     "keyHint": "Er wird im sicheren Schlüsselbund deines Telefons gespeichert.",
     "keySavedHint": "Ein Schlüssel ist bereits gespeichert. Füge nur einen neuen ein, wenn du ihn ersetzen möchtest.",
@@ -360,7 +360,7 @@
     "title": "Deine Daten verbinden",
     "subtitle": "Der Coach liest deine Daten aus {{source}}. Du entscheidest für jeden Datentyp, was du teilst.",
     "skip": "Vorerst überspringen",
-    "readOnly": "Nur Lesen: AlbA schreibt und ändert nichts.",
+    "readOnly": "Nur Lesen: {{name}} schreibt und ändert nichts.",
     "categories": {
       "activity": {
         "title": "Aktivität",
@@ -889,7 +889,7 @@
   "sidebar": {
     "open": "Menü öffnen",
     "close": "Menü schließen",
-    "subtitle": "Dein Coach {{name}}"
+    "subtitle": "Dein Gesundheitscoach"
   },
   "recipes": {
     "new": "Neues Rezept",

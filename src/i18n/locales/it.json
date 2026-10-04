@@ -155,7 +155,7 @@
     "delete": "Elimina referto",
     "deleteTitle": "Eliminare il referto?",
     "deleteBody": "Il file verrà cancellato definitivamente da questo telefono.",
-    "sharedNoFile": "AlbA ha ricevuto solo un testo o un link, senza file. Condividi il PDF o la foto del referto.",
+    "sharedNoFile": "{{name}} ha ricevuto solo un testo o un link, senza file. Condividi il PDF o la foto del referto.",
     "kinds": {
       "all": "Tutti ({{count}})",
       "pdf": "PDF",
@@ -304,7 +304,7 @@
       }
     },
     "openKeysPage": "Apri la pagina e crea il codice",
-    "billingNote": "L'uso dell'AI è fatturato dal provider sul tuo account, in base al consumo. AlbA non riceve né vede la chiave.",
+    "billingNote": "L'uso dell'AI è fatturato dal provider sul tuo account, in base al consumo. La chiave resta su questo telefono: noi non la riceviamo né la vediamo.",
     "apiKey": "Codice di accesso (chiave API)",
     "keyHint": "Viene salvata nel portachiavi sicuro del telefono.",
     "keySavedHint": "Chiave già salvata. Incollane una nuova solo se vuoi sostituirla.",
@@ -360,7 +360,7 @@
     "title": "Collega i tuoi dati",
     "subtitle": "Il coach legge i tuoi dati da {{source}}. Puoi scegliere tipo per tipo cosa condividere.",
     "skip": "Salta per ora",
-    "readOnly": "Solo lettura: AlbA non scrive e non modifica nulla.",
+    "readOnly": "Solo lettura: {{name}} non scrive e non modifica nulla.",
     "categories": {
       "activity": {
         "title": "Attività",
@@ -889,7 +889,7 @@
   "sidebar": {
     "open": "Apri il menu",
     "close": "Chiudi il menu",
-    "subtitle": "Il tuo coach {{name}}"
+    "subtitle": "Il tuo coach della salute"
   },
   "recipes": {
     "new": "Nuova ricetta",
