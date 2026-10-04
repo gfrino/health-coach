@@ -164,6 +164,8 @@
       "text": "Texte"
     },
     "share": "Partager",
+    "askCoach": "En parler avec le coach",
+    "askCoachPrompt": "Regardons ensemble mon compte rendu « {{title}} » : que dit-il et à quoi devrais-je faire attention ?",
     "extractionReading": "{{name}} lit le document…",
     "extractionFailed": "Le document n'a pas pu être lu. Réessaie ; pour les photos et les scans, tu peux aussi choisir une IA en ligne dans les Réglages.",
     "extractionNone": "{{name}} n'a pas encore lu ce document.",

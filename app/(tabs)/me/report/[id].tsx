@@ -109,6 +109,17 @@ export default function ReportScreen() {
       },
     ]);
 
+  // Nuova chat col referto allegato: il coach legge il documento, non solo il titolo.
+  const askCoach = () =>
+    router.navigate({
+      pathname: '/coach',
+      params: {
+        new: String(Date.now()),
+        ask: t('records.askCoachPrompt', { title: title.trim() || report.title }),
+        report: id,
+      },
+    });
+
   return (
     <>
       <Stack.Screen
@@ -189,6 +200,7 @@ export default function ReportScreen() {
         />
 
         <ReportFindings reportId={id} />
+        <Button label={t('records.askCoach')} variant="secondary" onPress={askCoach} />
 
         <AppText variant="caption" tone="textMuted">
           {t('records.encryptedNote')}

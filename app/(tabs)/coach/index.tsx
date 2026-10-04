@@ -16,7 +16,7 @@ export default function CoachScreen() {
   const { t } = useTranslation();
   const { colors, spacing } = useTheme();
   const coachName = useSettingsStore((s) => s.settings.coach.name);
-  const params = useLocalSearchParams<{ c?: string; new?: string; ask?: string }>();
+  const params = useLocalSearchParams<{ c?: string; new?: string; ask?: string; report?: string }>();
   const [conversationId, setConversationId] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
@@ -75,6 +75,7 @@ export default function CoachScreen() {
             conversationId={conversationId}
             onConversationCreated={setConversationId}
             initialPrompt={params.ask}
+            initialReportId={params.report}
           />
         )}
       </View>

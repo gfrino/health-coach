@@ -164,6 +164,8 @@
       "text": "Text"
     },
     "share": "Share",
+    "askCoach": "Talk about it with your coach",
+    "askCoachPrompt": "Let's look at my report \"{{title}}\" together: what does it say and what should I keep an eye on?",
     "extractionReading": "{{name}} is reading the document…",
     "extractionFailed": "The document couldn't be read. Try again; for photos and scans you can also choose an online AI in Settings.",
     "extractionNone": "{{name}} hasn't read this document yet.",

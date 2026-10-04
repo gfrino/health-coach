@@ -164,6 +164,8 @@
       "text": "Text"
     },
     "share": "Teilen",
+    "askCoach": "Mit dem Coach darüber sprechen",
+    "askCoachPrompt": "Lass uns meinen Befund \"{{title}}\" gemeinsam ansehen: Was steht darin und worauf sollte ich achten?",
     "extractionReading": "{{name}} liest das Dokument…",
     "extractionFailed": "Das Dokument konnte nicht gelesen werden. Versuche es erneut; für Fotos und Scans kannst du auch eine Online-KI in den Einstellungen wählen.",
     "extractionNone": "{{name}} hat dieses Dokument noch nicht gelesen.",

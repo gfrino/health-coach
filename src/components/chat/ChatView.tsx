@@ -32,9 +32,16 @@ interface Props {
   onConversationCreated: (id: string) => void;
   /** Domanda da inviare subito (es. dalla notifica toccata). */
   initialPrompt?: string;
+  /** Referto da allegare alla domanda iniziale (es. "Parlane con il coach" dalla Cartella). */
+  initialReportId?: string;
 }
 
-export function ChatView({ conversationId, onConversationCreated, initialPrompt }: Props) {
+export function ChatView({
+  conversationId,
+  onConversationCreated,
+  initialPrompt,
+  initialReportId,
+}: Props) {
   const { t } = useTranslation();
   const toolLabel = (tool: string) =>
     tool === 'save_journal_entry'
@@ -131,8 +138,8 @@ export function ChatView({ conversationId, onConversationCreated, initialPrompt 
     }
   };
 
-  const send = (text: string) => {
-    const sent = attachments;
+  const send = (text: string, extra: MessageAttachment[] = []) => {
+    const sent = [...attachments, ...extra];
     setAttachments([]);
     return run((id, cb) => runCoachTurn(settings, id, text, cb, sent), text, sent);
   };
@@ -166,7 +173,15 @@ export function ChatView({ conversationId, onConversationCreated, initialPrompt 
   useEffect(() => {
     if (!initialPrompt || promptSent.current || !settings.ai.provider) return;
     promptSent.current = true;
-    void send(initialPrompt);
+    void (async () => {
+      const report = initialReportId
+        ? await labReportRepository.getReport(await getDb(), initialReportId)
+        : null;
+      const extra = report
+        ? [{ reportId: report.id, title: report.title, mimeType: report.mimeType ?? '' }]
+        : [];
+      await send(initialPrompt, extra);
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPrompt]);
 

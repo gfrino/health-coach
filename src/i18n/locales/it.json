@@ -164,6 +164,8 @@
       "text": "Testo"
     },
     "share": "Condividi",
+    "askCoach": "Parlane con il coach",
+    "askCoachPrompt": "Guardiamo insieme il mio referto \"{{title}}\": cosa dice e a cosa dovrei fare attenzione?",
     "extractionReading": "{{name}} sta leggendo il documento…",
     "extractionFailed": "Non è stato possibile leggere il documento. Riprova; per foto e scansioni puoi anche scegliere un'AI online nelle Opzioni.",
     "extractionNone": "{{name}} non ha ancora letto questo documento.",
