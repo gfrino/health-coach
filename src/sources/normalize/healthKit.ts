@@ -98,6 +98,10 @@ export const FOOD_WRITE_TYPES = [
   'HKQuantityTypeIdentifierDietaryProtein',
   'HKQuantityTypeIdentifierDietaryCarbohydrates',
   'HKQuantityTypeIdentifierDietaryFatTotal',
+  'HKQuantityTypeIdentifierDietaryFiber',
+  'HKQuantityTypeIdentifierDietarySugar',
+  'HKQuantityTypeIdentifierDietaryFatSaturated',
+  'HKQuantityTypeIdentifierDietarySodium',
 ] as const;
 
 const origin = (s: HKSampleLike) => {

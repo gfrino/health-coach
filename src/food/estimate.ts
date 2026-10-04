@@ -17,12 +17,17 @@ export interface FoodEstimate {
   protein: number | null;
   carbs: number | null;
   fat: number | null;
+  fiber: number | null;
+  sugar: number | null;
+  saturatedFat: number | null;
+  /** Milligrammi. */
+  sodium: number | null;
 }
 
 export function estimateInstruction(language: string, text: string): string {
   return [
     'Estimate the nutrition of what the user ate. Reply in EXACTLY this format, one line per food, nothing else:',
-    'name | quantity | kcal | protein g | carbs g | fat g',
+    'name | quantity | kcal | protein g | carbs g | fat g | fiber g | sugar g | saturated fat g | sodium mg',
     `- name: short, in ${language}, starting with a capital letter.`,
     '- quantity: the amount as the user said it; if they gave none, a typical portion you assume (e.g. "1 slice, 30 g").',
     '- Numbers only (no units), with a dot for decimals and no thousands separators. Use typical values for that food and quantity.',
@@ -66,6 +71,10 @@ export function parseFoodEstimate(reply: string): FoodEstimate[] {
       protein: n(3),
       carbs: n(4),
       fat: n(5),
+      fiber: n(6),
+      sugar: n(7),
+      saturatedFat: n(8),
+      sodium: n(9),
     });
     if (out.length >= 20) break;
   }

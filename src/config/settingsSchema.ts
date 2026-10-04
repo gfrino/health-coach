@@ -77,6 +77,8 @@ export const foodSettingsSchema = z.object({
   writeToHealth: z.boolean(),
   /** Quando è stato chiesto il permesso di scrittura in Apple Salute: si chiede una volta sola. */
   healthAskedAt: z.number().int().nullable().optional(),
+  /** Quanti tipi c'erano nell'ultima richiesta: se l'app ne scrive di nuovi, si richiede una volta. */
+  healthAskedTypes: z.number().int().nullable().optional(),
 });
 
 export const ONBOARDING_FLOW_VERSION = 2;

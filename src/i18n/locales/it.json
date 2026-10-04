@@ -1016,9 +1016,13 @@
     "proteinG": "Proteine (g)",
     "carbsG": "Carboidrati (g)",
     "fatG": "Grassi (g)",
-    "moreDetails": "Più dettagli (proteine, carboidrati, grassi)",
+    "moreDetails": "Più dettagli (proteine, grassi, zuccheri, sale…)",
     "done": "Fatto",
     "tapToEdit": "Tocca per modificare",
-    "untitled": "Senza nome"
+    "untitled": "Senza nome",
+    "fiberG": "Fibre (g)",
+    "sugarG": "Zuccheri (g)",
+    "saturatedFatG": "Grassi saturi (g)",
+    "sodiumG": "Sodio (mg)"
   }
 }

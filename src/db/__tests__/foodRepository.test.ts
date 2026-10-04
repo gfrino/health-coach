@@ -29,6 +29,8 @@ describe('diario alimentare', () => {
       name: 'Pane integrale',
       calories: 80,
       carbs: 15,
+      fiber: 3.46,
+      sodium: 520.4,
       eatenAt: at('2026-10-04', 8),
       meal: 'breakfast',
     });
@@ -51,6 +53,10 @@ describe('diario alimentare', () => {
       protein: 12.6,
       carbs: 15,
       fat: 0,
+      fiber: 3.5,
+      sugar: 0,
+      saturatedFat: 0,
+      sodium: 520,
       count: 2,
     });
 

@@ -47,14 +47,15 @@ describe('stima dei cibi dalla risposta a righe', () => {
   it('legge righe con unità, virgole e intestazione', () => {
     const items = parseFoodEstimate(
       [
-        'name | quantity | kcal | protein g | carbs g | fat g',
-        '- **Uova strapazzate** | 2 uova | 182 kcal | 12,6 g | 1 | 14',
-        'Pane integrale | 1 fetta, 30 g | 75 | 3 | 13 | 1',
+        'name | quantity | kcal | protein g | carbs g | fat g | fiber g | sugar g | saturated fat g | sodium mg',
+        '- **Uova strapazzate** | 2 uova | 182 kcal | 12,6 g | 1 | 14 | 0 | 0,5 | 4,5 | 180 mg',
+        'Pane integrale | 1 fetta, 30 g | 75 | 3 | 13 | 1 | 2 | 1 | 0.2 | 140',
         'Caffè | 1 tazzina | 2 | | |',
         'Cappuccino | 1 tazza | ~90 | circa 4,5 g | 80-100 |',
         'nota senza numeri',
       ].join('\n'),
     );
+    const none = { fiber: null, sugar: null, saturatedFat: null, sodium: null };
     expect(items).toEqual([
       {
         name: 'Uova strapazzate',
@@ -63,6 +64,10 @@ describe('stima dei cibi dalla risposta a righe', () => {
         protein: 12.6,
         carbs: 1,
         fat: 14,
+        fiber: 0,
+        sugar: 0.5,
+        saturatedFat: 4.5,
+        sodium: 180,
       },
       {
         name: 'Pane integrale',
@@ -71,9 +76,29 @@ describe('stima dei cibi dalla risposta a righe', () => {
         protein: 3,
         carbs: 13,
         fat: 1,
+        fiber: 2,
+        sugar: 1,
+        saturatedFat: 0.2,
+        sodium: 140,
       },
-      { name: 'Caffè', quantity: '1 tazzina', calories: 2, protein: null, carbs: null, fat: null },
-      { name: 'Cappuccino', quantity: '1 tazza', calories: 90, protein: 4.5, carbs: 90, fat: null },
+      {
+        name: 'Caffè',
+        quantity: '1 tazzina',
+        calories: 2,
+        protein: null,
+        carbs: null,
+        fat: null,
+        ...none,
+      },
+      {
+        name: 'Cappuccino',
+        quantity: '1 tazza',
+        calories: 90,
+        protein: 4.5,
+        carbs: 90,
+        fat: null,
+        ...none,
+      },
     ]);
     expect(parseFoodEstimate('NONE')).toEqual([]);
   });

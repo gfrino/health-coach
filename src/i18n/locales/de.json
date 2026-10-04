@@ -1016,9 +1016,13 @@
     "proteinG": "Eiweiß (g)",
     "carbsG": "Kohlenhydrate (g)",
     "fatG": "Fett (g)",
-    "moreDetails": "Mehr Details (Eiweiß, Kohlenhydrate, Fett)",
+    "moreDetails": "Mehr Details (Eiweiß, Fett, Zucker, Salz…)",
     "done": "Fertig",
     "tapToEdit": "Tippen zum Bearbeiten",
-    "untitled": "Ohne Namen"
+    "untitled": "Ohne Namen",
+    "fiberG": "Ballaststoffe (g)",
+    "sugarG": "Zucker (g)",
+    "saturatedFatG": "Gesättigte Fette (g)",
+    "sodiumG": "Natrium (mg)"
   }
 }

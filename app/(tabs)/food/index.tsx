@@ -348,7 +348,7 @@ export default function FoodScreen() {
                   food: {
                     ...settings.food,
                     writeToHealth: v,
-                    ...(v ? { healthAskedAt: null } : {}),
+                    ...(v ? { healthAskedAt: null, healthAskedTypes: null } : {}),
                   },
                 })
               }

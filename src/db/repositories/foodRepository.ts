@@ -24,6 +24,11 @@ export interface FoodEntry {
   protein: number | null;
   carbs: number | null;
   fat: number | null;
+  fiber: number | null;
+  sugar: number | null;
+  saturatedFat: number | null;
+  /** Milligrammi. */
+  sodium: number | null;
   source: 'user' | 'coach';
   recipeId: string | null;
   /** Id dei campioni scritti in Apple Salute, per tipo. */
@@ -41,6 +46,10 @@ export interface FoodInput {
   protein?: number | null;
   carbs?: number | null;
   fat?: number | null;
+  fiber?: number | null;
+  sugar?: number | null;
+  saturatedFat?: number | null;
+  sodium?: number | null;
   recipeId?: string | null;
 }
 
@@ -49,6 +58,10 @@ export interface FoodTotals {
   protein: number;
   carbs: number;
   fat: number;
+  fiber: number;
+  sugar: number;
+  saturatedFat: number;
+  sodium: number;
   count: number;
 }
 
@@ -63,6 +76,10 @@ interface Row {
   protein: number | null;
   carbs: number | null;
   fat: number | null;
+  fiber: number | null;
+  sugar: number | null;
+  saturated_fat: number | null;
+  sodium: number | null;
   source: string;
   recipe_id: string | null;
   health_samples: string | null;
@@ -110,6 +127,10 @@ const toEntry = (r: Row): FoodEntry => ({
   protein: r.protein,
   carbs: r.carbs,
   fat: r.fat,
+  fiber: r.fiber,
+  sugar: r.sugar,
+  saturatedFat: r.saturated_fat,
+  sodium: r.sodium,
   source: r.source === 'coach' ? 'coach' : 'user',
   recipeId: r.recipe_id,
   healthSamples: samples(r.health_samples),
@@ -125,6 +146,10 @@ function clean(input: FoodInput) {
     protein: amount(input.protein, 1000, 1),
     carbs: amount(input.carbs, 1000, 1),
     fat: amount(input.fat, 1000, 1),
+    fiber: amount(input.fiber, 300, 1),
+    sugar: amount(input.sugar, 1000, 1),
+    saturatedFat: amount(input.saturatedFat, 500, 1),
+    sodium: amount(input.sodium, 50000, 0),
   };
 }
 
@@ -140,8 +165,8 @@ export async function createEntry(
   const id = newId();
   await db.runAsync(
     `INSERT INTO food_entries (id, day, eaten_at, meal, name, quantity, calories, protein, carbs, fat,
-       source, recipe_id, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       fiber, sugar, saturated_fat, sodium, source, recipe_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       localIsoDate(new Date(eatenAt)),
@@ -153,6 +178,10 @@ export async function createEntry(
       c.protein,
       c.carbs,
       c.fat,
+      c.fiber,
+      c.sugar,
+      c.saturatedFat,
+      c.sodium,
       source,
       input.recipeId ?? null,
       now,
@@ -170,7 +199,8 @@ export async function updateEntry(db: Db, id: string, input: FoodInput): Promise
   const eatenAt = input.eatenAt ?? current.eatenAt;
   await db.runAsync(
     `UPDATE food_entries SET day = ?, eaten_at = ?, meal = ?, name = ?, quantity = ?, calories = ?,
-       protein = ?, carbs = ?, fat = ?, updated_at = ? WHERE id = ?`,
+       protein = ?, carbs = ?, fat = ?, fiber = ?, sugar = ?, saturated_fat = ?, sodium = ?,
+       updated_at = ? WHERE id = ?`,
     [
       localIsoDate(new Date(eatenAt)),
       eatenAt,
@@ -181,6 +211,10 @@ export async function updateEntry(db: Db, id: string, input: FoodInput): Promise
       c.protein,
       c.carbs,
       c.fat,
+      c.fiber,
+      c.sugar,
+      c.saturatedFat,
+      c.sodium,
       Date.now(),
       id,
     ],
@@ -215,16 +249,23 @@ export async function listDay(db: Db, day: string): Promise<FoodEntry[]> {
   return rows.map(toEntry);
 }
 
-export function totals(entries: Pick<FoodEntry, 'calories' | 'protein' | 'carbs' | 'fat'>[]) {
-  const sum = (k: 'calories' | 'protein' | 'carbs' | 'fat') =>
+type NutrientKey =
+  'calories' | 'protein' | 'carbs' | 'fat' | 'fiber' | 'sugar' | 'saturatedFat' | 'sodium';
+
+export function totals(entries: Partial<Pick<FoodEntry, NutrientKey>>[]): FoodTotals {
+  const sum = (k: NutrientKey) =>
     Math.round(entries.reduce((a, e) => a + (e[k] ?? 0), 0) * 10) / 10;
   return {
     calories: Math.round(sum('calories')),
     protein: sum('protein'),
     carbs: sum('carbs'),
     fat: sum('fat'),
+    fiber: sum('fiber'),
+    sugar: sum('sugar'),
+    saturatedFat: sum('saturatedFat'),
+    sodium: Math.round(sum('sodium')),
     count: entries.length,
-  } satisfies FoodTotals;
+  };
 }
 
 /** Totali per giorno tra due date (incluse), solo i giorni con almeno una voce. */
@@ -239,10 +280,15 @@ export async function dailyTotals(
     protein: number | null;
     carbs: number | null;
     fat: number | null;
+    fiber: number | null;
+    sugar: number | null;
+    saturated_fat: number | null;
+    sodium: number | null;
     n: number;
   }>(
     `SELECT day, SUM(calories) AS calories, SUM(protein) AS protein, SUM(carbs) AS carbs,
-       SUM(fat) AS fat, COUNT(*) AS n
+       SUM(fat) AS fat, SUM(fiber) AS fiber, SUM(sugar) AS sugar,
+       SUM(saturated_fat) AS saturated_fat, SUM(sodium) AS sodium, COUNT(*) AS n
      FROM food_entries WHERE day BETWEEN ? AND ? GROUP BY day ORDER BY day`,
     [fromDay, toDay],
   );
@@ -253,6 +299,10 @@ export async function dailyTotals(
     protein: r1(r.protein),
     carbs: r1(r.carbs),
     fat: r1(r.fat),
+    fiber: r1(r.fiber),
+    sugar: r1(r.sugar),
+    saturatedFat: r1(r.saturated_fat),
+    sodium: Math.round(r.sodium ?? 0),
     count: r.n,
   }));
 }

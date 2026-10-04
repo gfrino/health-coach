@@ -268,7 +268,16 @@ When the user asks for a plan, a routine or a program (or agrees to one you prop
 
 export interface FoodContext {
   today: { id: string; meal: string; name: string; quantity: string | null; kcal: number | null }[];
-  todayTotals: { calories: number; protein: number; carbs: number; fat: number };
+  todayTotals: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    fiber?: number;
+    sugar?: number;
+    saturatedFat?: number;
+    sodium?: number;
+  };
   /** Media sui giorni con voci negli ultimi 7 (oggi escluso). */
   avg7: { calories: number; days: number } | null;
   target: { kcal: number; custom: boolean } | null;
@@ -284,7 +293,7 @@ export function foodSection(
   if (!food) return null;
   const t = food.todayTotals;
   const head = [
-    `Today so far: ${t.calories} kcal (protein ${t.protein} g, carbs ${t.carbs} g, fat ${t.fat} g) in ${food.today.length} foods`,
+    `Today so far: ${t.calories} kcal (protein ${t.protein} g, carbs ${t.carbs} g, fat ${t.fat} g${t.saturatedFat ? ` of which saturated ${t.saturatedFat} g` : ''}${t.fiber ? `, fiber ${t.fiber} g` : ''}${t.sugar ? `, sugar ${t.sugar} g` : ''}${t.sodium ? `, sodium ${t.sodium} mg` : ''}; estimates) in ${food.today.length} foods`,
     food.target
       ? `daily target ${food.target.kcal} kcal (${food.target.custom ? 'set by the user' : 'estimated by the app from profile and activity'})`
       : null,

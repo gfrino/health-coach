@@ -14,6 +14,10 @@ export interface FoodDraft {
   protein: string;
   carbs: string;
   fat: string;
+  fiber: string;
+  sugar: string;
+  saturatedFat: string;
+  sodium: string;
 }
 
 export const emptyDraft = (): FoodDraft => ({
@@ -23,6 +27,10 @@ export const emptyDraft = (): FoodDraft => ({
   protein: '',
   carbs: '',
   fat: '',
+  fiber: '',
+  sugar: '',
+  saturatedFat: '',
+  sodium: '',
 });
 
 const str = (v: number | null | undefined) => (v == null ? '' : String(v));
@@ -34,6 +42,10 @@ export function toDraft(v: {
   protein: number | null;
   carbs: number | null;
   fat: number | null;
+  fiber?: number | null;
+  sugar?: number | null;
+  saturatedFat?: number | null;
+  sodium?: number | null;
 }): FoodDraft {
   return {
     name: v.name,
@@ -42,6 +54,10 @@ export function toDraft(v: {
     protein: str(v.protein),
     carbs: str(v.carbs),
     fat: str(v.fat),
+    fiber: str(v.fiber),
+    sugar: str(v.sugar),
+    saturatedFat: str(v.saturatedFat),
+    sodium: str(v.sodium),
   };
 }
 
@@ -53,6 +69,10 @@ export function fromDraft(d: FoodDraft) {
     protein: parseNumber(d.protein),
     carbs: parseNumber(d.carbs),
     fat: parseNumber(d.fat),
+    fiber: parseNumber(d.fiber),
+    sugar: parseNumber(d.sugar),
+    saturatedFat: parseNumber(d.saturatedFat),
+    sodium: parseNumber(d.sodium),
   };
 }
 
@@ -71,7 +91,9 @@ export function FoodItemFields({
   const { colors, spacing } = useTheme();
   const [details, setDetails] = useState(false);
   const set = (k: keyof FoodDraft) => (text: string) => onChange({ ...value, [k]: text });
-  const numberField = (k: 'protein' | 'carbs' | 'fat') => (
+  const numberField = (
+    k: 'protein' | 'carbs' | 'fat' | 'fiber' | 'sugar' | 'saturatedFat' | 'sodium',
+  ) => (
     <View style={{ flex: 1 }}>
       <TextField
         label={t(`food.${k}G`)}
@@ -105,10 +127,20 @@ export function FoodItemFields({
         </View>
       </View>
       {details ? (
-        <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-          {numberField('protein')}
-          {numberField('carbs')}
-          {numberField('fat')}
+        <View style={{ gap: spacing.md }}>
+          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+            {numberField('protein')}
+            {numberField('carbs')}
+            {numberField('fat')}
+          </View>
+          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+            {numberField('fiber')}
+            {numberField('sugar')}
+          </View>
+          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+            {numberField('saturatedFat')}
+            {numberField('sodium')}
+          </View>
         </View>
       ) : (
         <Pressable onPress={() => setDetails(true)} accessibilityRole="button" hitSlop={8}>

@@ -16,11 +16,19 @@ import { useSettingsStore } from '@/store/settingsStore';
 
 type FoodType = (typeof FOOD_WRITE_TYPES)[number];
 
-const FIELDS: { type: FoodType; key: 'calories' | 'protein' | 'carbs' | 'fat'; unit: string }[] = [
+const FIELDS: {
+  type: FoodType;
+  key: 'calories' | 'protein' | 'carbs' | 'fat' | 'fiber' | 'sugar' | 'saturatedFat' | 'sodium';
+  unit: string;
+}[] = [
   { type: 'HKQuantityTypeIdentifierDietaryEnergyConsumed', key: 'calories', unit: 'kcal' },
   { type: 'HKQuantityTypeIdentifierDietaryProtein', key: 'protein', unit: 'g' },
   { type: 'HKQuantityTypeIdentifierDietaryCarbohydrates', key: 'carbs', unit: 'g' },
   { type: 'HKQuantityTypeIdentifierDietaryFatTotal', key: 'fat', unit: 'g' },
+  { type: 'HKQuantityTypeIdentifierDietaryFiber', key: 'fiber', unit: 'g' },
+  { type: 'HKQuantityTypeIdentifierDietarySugar', key: 'sugar', unit: 'g' },
+  { type: 'HKQuantityTypeIdentifierDietaryFatSaturated', key: 'saturatedFat', unit: 'g' },
+  { type: 'HKQuantityTypeIdentifierDietarySodium', key: 'sodium', unit: 'mg' },
 ];
 
 export function canWriteFoodToHealth(): boolean {
@@ -44,8 +52,13 @@ const SHARING_AUTHORIZED = 2; // AuthorizationStatus.sharingAuthorized
 async function writableTypes(): Promise<Set<FoodType>> {
   const hk = healthKit();
   const store = useSettingsStore.getState();
-  if (!store.settings.food.healthAskedAt) {
-    await store.update({ food: { ...store.settings.food, healthAskedAt: Date.now() } });
+  const food = store.settings.food;
+  // Si richiede anche quando l'app scrive tipi nuovi (prima versione: 4 tipi), una volta sola.
+  const asked = food.healthAskedAt ? (food.healthAskedTypes ?? 4) : 0;
+  if (asked < FOOD_WRITE_TYPES.length) {
+    await store.update({
+      food: { ...food, healthAskedAt: Date.now(), healthAskedTypes: FOOD_WRITE_TYPES.length },
+    });
     await hk.requestAuthorization({ toShare: FOOD_WRITE_TYPES });
   }
   return new Set(

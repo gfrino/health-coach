@@ -1016,9 +1016,13 @@
     "proteinG": "Protéines (g)",
     "carbsG": "Glucides (g)",
     "fatG": "Lipides (g)",
-    "moreDetails": "Plus de détails (protéines, glucides, lipides)",
+    "moreDetails": "Plus de détails (protéines, lipides, sucres, sel…)",
     "done": "OK",
     "tapToEdit": "Touche pour modifier",
-    "untitled": "Sans nom"
+    "untitled": "Sans nom",
+    "fiberG": "Fibres (g)",
+    "sugarG": "Sucres (g)",
+    "saturatedFatG": "Graisses saturées (g)",
+    "sodiumG": "Sodium (mg)"
   }
 }
