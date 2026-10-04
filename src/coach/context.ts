@@ -1,6 +1,7 @@
 import type { ChatMessage } from '@/ai/types';
 import type { CoachConfig, SupportedLanguage } from '@/config/settingsSchema';
 import { localIsoDate } from '@/lib/dates';
+import { extraMeasuresSection, type CycleInfo, type ExtraMeasure } from './extraMeasuresText';
 
 import { dietGuideText } from './diets';
 import type { Insights } from './insights';
@@ -95,6 +96,9 @@ export interface CoachContextInput {
   }[];
   /** Programmi attivi con le azioni e le spunte di oggi. */
   programs?: ProgramContext[];
+  /** Altre misure di salute presenti (VO2 max, grasso corporeo, acqua…) e ciclo mestruale. */
+  extras?: ExtraMeasure[];
+  cycle?: CycleInfo | null;
   /** Prompt ridotto per i modelli sul telefono (contesto ~4K token). */
   compact?: boolean;
   /** Quando sono stati letti i totali di oggi dalla sorgente (null = non noto). */
@@ -231,7 +235,12 @@ function journalSection(journal: JournalContext[] | undefined): string | null {
  */
 export function dataAvailabilitySection(input: CoachContextInput): string {
   const missing: string[] = [];
-  if (!input.metrics?.length && !input.anomalies?.length && !input.insights?.lines.length)
+  if (
+    !input.metrics?.length &&
+    !input.anomalies?.length &&
+    !input.insights?.lines.length &&
+    !input.extras?.length
+  )
     missing.push('health measurements (activity, sleep, heart, body)');
   if (!input.labs?.length) missing.push('lab results');
   if (!input.journal?.length) missing.push('journal entries');
@@ -293,6 +302,7 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     insightsSection(input.insights, input.anomalies),
     // I modelli sul telefono hanno poco contesto: bastano le osservazioni già calcolate.
     input.compact && input.insights?.lines.length ? null : metricsSection(input.metrics, []),
+    extraMeasuresSection(input.extras, input.cycle),
     labsSection(input.labs),
     recordsSection(input.records, input.compact),
     journalSection(input.journal),

@@ -11,6 +11,7 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
 
 import { loadToday, type TodayData } from './loadToday';
+import { OtherMeasures } from './OtherMeasures';
 
 /**
  * Dati di esempio: in sviluppo, oppure nelle build locali per gli screenshot dello store
@@ -244,6 +245,8 @@ export function TodaySection() {
           </AppText>
         ))}
       </MetricCard>
+
+      <OtherMeasures />
     </View>
   );
 }

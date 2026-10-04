@@ -38,6 +38,14 @@ export const useSyncStore = create<SyncState>(() => ({
 
 let running: Promise<SyncReport | null> | null = null;
 
+async function compactOldHeartRate(): Promise<void> {
+  const cutoff = new Date();
+  cutoff.setHours(0, 0, 0, 0);
+  cutoff.setDate(cutoff.getDate() - healthDataRepository.HEART_RATE_RAW_DAYS);
+  const days = await healthDataRepository.compactHeartRate(await getDb(), cutoff.getTime());
+  if (__DEV__ && days) console.warn(`[sync] frequenza cardiaca compattata: ${days} giorni`);
+}
+
 async function runPlatformSync(onProgress: (p: SyncProgress) => void): Promise<SyncReport> {
   const db = await getDb();
   /* eslint-disable @typescript-eslint/no-require-imports -- moduli nativi caricati solo sulla loro piattaforma */
@@ -78,6 +86,8 @@ export function syncHealthData(
       // Arrivati i dati veri, i dati di esempio (sviluppo) non devono mescolarsi con loro.
       if (report.upserted > 0) await clearDemoData().catch(() => undefined);
       useSyncStore.setState({ lastSyncAt: Date.now(), lastReport: report });
+      // Frequenza cardiaca: oltre 30 giorni basta un riassunto per giorno (il DB non cresce senza limite).
+      await compactOldHeartRate().catch(() => undefined);
       // Dati aggiornati: c'è qualcosa di utile da segnalare? (notifica locale, vedi proactive/)
       // Atteso: in background iOS sospende l'app appena finisce il task.
       await runProactiveCheck(await getDb());

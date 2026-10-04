@@ -140,3 +140,40 @@ describe('recentHistory', () => {
     expect(recentHistory([{ role: 'assistant', content: 'solo io' }])).toEqual([]);
   });
 });
+
+describe('altre misure', () => {
+  it('una riga per misura presente, anche nel prompt compatto', () => {
+    const p = composeSystemPrompt({
+      coach,
+      language: 'it',
+      now,
+      compact: true,
+      extras: [
+        {
+          type: 'vo2max',
+          unit: 'ml/kg/min',
+          daily: false,
+          latest: 41.5,
+          latestDay: '2026-09-27',
+          avg7: 41.5,
+          avg30: 40.9,
+        },
+        {
+          type: 'water',
+          unit: 'ml',
+          daily: true,
+          latest: 1500,
+          latestDay: '2026-09-29',
+          avg7: 1800,
+          avg30: 1700,
+        },
+      ],
+      cycle: { lastStart: '2026-09-15', avgLength: 28 },
+    });
+    expect(p).toContain('OTHER MEASUREMENTS');
+    expect(p).toContain('- VO2 max: 41.5 ml/kg/min (2026-09-27), 30-day avg 40.9 ml/kg/min');
+    expect(p).toContain('- Water drunk: 1800 ml/day (7-day avg), 30-day avg 1700 ml/day');
+    expect(p).toContain('last period started 2026-09-15, average cycle 28 days');
+    expect(composeSystemPrompt({ coach, language: 'it', now })).not.toContain('OTHER MEASUREMENTS');
+  });
+});

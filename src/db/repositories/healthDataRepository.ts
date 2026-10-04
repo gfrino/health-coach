@@ -329,3 +329,76 @@ export async function hasAnyHealthData(db: Db): Promise<boolean> {
   );
   return (r?.n ?? 0) > 0;
 }
+
+// ── Compattazione della frequenza cardiaca ───────────────────────────────────
+
+/** Fonte delle righe riassuntive create sul telefono (una per giorno). */
+export const SOURCE_DAILY_SUMMARY = 'daily_summary';
+/** Tipi con migliaia di campioni al giorno (Apple Watch): oltre questa età si tiene un riassunto. */
+export const HEART_RATE_RAW_DAYS = 30;
+
+/**
+ * Sostituisce i singoli campioni di frequenza cardiaca più vecchi di `beforeMs` con una riga
+ * per giorno (media; minimo, massimo e numero di campioni nei metadati). Le medie giornaliere
+ * restano uguali, il database non cresce più senza limite. Al massimo `maxDays` giorni per
+ * volta, così una sincronizzazione non resta bloccata a lungo: il resto alla volta successiva.
+ */
+export async function compactHeartRate(db: Db, beforeMs: number, maxDays = 60): Promise<number> {
+  const days = await db.getAllAsync<{
+    day: string;
+    avg: number;
+    min: number;
+    max: number;
+    n: number;
+    unit: string;
+    start: number;
+    end: number;
+  }>(
+    `SELECT date(start_at / 1000, 'unixepoch', 'localtime') AS day, AVG(value) AS avg, MIN(value) AS min,
+       MAX(value) AS max, COUNT(*) AS n, MAX(unit) AS unit, MIN(start_at) AS start, MAX(end_at) AS end
+     FROM metrics WHERE type = 'heartRate' AND source <> ? AND start_at < ?
+     GROUP BY day ORDER BY day LIMIT ?`,
+    [SOURCE_DAILY_SUMMARY, beforeMs, maxDays],
+  );
+  if (!days.length) return 0;
+  await db.withTransactionAsync(async () => {
+    for (const d of days) {
+      // Il giorno può avere già un riassunto (campioni arrivati in ritardo): si unisce.
+      const prev = await db.getFirstAsync<{ value: number; metadata: string | null }>(
+        'SELECT value, metadata FROM metrics WHERE source = ? AND source_id = ?',
+        [SOURCE_DAILY_SUMMARY, `heartRate:${d.day}`],
+      );
+      let { avg, min, max, n } = d;
+      if (prev) {
+        const m = JSON.parse(prev.metadata ?? '{}') as { min?: number; max?: number; n?: number };
+        const pn = m.n ?? 1;
+        avg = (prev.value * pn + d.avg * d.n) / (pn + d.n);
+        min = Math.min(min, m.min ?? min);
+        max = Math.max(max, m.max ?? max);
+        n += pn;
+      }
+      await db.runAsync(
+        `INSERT INTO metrics (id, type, value, unit, start_at, end_at, source, source_id, metadata)
+         VALUES (?, 'heartRate', ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT (source, source_id) DO UPDATE SET value = excluded.value, metadata = excluded.metadata,
+           start_at = MIN(start_at, excluded.start_at), end_at = MAX(end_at, excluded.end_at)`,
+        [
+          newId(),
+          Math.round(avg * 10) / 10,
+          d.unit,
+          d.start,
+          d.end,
+          SOURCE_DAILY_SUMMARY,
+          `heartRate:${d.day}`,
+          JSON.stringify({ min, max, n }),
+        ],
+      );
+      await db.runAsync(
+        `DELETE FROM metrics WHERE type = 'heartRate' AND source <> ? AND start_at < ?
+         AND date(start_at / 1000, 'unixepoch', 'localtime') = ?`,
+        [SOURCE_DAILY_SUMMARY, beforeMs, d.day],
+      );
+    }
+  });
+  return days.length;
+}

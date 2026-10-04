@@ -69,6 +69,42 @@
       "coreTraining": "Core",
       "mixedCardio": "Cardio misto",
       "other": "Altro"
+    },
+    "other": {
+      "title": "Altre misure",
+      "perDay7": "al giorno, ultimi 7 giorni",
+      "cycle": "Ultime mestruazioni",
+      "cycleAvg": "ciclo ~{{days}} giorni",
+      "cycleLast": "data di inizio",
+      "bloodGlucose": "Glicemia",
+      "heartRate": "Frequenza cardiaca (media)",
+      "vo2max": "VO₂ max",
+      "bodyFat": "Massa grassa",
+      "leanMass": "Massa magra",
+      "bmi": "IMC",
+      "respiratoryRate": "Frequenza respiratoria",
+      "bodyTemperature": "Temperatura corporea",
+      "restingEnergy": "Energia a riposo",
+      "distance": "Distanza",
+      "floors": "Piani",
+      "protein": "Proteine",
+      "carbs": "Carboidrati",
+      "fat": "Grassi",
+      "water": "Acqua",
+      "caffeine": "Caffeina",
+      "mindfulness": "Consapevolezza",
+      "units": {
+        "heartRate": "bpm",
+        "respiratoryRate": "atti/min",
+        "restingEnergy": "kcal",
+        "protein": "g",
+        "carbs": "g",
+        "fat": "g",
+        "water": "ml",
+        "caffeine": "mg",
+        "mindfulness": "min",
+        "vo2max": "ml/kg/min"
+      }
     }
   },
   "journal": {

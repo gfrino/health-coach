@@ -20,6 +20,7 @@ import { loadProgramContext } from '@/programs/summary';
 import { getTodayTotalsAt } from '@/sources/freshness';
 
 import { composeSystemPrompt, recentHistory } from './context';
+import { loadCycle, loadExtraMeasures } from './extraMeasures';
 import { buildHealthSnapshot } from './snapshot';
 import { COACH_TOOLS, executeTool } from './tools';
 
@@ -67,17 +68,29 @@ export interface TurnResult {
 }
 
 export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Promise<string> {
-  const [profile, memoryFacts, summaries, snapshot, journal, reports, programs, latest] =
-    await Promise.all([
-      profileRepository.loadProfileContext(db),
-      healthQueries.recentMemoryFacts(db),
-      healthQueries.recentSummaries(db),
-      buildHealthSnapshot(db, now),
-      healthQueries.journalRange(db, now.getTime() - 7 * DAY_MS, now.getTime() + 1, 7),
-      labReportRepository.listReports(db),
-      loadProgramContext(db, now),
-      labReportRepository.latestResults(db),
-    ]);
+  const [
+    profile,
+    memoryFacts,
+    summaries,
+    snapshot,
+    journal,
+    reports,
+    programs,
+    latest,
+    extras,
+    cycle,
+  ] = await Promise.all([
+    profileRepository.loadProfileContext(db),
+    healthQueries.recentMemoryFacts(db),
+    healthQueries.recentSummaries(db),
+    buildHealthSnapshot(db, now),
+    healthQueries.journalRange(db, now.getTime() - 7 * DAY_MS, now.getTime() + 1, 7),
+    labReportRepository.listReports(db),
+    loadProgramContext(db, now),
+    labReportRepository.latestResults(db),
+    loadExtraMeasures(db, now),
+    loadCycle(db, now),
+  ]);
   const records = reports.map((r) => ({
     id: r.id,
     title: r.title,
@@ -111,6 +124,8 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     records,
     labs,
     programs,
+    extras,
+    cycle,
     todayTotalsAt: getTodayTotalsAt(),
     now,
     compact,

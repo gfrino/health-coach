@@ -69,6 +69,42 @@
       "coreTraining": "Gainage",
       "mixedCardio": "Cardio mixte",
       "other": "Autre"
+    },
+    "other": {
+      "title": "Autres mesures",
+      "perDay7": "par jour, 7 derniers jours",
+      "cycle": "Dernières règles",
+      "cycleAvg": "cycle ~{{days}} jours",
+      "cycleLast": "date de début",
+      "bloodGlucose": "Glycémie",
+      "heartRate": "Fréquence cardiaque (moy.)",
+      "vo2max": "VO₂ max",
+      "bodyFat": "Masse grasse",
+      "leanMass": "Masse maigre",
+      "bmi": "IMC",
+      "respiratoryRate": "Fréquence respiratoire",
+      "bodyTemperature": "Température corporelle",
+      "restingEnergy": "Énergie au repos",
+      "distance": "Distance",
+      "floors": "Étages",
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides",
+      "water": "Eau",
+      "caffeine": "Caféine",
+      "mindfulness": "Pleine conscience",
+      "units": {
+        "heartRate": "bpm",
+        "respiratoryRate": "resp./min",
+        "restingEnergy": "kcal",
+        "protein": "g",
+        "carbs": "g",
+        "fat": "g",
+        "water": "ml",
+        "caffeine": "mg",
+        "mindfulness": "min",
+        "vo2max": "ml/kg/min"
+      }
     }
   },
   "journal": {
