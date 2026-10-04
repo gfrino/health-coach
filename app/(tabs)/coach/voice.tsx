@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Icon } from '@/components';
 import { haptic } from '@/lib/haptics';
+import { useKeepAwake } from '@/lib/keepAwake';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
 import { useVoiceConversation } from '@/voice/useVoiceConversation';
@@ -17,6 +18,8 @@ export default function VoiceScreen() {
   const coachName = useSettingsStore((s) => s.settings.coach.name);
   const { c } = useLocalSearchParams<{ c: string }>();
   const v = useVoiceConversation(c ?? null, () => undefined);
+  // Schermo acceso finché si parla: se si spegne, iOS sospende l'app e taglia l'audio.
+  useKeepAwake('voice-mode');
 
   // Avvio automatico all'apertura; alla chiusura la sessione si ferma.
   const started = useRef(false);
@@ -58,7 +61,7 @@ export default function VoiceScreen() {
   }, [v.state, scale]);
 
   const status = v.error
-    ? t(`ai.errors.${v.error.code}` as 'ai.errors.unknown')
+    ? `${t(`ai.errors.${v.error.code}` as 'ai.errors.unknown')}${v.engine === 'realtime' ? ` ${t('voiceMode.retry')}` : ''}`
     : v.tool === 'save_journal_entry'
       ? t('chat.savingJournal')
       : v.tool === 'create_program' || v.tool === 'update_program'
@@ -73,7 +76,7 @@ export default function VoiceScreen() {
                 ? t(`voice.errors.${v.voiceError}`)
                 : t(`voiceMode.state.${v.state}`);
 
-  const canTap = v.engine === 'loop' && !v.error;
+  const canTap = v.engine === 'loop' ? !v.error : !!v.error;
 
   return (
     <SafeAreaView

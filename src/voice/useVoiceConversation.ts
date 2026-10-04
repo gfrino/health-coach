@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 
 import type { AIError } from '@/ai/errors';
 import { toAIError } from '@/ai/errors';
@@ -46,6 +47,8 @@ export function useVoiceConversation(
   const convRef = useRef(conversationId);
   const session = useRef<OpenAIRealtimeSession | null>(null);
   const active = useRef(false);
+  /** Sessione realtime chiusa perché l'app è andata in background: riparte al ritorno. */
+  const pausedRef = useRef(false);
 
   const ensureConversation = useCallback(async () => {
     if (convRef.current) return convRef.current;
@@ -160,7 +163,12 @@ export function useVoiceConversation(
           if (final) void save('assistant', text);
         },
         onToolUse: (name) => setTool(name),
-        onError: (e) => setError(e),
+        // Con l'app in background (schermo spento, altra app) iOS taglia l'audio: non è un
+        // problema di rete. La conversazione si riprende al ritorno.
+        onError: (e) => {
+          if (AppState.currentState !== 'active') pausedRef.current = true;
+          else setError(e);
+        },
       },
     );
     session.current = s;
@@ -176,9 +184,33 @@ export function useVoiceConversation(
     setState('ended');
   }, [voice]);
 
-  /** Tocco sull'orb: interrompe il coach (loop) o riprende ad ascoltare. */
+  // Realtime: in background l'audio si ferma; si chiude la sessione e si riprende al ritorno
+  // (con la cronologia della chat, quindi il coach sa dove eravate rimasti).
+  const startRef = useRef(start);
+  useEffect(() => {
+    startRef.current = start;
+  }, [start]);
+  useEffect(() => {
+    if (engine !== 'realtime') return;
+    const sub = AppState.addEventListener('change', (next) => {
+      if (next === 'background' && active.current && session.current) {
+        pausedRef.current = true;
+        session.current.stop();
+        session.current = null;
+      } else if (next === 'active' && pausedRef.current && active.current) {
+        pausedRef.current = false;
+        void startRef.current();
+      }
+    });
+    return () => sub.remove();
+  }, [engine]);
+
+  /** Tocco sull'orb: interrompe il coach (loop), riprende ad ascoltare o riprova dopo un errore. */
   const tap = useCallback(() => {
-    if (engine === 'realtime') return;
+    if (engine === 'realtime') {
+      if (error) void start();
+      return;
+    }
     if (state === 'speaking') {
       stopSpeaking();
       listenAgain.current();
@@ -188,7 +220,7 @@ export function useVoiceConversation(
     } else if (state === 'listening') {
       voice.stop();
     }
-  }, [engine, state, voice]);
+  }, [engine, state, voice, error, start]);
 
   const toggleMute = useCallback(() => {
     setMuted((m) => {

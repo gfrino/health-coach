@@ -709,6 +709,7 @@
     "engineRealtime": "OpenAI-Echtzeitstimme · du kannst jederzeit unterbrechen",
     "engineLoop": "Telefonstimme · für ein natürlicheres Gespräch nutze OpenAI",
     "tapHint": "Tippen zum Unterbrechen oder Sprechen",
+    "retry": "Tippe, um es erneut zu versuchen.",
     "mute": "Mikrofon stummschalten",
     "unmute": "Mikrofon einschalten",
     "end": "Gespräch beenden",

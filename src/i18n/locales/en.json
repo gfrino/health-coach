@@ -709,6 +709,7 @@
     "engineRealtime": "OpenAI real-time voice · interrupt any time",
     "engineLoop": "Phone voice · for a more natural conversation use OpenAI",
     "tapHint": "Tap to interrupt or to speak",
+    "retry": "Tap to try again.",
     "mute": "Mute microphone",
     "unmute": "Unmute microphone",
     "end": "End conversation",
