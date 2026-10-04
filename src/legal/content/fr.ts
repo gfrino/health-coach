@@ -63,14 +63,14 @@ ${contact}. La loi fédérale suisse sur la protection des données (LPD) s'appl
 - **Profil** : nom, âge, taille, objectifs, affections, médicaments et allergies que tu saisis.
 - **Journal** : humeur, énergie, symptômes et notes (écrits par toi ou notés par le coach à ta demande).
 - **Documents** : rapports, analyses et photos que tu ajoutes ou partages avec l'app, avec les valeurs et le résumé que l'IA en tire.
-- **Conversations** avec le coach.
+- **Conversations** avec le coach et sa mémoire : courts résumés des conversations passées et faits durables que tu lui as racontés (visibles et supprimables dans les Réglages).
 
 Elles sont conservées dans une base de données **chiffrée** (SQLCipher, AES-256) sur l'appareil ; la clé se trouve dans le trousseau protégé du système et ne quitte jamais le téléphone. La sauvegarde automatique dans le cloud de ces données est désactivée.
 
 ## Quand les données quittent le téléphone
 Uniquement dans les cas suivants, et toujours directement de ton téléphone vers le service choisi (jamais par nous) :
 
-1. **IA en ligne** (OpenAI, Anthropic, Google), seulement si tu l'actives : à chaque question, l'app envoie ton message, un résumé des données pertinentes (p. ex. moyennes de sommeil et de pas) et les éventuelles pièces jointes. Si le coach est proactif, ce même résumé est aussi envoyé une fois par jour pour préparer ton check-in du matin. Chaque document que tu ajoutes à ton dossier santé est aussi envoyé une fois, pour que l'IA en lise les valeurs et le résume ; avec l'IA du téléphone, le texte des PDF et des photos est lu sur l'appareil. Le fournisseur les traite selon sa propre politique ; ses serveurs peuvent se trouver hors de Suisse et de l'UE (p. ex. aux États-Unis). Avec OpenAI, nous demandons que les conversations ne soient pas conservées (\`store: false\`). Avec l'**IA du téléphone** (par défaut), rien ne quitte l'appareil.
+1. **IA en ligne** (OpenAI, Anthropic, Google), seulement si tu l'actives : à chaque question, l'app envoie ton message, un résumé des données pertinentes (p. ex. moyennes de sommeil et de pas) et les éventuelles pièces jointes. Si le coach est proactif, ce même résumé est aussi envoyé une fois par jour pour préparer ton check-in du matin. Chaque document que tu ajoutes à ton dossier santé est aussi envoyé une fois, pour que l'IA en lise les valeurs et le résume ; chaque conversation terminée est aussi envoyée une fois pour en écrire le résumé et noter les faits durables pour la mémoire du coach ; avec l'IA du téléphone, le texte des PDF et des photos est lu sur l'appareil. Le fournisseur les traite selon sa propre politique ; ses serveurs peuvent se trouver hors de Suisse et de l'UE (p. ex. aux États-Unis). Avec OpenAI, nous demandons que les conversations ne soient pas conservées (\`store: false\`). Avec l'**IA du téléphone** (par défaut), rien ne quitte l'appareil.
 2. **Voix** : la transcription se fait sur le téléphone lorsque c'est possible ; sinon, le service vocal d'Apple ou de Google est utilisé. Dans la **conversation vocale avec OpenAI**, l'audio est transmis en temps réel à OpenAI.
 3. **Partage et exportation** que tu lances (p. ex. ouvrir un document dans une autre app).
 

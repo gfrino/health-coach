@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { summarizePendingConversations } from '@/coach/memory';
 import { ensureNotificationPermission, refreshCheckins } from '@/proactive/notifier';
 import { useSettingsStore } from '@/store/settingsStore';
 
@@ -27,6 +28,7 @@ export function HealthSyncManager() {
     void (async () => {
       if (proactivity.mode === 'proactive') await ensureNotificationPermission();
       await refreshCheckins();
+      await summarizePendingConversations(useSettingsStore.getState().settings);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onboarded, prefsKey]);

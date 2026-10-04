@@ -578,7 +578,8 @@
     "attachHint": "Photo, appareil photo ou document",
     "attachmentA11y": "Pièce jointe : {{name}}",
     "removeAttachment": "Retirer {{name}}",
-    "savingProgram": "Mise à jour de ton programme…"
+    "savingProgram": "Mise à jour de ton programme…",
+    "savingMemory": "Je le note…"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",
@@ -858,5 +859,18 @@
     "showDetails": "Détails et modification",
     "expand": "Affiche les actions",
     "collapse": "Masque les actions"
+  },
+  "memory": {
+    "title": "Ce dont ton coach se souvient",
+    "subtitle": "Ce que {{name}} a appris sur toi",
+    "intro": "Pendant vos échanges, {{name}} note ce qui dure chez toi (routine, travail, préférences, ce qui a marché) pour te donner des conseils plus personnels. Tu peux tout supprimer.",
+    "emptyTitle": "Rien pour l'instant",
+    "emptyBody": "Parle à {{name}} de tes journées, habitudes et préférences : l'essentiel apparaîtra ici.",
+    "summaries_one": "Plus un court résumé d'1 conversation passée.",
+    "summaries_other": "Plus de courts résumés de {{count}} conversations passées.",
+    "privacy": "Enregistré uniquement sur ce téléphone, chiffré.",
+    "clear": "Supprimer tous les souvenirs",
+    "clearTitle": "Supprimer tous les souvenirs ?",
+    "clearBody": "{{name}} oubliera ce qu'il a appris sur toi et les résumés des conversations passées. Tes chats, ton journal et tes données restent."
   }
 }

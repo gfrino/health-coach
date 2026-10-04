@@ -578,7 +578,8 @@
     "attachHint": "Foto, fotocamera o documento",
     "attachmentA11y": "Allegato: {{name}}",
     "removeAttachment": "Rimuovi {{name}}",
-    "savingProgram": "Aggiorno il tuo programma…"
+    "savingProgram": "Aggiorno il tuo programma…",
+    "savingMemory": "Me lo segno…"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",
@@ -858,5 +859,18 @@
     "showDetails": "Dettagli e modifica",
     "expand": "Mostra le azioni",
     "collapse": "Nasconde le azioni"
+  },
+  "memory": {
+    "title": "Cosa ricorda il coach",
+    "subtitle": "Cosa ha imparato {{name}} su di te",
+    "intro": "Mentre parlate, {{name}} si annota le cose durature su di te (abitudini, lavoro, preferenze, cosa ha funzionato) per darti consigli più personali. Puoi eliminare qualsiasi cosa.",
+    "emptyTitle": "Ancora niente",
+    "emptyBody": "Parla con {{name}} delle tue giornate, abitudini e preferenze: quello che conta apparirà qui.",
+    "summaries_one": "Più un breve riassunto di 1 conversazione passata.",
+    "summaries_other": "Più brevi riassunti di {{count}} conversazioni passate.",
+    "privacy": "Salvato solo su questo telefono, cifrato.",
+    "clear": "Elimina tutti i ricordi",
+    "clearTitle": "Eliminare tutti i ricordi?",
+    "clearBody": "{{name}} dimenticherà ciò che ha imparato su di te e i riassunti delle conversazioni passate. Chat, diario e dati restano."
   }
 }

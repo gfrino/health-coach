@@ -4,6 +4,7 @@ import {
   healthQueries,
   journalRepository,
   labReportRepository,
+  memoryRepository,
   programRepository,
   type Db,
 } from '@/db';
@@ -177,6 +178,20 @@ export const COACH_TOOLS: ToolDefinition[] = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'remember',
+    description:
+      "Save, update or delete a lasting fact about the user in your memory (routine, work and schedule, family, food likes and dislikes, sports, what they tried and whether it worked, motivations). Short third-person sentence in the user's language. To change or remove a fact, pass its id from WHAT YOU REMEMBER.",
+    parameters: {
+      type: 'object',
+      properties: {
+        fact: { type: 'string', description: 'The fact, e.g. "Works night shifts on weekends".' },
+        fact_id: { type: 'string', description: 'Id of an existing fact to update or delete.' },
+        delete: { type: 'boolean', description: 'true to delete the fact with fact_id.' },
+      },
+      additionalProperties: false,
+    },
+  },
 ];
 
 class ToolInputError extends Error {}
@@ -345,6 +360,21 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
         for (const item of parseProgramItems(args.add_items))
           await programRepository.addItem(db, id, item);
         return ok({ updated: true, program_id: id });
+      }
+      case 'remember': {
+        const id = typeof args.fact_id === 'string' && args.fact_id ? args.fact_id : null;
+        if (id && args.delete === true) {
+          await memoryRepository.deleteFact(db, id);
+          return ok({ deleted: true });
+        }
+        if (typeof args.fact !== 'string' || !args.fact.trim())
+          throw new ToolInputError('"fact" is required');
+        if (id) {
+          if (!(await memoryRepository.updateFact(db, id, args.fact)))
+            throw new ToolInputError('fact not found: use an id from WHAT YOU REMEMBER');
+          return ok({ updated: true, fact_id: id });
+        }
+        return ok({ saved: true, fact_id: await memoryRepository.addFact(db, args.fact) });
       }
       default:
         return { content: JSON.stringify({ error: `unknown tool: ${call.name}` }), isError: true };

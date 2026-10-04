@@ -578,7 +578,8 @@
     "attachHint": "Photo, camera or document",
     "attachmentA11y": "Attachment: {{name}}",
     "removeAttachment": "Remove {{name}}",
-    "savingProgram": "Updating your program…"
+    "savingProgram": "Updating your program…",
+    "savingMemory": "Noting this…"
   },
   "integrations": {
     "healthTitle": "Phone health data",
@@ -858,5 +859,18 @@
     "showDetails": "Details and edit",
     "expand": "Opens the actions",
     "collapse": "Closes the actions"
+  },
+  "memory": {
+    "title": "What your coach remembers",
+    "subtitle": "What {{name}} has learned about you",
+    "intro": "While you talk, {{name}} notes lasting things about you (routine, work, preferences, what has worked) to give you more personal advice. You can delete anything.",
+    "emptyTitle": "Nothing yet",
+    "emptyBody": "Talk with {{name}} about your days, habits and preferences: what matters will appear here.",
+    "summaries_one": "Plus a short summary of 1 past conversation.",
+    "summaries_other": "Plus short summaries of {{count}} past conversations.",
+    "privacy": "Stored only on this phone, encrypted.",
+    "clear": "Delete all memories",
+    "clearTitle": "Delete all memories?",
+    "clearBody": "{{name}} will forget what it learned about you and the summaries of past conversations. Your chats, journal and data stay."
   }
 }

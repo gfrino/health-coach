@@ -84,7 +84,7 @@ export async function recentMemoryFacts(db: Db, limit = 30): Promise<string[]> {
 
 export async function recentSummaries(db: Db, limit = 3) {
   const rows = await db.getAllAsync<{ summary: string; created_at: number }>(
-    'SELECT summary, created_at FROM conversation_summaries ORDER BY created_at DESC LIMIT ?',
+    "SELECT summary, created_at FROM conversation_summaries WHERE summary <> '—' ORDER BY created_at DESC LIMIT ?",
     [limit],
   );
   return rows.map((r) => ({ date: localIsoDate(new Date(r.created_at)), text: r.summary }));

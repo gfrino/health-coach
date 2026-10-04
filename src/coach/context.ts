@@ -8,6 +8,8 @@ import type { Insights } from './insights';
 import {
   ANSWER_GUIDE,
   coachIdentity,
+  GETTING_TO_KNOW,
+  MEMORY_RULE,
   JOURNAL_RULE,
   MEDICAL_PROMPTS,
   SAFETY_RULES,
@@ -60,6 +62,7 @@ export interface JournalContext {
   energy?: number | null;
   text?: string | null;
   tags?: string[];
+  symptoms?: string[];
 }
 
 export interface ProgramContext {
@@ -77,7 +80,8 @@ export interface CoachContextInput {
   coach: CoachConfig;
   language: SupportedLanguage;
   profile?: ProfileContext;
-  memoryFacts?: string[];
+  /** Fatti ricordati sull'utente (id per aggiornarli con il tool remember). */
+  memoryFacts?: { id: string; text: string }[];
   summaries?: { date: string; text: string }[];
   metrics?: MetricSummary[];
   anomalies?: string[];
@@ -221,12 +225,13 @@ function journalSection(journal: JournalContext[] | undefined): string | null {
     const bits = [
       j.mood != null ? `mood ${j.mood}/5` : null,
       j.energy != null ? `energy ${j.energy}/5` : null,
+      j.symptoms?.length ? `symptoms: ${j.symptoms.join(', ')}` : null,
       j.tags?.length ? `tags: ${j.tags.join(', ')}` : null,
     ].filter(Boolean);
     const text = j.text ? ` — "${j.text.slice(0, 280)}"` : '';
     return `- ${j.date}: ${bits.join(', ')}${text}`;
   });
-  return `RECENT JOURNAL ENTRIES\n${lines.join('\n')}`;
+  return `RECENT JOURNAL ENTRIES (what the user wrote about how they feel)\n${lines.join('\n')}`;
 }
 
 /**
@@ -281,8 +286,8 @@ export function composeSystemPrompt(full: CoachContextInput): string {
   const input: CoachContextInput = full.compact
     ? {
         ...full,
-        memoryFacts: full.memoryFacts?.slice(0, 5),
-        summaries: full.summaries?.slice(0, 1),
+        memoryFacts: full.memoryFacts?.slice(0, 12),
+        summaries: full.summaries?.slice(0, 2),
         journal: full.journal?.slice(0, 3),
         labs: full.labs?.slice(0, 3),
       }
@@ -294,7 +299,7 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     SAFETY_RULES,
     profileSection(input.profile, input.now),
     input.memoryFacts?.length
-      ? `WHAT YOU REMEMBER ABOUT THE USER\n${input.memoryFacts.map((f) => `- ${f}`).join('\n')}`
+      ? `WHAT YOU REMEMBER ABOUT THE USER (from previous conversations)\n${input.memoryFacts.map((f) => `- ${input.compact ? '' : `[${f.id}] `}${f.text}`).join('\n')}`
       : null,
     input.summaries?.length
       ? `SUMMARIES OF PREVIOUS CONVERSATIONS\n${input.summaries.map((s) => `- ${s.date}: ${s.text}`).join('\n')}`
@@ -312,6 +317,8 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     // Il modello sul telefono non ha tool: niente regole sul diario.
     input.compact ? null : JOURNAL_RULE,
     input.compact ? null : PROGRAM_RULE,
+    input.compact ? null : MEMORY_RULE,
+    (input.memoryFacts?.length ?? 0) < 8 ? GETTING_TO_KNOW : null,
     todayTotalsLine(input.todayTotalsAt),
     `CURRENT DATE: ${localIsoDate(input.now)} ${input.now.toTimeString().slice(0, 5)}`,
   ];

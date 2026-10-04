@@ -174,8 +174,23 @@ async function scheduleCheckins(
   }
 }
 
-const MORNING_INSTRUCTION = `Write my morning check-in. Analyse last night's sleep (duration, stages and timing compared to my usual), my recovery signals (resting heart rate, HRV) and yesterday's activity, plus my active programs if any. Then give 2–3 concrete suggestions for today. Max 130 words, warm and direct.
-The FIRST sentence must be a self-contained summary under 110 characters, without markdown: it is shown in the notification.`;
+/** Istruzione del check-in del mattino; i check-in recenti servono a non ripetersi. */
+export function morningInstruction(recent: { id: string; text: string }[]): string {
+  const past = recent.length
+    ? `\n\nRECENT CHECK-INS (do not repeat their advice; pick a different focus or build on them):\n${recent
+        .map(
+          (r) => `- ${r.id.replace('morning:', '')}: ${r.text.replace(/\s+/g, ' ').slice(0, 400)}`,
+        )
+        .join('\n')}`
+    : '';
+  return `Write my morning check-in for today.
+1. Start with how I slept and recovered last night (sleep, resting heart rate, HRV compared with my usual): one or two sentences with the numbers.
+2. Then think about me as a person, not a generic user: my goals, conditions, medications, diet and approach, lab results, my journal (mood, energy, symptoms and notes of the last days, especially yesterday), my active programs and what you remember about my routine and preferences.
+3. Give 2–3 actions for TODAY, each explicitly tied to one of those things ("since your goal is…", "you wrote yesterday that…", "your LDL is…", "for your program…"). No generic sleep-hygiene or wellness tips that would fit anyone.
+4. If it fits, end with one short question to learn something that would help you coach me better.
+Max 140 words, warm and direct, in my language.
+The FIRST sentence must be a self-contained summary under 110 characters, without markdown: it is shown in the notification.${past}`;
+}
 
 const ANALYSIS_TIMEOUT_MS = 25_000;
 const ANALYSIS_RETRY_MS = 30 * 60 * 1000;
@@ -215,7 +230,13 @@ async function prepareMorningCheckin(
         month: 'long',
       }),
     });
-    const res = await generateCheckin(settings, title, MORNING_INSTRUCTION, controller.signal);
+    const recent = await programRepository.recentCheckinTexts(db, 3);
+    const res = await generateCheckin(
+      settings,
+      title,
+      morningInstruction(recent),
+      controller.signal,
+    );
     await programRepository.saveCheckin(db, id, res.conversationId, firstSentence(res.text));
   } finally {
     clearTimeout(timer);

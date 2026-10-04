@@ -41,7 +41,9 @@ export function ChatView({ conversationId, onConversationCreated, initialPrompt 
       ? t('chat.savingJournal')
       : tool === 'create_program' || tool === 'update_program'
         ? t('chat.savingProgram')
-        : t('chat.readingData');
+        : tool === 'remember'
+          ? t('chat.savingMemory')
+          : t('chat.readingData');
   const { spacing } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const [messages, setMessages] = useState<StoredMessage[]>([]);

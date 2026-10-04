@@ -8,6 +8,7 @@ import {
   getDb,
   healthQueries,
   labReportRepository,
+  memoryRepository,
   profileRepository,
   type Db,
 } from '@/db';
@@ -81,8 +82,8 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     cycle,
   ] = await Promise.all([
     profileRepository.loadProfileContext(db),
-    healthQueries.recentMemoryFacts(db),
-    healthQueries.recentSummaries(db),
+    memoryRepository.listFacts(db),
+    healthQueries.recentSummaries(db, 5),
     buildHealthSnapshot(db, now),
     healthQueries.journalRange(db, now.getTime() - 7 * DAY_MS, now.getTime() + 1, 7),
     labReportRepository.listReports(db),
@@ -115,7 +116,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     coach: settings.coach,
     language: resolveLanguage(settings.language, deviceLanguageCodes()),
     profile,
-    memoryFacts,
+    memoryFacts: memoryFacts.map((f) => ({ id: f.id, text: f.text })),
     summaries,
     metrics: snapshot.metrics,
     anomalies: snapshot.anomalies,

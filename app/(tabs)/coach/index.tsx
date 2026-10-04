@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components';
 import { ChatView } from '@/components/chat/ChatView';
+import { summarizePendingConversations } from '@/coach/memory';
 import { useSettingsStore } from '@/store/settingsStore';
 import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/theme';
@@ -23,6 +24,8 @@ export default function CoachScreen() {
     // Conversazione indicata (?c=…, es. dalla Cronologia); altrimenti, anche all'apertura
     // dell'app, una chat nuova: le precedenti restano in "Cronologia".
     void Promise.resolve().then(() => active && setConversationId(params.c ?? null));
+    // Le conversazioni concluse diventano memoria del coach (riassunto e fatti sull'utente).
+    void summarizePendingConversations(useSettingsStore.getState().settings);
     return () => {
       active = false;
     };

@@ -86,7 +86,7 @@ describe('composeSystemPrompt', () => {
       coach,
       language: 'it',
       now,
-      memoryFacts: ['Corre la domenica'],
+      memoryFacts: [{ id: 'f1', text: 'Corre la domenica' }],
     });
     expect(p.trim().split('\n').at(-1)).toBe('CURRENT DATE: 2026-09-29 18:30');
     expect(p.indexOf('WHAT YOU REMEMBER')).toBeLessThan(p.indexOf('CURRENT DATE'));

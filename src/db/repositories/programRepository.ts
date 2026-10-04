@@ -364,3 +364,17 @@ export async function saveCheckin(
     [id, conversationId, summary, Date.now()],
   );
 }
+
+/** Testo degli ultimi check-in del coach (per non ripetere gli stessi consigli). */
+export async function recentCheckinTexts(
+  db: Db,
+  limit = 3,
+): Promise<{ id: string; text: string }[]> {
+  const rows = await db.getAllAsync<{ id: string; text: string | null }>(
+    `SELECT d.id, (SELECT m.content FROM messages m WHERE m.conversation_id = d.conversation_id
+        AND m.role = 'assistant' AND m.status = 'complete' ORDER BY m.created_at LIMIT 1) AS text
+     FROM daily_checkins d WHERE d.conversation_id IS NOT NULL ORDER BY d.created_at DESC LIMIT ?`,
+    [limit],
+  );
+  return rows.filter((r) => r.text).map((r) => ({ id: r.id, text: r.text! }));
+}

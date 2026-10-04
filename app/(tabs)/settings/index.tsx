@@ -42,6 +42,12 @@ export default function SettingsScreen() {
             onPress={() => router.push('/settings/coach')}
           />
           <NavRow
+            icon="sparkles"
+            label={t('memory.title')}
+            value={t('memory.subtitle', { name: settings.coach.name })}
+            onPress={() => router.push('/settings/memory')}
+          />
+          <NavRow
             icon="today"
             label={t('preferences.title')}
             value={t(`preferences.modes.${settings.proactivity.mode}.label`)}
