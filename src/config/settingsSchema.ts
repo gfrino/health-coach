@@ -71,6 +71,12 @@ export const proactivitySchema = z.object({
 export type Proactivity = z.infer<typeof proactivitySchema>;
 
 /** Versione del flusso di onboarding: se cambia, chi l'aveva completato riprende dai passi nuovi. */
+/** Diario alimentare: obiettivo scelto dall'utente (null = stimato dall'app) e Apple Salute. */
+export const foodSettingsSchema = z.object({
+  calorieTarget: z.number().int().min(800).max(6000).nullable(),
+  writeToHealth: z.boolean(),
+});
+
 export const ONBOARDING_FLOW_VERSION = 2;
 
 /**
@@ -91,6 +97,7 @@ export const settingsShape = {
   proactivity: proactivitySchema,
   /** Sorgente di salute di piattaforma collegata (Apple Health su iOS, Health Connect su Android). */
   healthSourceConnectedAt: z.number().int().nullable(),
+  food: foodSettingsSchema,
 } as const;
 
 export const settingsSchema = z.object(settingsShape);
@@ -139,5 +146,6 @@ export function getDefaultSettings(region?: string | null): AppSettings {
       reports: { daily: true, weekly: true, monthly: false },
     },
     healthSourceConnectedAt: null,
+    food: { calorieTarget: null, writeToHealth: true },
   };
 }

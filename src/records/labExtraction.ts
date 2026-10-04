@@ -50,6 +50,58 @@ export function linesExtractionInstruction(language: string, detailed: boolean):
   ].join('\n');
 }
 
+/** Valori salvati al massimo per referto (i report dei dispositivi ne hanno anche centinaia). */
+const MAX_RESULTS = 400;
+
+/** Modi in cui un numero può essere scritto nel documento: 14.2 / 14,2, 9676 / 9,676 / 9.676 / 9'676. */
+function numberSpellings(v: number): string[] {
+  const out = new Set<string>();
+  const plain = String(v);
+  out.add(plain);
+  out.add(plain.replace('.', ','));
+  // Decimali con zero finale nel documento (13.0 → 13).
+  if (Number.isInteger(v)) {
+    out.add(`${v}.0`);
+    out.add(`${v},0`);
+  }
+  const [int, dec] = plain.split('.');
+  if (int && int.replace('-', '').length > 3) {
+    const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, '#');
+    for (const sep of [',', '.', "'", '’', ' ']) {
+      const g = grouped.replace(/#/g, sep);
+      out.add(dec ? `${g}${sep === '.' ? ',' : '.'}${dec}` : g);
+    }
+  }
+  return [...out];
+}
+
+/**
+ * L'AI del telefono a volte copia il numero di un'altra riga: l'OCR legge le tabelle per colonne
+ * (prima i nomi, poi i valori) e il modello li accoppia male (es. TSH 24, il valore della
+ * vitamina D). Si tengono solo i numeri che compaiono nel documento, e ciascuno al massimo
+ * tante volte quante vi compare: se due esami hanno lo stesso numero scritto una volta sola,
+ * il secondo è un errore.
+ */
+export function keepValuesInSource(results: LabResultInput[], source: string): LabResultInput[] {
+  const text = source.replace(/\u00a0/g, ' ');
+  const occurrences = (v: number) =>
+    Math.max(
+      0,
+      ...numberSpellings(v).map((sp) => {
+        const esc = sp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return (text.match(new RegExp(`(^|[^\\d.,])${esc}(?![\\d]|[.,]\\d)`, 'g')) ?? []).length;
+      }),
+    );
+  const used = new Map<number, number>();
+  return results.filter((r) => {
+    if (r.value === null) return true;
+    const n = (used.get(r.value) ?? 0) + 1;
+    if (n > occurrences(r.value)) return false;
+    used.set(r.value, n);
+    return true;
+  });
+}
+
 /** Intervallo di riferimento dal testo: "13.0 – 17.0", "3,5-20", "< 200", "≥ 40". */
 export function parseRange(text: string | null): { low: number | null; high: number | null } {
   if (!text) return { low: null, high: null };
@@ -92,7 +144,7 @@ export function parseDeviceExtraction(text: string): ParsedExtraction | null {
       refHigh: range.high,
       refText,
     });
-    if (results.length >= 200) break;
+    if (results.length >= MAX_RESULTS) break;
   }
   const date = field('DATE');
   const summary = field('SUMMARY');
@@ -153,7 +205,7 @@ export function parseExtraction(text: string): ParsedExtraction | null {
     let refHigh = num(r.ref_high);
     if (refLow === null && refHigh === null) ({ low: refLow, high: refHigh } = parseRange(refText));
     results.push({ name, value, valueText, unit: str(r.unit, 30), refLow, refHigh, refText });
-    if (results.length >= 200) break;
+    if (results.length >= MAX_RESULTS) break;
   }
   return {
     reportDate: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null,
@@ -241,7 +293,9 @@ export async function extractReport(
     const device = provider.id === 'device';
     const content = await loadAttachmentContent(
       [{ reportId, title: report.title, mimeType: report.mimeType ?? '' }],
-      { vision: provider.supportsVision(model), pdf: !device, preferText: 'all' },
+      // Foto: ai modelli online l'immagine (leggono bene le tabelle); il testo del telefono solo per
+      // i PDF, dove è già nell'ordine giusto. L'AI del telefono usa sempre il testo (OCR).
+      { vision: provider.supportsVision(model), pdf: !device, preferText: device ? 'all' : 'pdf' },
     );
     if (__DEV__)
       console.warn(
@@ -285,10 +339,7 @@ export async function extractReport(
       [
         {
           role: 'user',
-          content: [
-            linesExtractionInstruction(language, !device),
-            ...texts,
-          ].join('\n\n'),
+          content: [linesExtractionInstruction(language, !device), ...texts].join('\n\n'),
           images: content.images.length ? content.images : undefined,
           documents: content.documents.length ? content.documents : undefined,
         },
@@ -297,8 +348,13 @@ export async function extractReport(
       { apiKey, model, quick: true, maxOutputTokens: 12000, signal: timeout.signal, onToken },
     );
     // Righe; se un modello risponde comunque in JSON, si legge anche quello.
-    const parsed =
+    let parsed =
       parseDeviceExtraction(result.text) ?? (device ? null : parseExtraction(result.text));
+    // Con l'AI del telefono si scartano i numeri che nel documento non ci sono.
+    if (parsed && device && content.texts.length) {
+      const source = content.texts.map((d) => d.text).join('\n');
+      parsed = { ...parsed, results: keepValuesInSource(parsed.results, source) };
+    }
     if (!parsed) {
       if (__DEV__) console.warn(`[referti] risposta non leggibile: ${JSON.stringify(result.text)}`);
       await labReportRepository.setExtractionStatus(db, reportId, 'failed');

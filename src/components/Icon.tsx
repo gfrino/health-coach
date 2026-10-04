@@ -62,6 +62,7 @@ export const icons = {
   calm: { ios: 'wind', android: 'self_improvement' },
   menu: { ios: 'line.3.horizontal', android: 'menu' },
   recipes: { ios: 'fork.knife', android: 'restaurant' },
+  food: { ios: 'carrot.fill', android: 'nutrition' },
   heartOutline: { ios: 'heart', android: 'favorite_border' },
   clock: { ios: 'clock', android: 'schedule' },
   people: { ios: 'person.2', android: 'group' },

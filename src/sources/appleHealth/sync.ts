@@ -12,6 +12,8 @@ import { DAY_MS } from '@/lib/dates';
 
 import type { NormalizedMetric } from '../model';
 import {
+  FOOD_ENTRY_METADATA_KEY,
+  FOOD_WRITE_TYPES,
   HK_MENSTRUAL_FLOW,
   HK_MINDFUL,
   HK_QUANTITY,
@@ -26,6 +28,8 @@ import {
 } from '../normalize/healthKit';
 import { buildSleepSessions } from '../sleep';
 import type { SyncProgress, SyncReport } from '../syncTypes';
+
+const ownFood = (id: string) => (FOOD_WRITE_TYPES as readonly string[]).includes(id);
 
 /** Storico letto alla prima sincronizzazione. */
 const INITIAL_DAYS = 365;
@@ -112,7 +116,13 @@ export async function syncAppleHealth(
           from,
           { day: 1 },
           {
-            filter: { date: { startDate: from, endDate: new Date(now) } },
+            filter: {
+              date: { startDate: from, endDate: new Date(now) },
+              // Le voci del diario alimentare scritte dall'app sono già nel DB: non si contano due volte.
+              ...(ownFood(id)
+                ? { NOT: [{ metadata: { withMetadataKey: FOOD_ENTRY_METADATA_KEY } }] }
+                : {}),
+            },
             unit: mapping.unit as never,
           },
         );
@@ -258,7 +268,12 @@ export async function refreshTodayAppleHealth(db: Db): Promise<number> {
           from,
           { day: 1 },
           {
-            filter: { date: { startDate: from, endDate: new Date(now) } },
+            filter: {
+              date: { startDate: from, endDate: new Date(now) },
+              ...(ownFood(id)
+                ? { NOT: [{ metadata: { withMetadataKey: FOOD_ENTRY_METADATA_KEY } }] }
+                : {}),
+            },
             unit: HK_QUANTITY[id]!.unit as never,
           },
         );

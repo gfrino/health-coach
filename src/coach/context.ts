@@ -102,6 +102,8 @@ export interface CoachContextInput {
   programs?: ProgramContext[];
   /** Ricette salvate (titolo, pasto, preferita, quante volte cucinata). */
   recipes?: { id: string; title: string; meal: string; favorite: boolean; cooked: number }[];
+  /** Diario alimentare: voci di oggi, media dei giorni registrati, obiettivo calcolato dall'app. */
+  food?: FoodContext | null;
   /** Altre misure di salute presenti (VO2 max, grasso corporeo, acqua…) e ciclo mestruale. */
   extras?: ExtraMeasure[];
   cycle?: CycleInfo | null;
@@ -264,6 +266,42 @@ ${rule}`;
 const PROGRAM_RULE = `PROGRAMS
 When the user asks for a plan, a routine or a program (or agrees to one you proposed), create it with create_program: a short title, the goal, 3–7 concrete, doable actions (daily habits or one-time steps), each with a one-line how-to. Adapt it to their data, conditions, diet and preferences. To change an existing program (add, edit or remove actions, rename, mark it completed) use update_program with ids from ACTIVE PROGRAMS. Tell the user the program is in the Programs tab, where they can tick actions and edit it. When relevant, encourage progress on their active programs.`;
 
+export interface FoodContext {
+  today: { id: string; meal: string; name: string; quantity: string | null; kcal: number | null }[];
+  todayTotals: { calories: number; protein: number; carbs: number; fat: number };
+  /** Media sui giorni con voci negli ultimi 7 (oggi escluso). */
+  avg7: { calories: number; days: number } | null;
+  target: { kcal: number; custom: boolean } | null;
+}
+
+const FOOD_RULE = `FOOD DIARY
+When the user tells you what they ate or drank (now or earlier today), log it with log_food in the same turn: split it into foods, estimate calories and macros for the portion they said (typical portions if not said), and pick the meal from what they say or the time. Never log something already in FOOD TODAY. Then confirm in one short phrase with the estimated total (e.g. "Logged: about 450 kcal"); they can correct it in the Food tab. Calories are estimates: say "about". Never judge or moralize about food; respect their diet and approach. Relate meals to their goals, labs and calorie target only when useful.`;
+
+export function foodSection(
+  food: FoodContext | null | undefined,
+  compact?: boolean,
+): string | null {
+  if (!food) return null;
+  const t = food.todayTotals;
+  const head = [
+    `Today so far: ${t.calories} kcal (protein ${t.protein} g, carbs ${t.carbs} g, fat ${t.fat} g) in ${food.today.length} foods`,
+    food.target
+      ? `daily target ${food.target.kcal} kcal (${food.target.custom ? 'set by the user' : 'estimated by the app from profile and activity'})`
+      : null,
+    food.avg7
+      ? `average of the last ${food.avg7.days} logged days: ${food.avg7.calories} kcal`
+      : null,
+  ]
+    .filter(Boolean)
+    .join('; ');
+  if (compact) return `FOOD DIARY\n${head}.`;
+  const lines = food.today.map(
+    (f) =>
+      `- [${f.id}] ${f.meal}: ${f.name}${f.quantity ? ` (${f.quantity})` : ''}${f.kcal != null ? ` · ${f.kcal} kcal` : ''}`,
+  );
+  return `FOOD TODAY (food diary, Food tab)\n${head}.${lines.length ? `\n${lines.join('\n')}` : '\nNothing logged yet today.'}`;
+}
+
 const RECIPE_RULE = `RECIPES
 When the user asks for a recipe or a meal idea they may want to keep, save it with create_recipe (they find it in the Recipes tab). Every recipe must respect their allergies and intolerances, diet and approach, conditions, medications and tastes (see what you remember), and suit their goals and lab results. When suggesting meals, prefer their favourite and most cooked recipes from SAVED RECIPES.`;
 
@@ -334,12 +372,14 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     journalSection(input.journal),
     programsSection(input.programs, input.compact),
     recipesSection(input.recipes, input.compact),
+    foodSection(input.food, input.compact),
     dataAvailabilitySection(input),
     ANSWER_GUIDE,
     // Il modello sul telefono non ha tool: niente regole sul diario.
     input.compact ? null : JOURNAL_RULE,
     input.compact ? null : PROGRAM_RULE,
     input.compact ? null : RECIPE_RULE,
+    input.compact ? null : FOOD_RULE,
     input.compact ? null : MEMORY_RULE,
     (input.memoryFacts?.length ?? 0) < 8 ? GETTING_TO_KNOW : null,
     todayTotalsLine(input.todayTotalsAt),

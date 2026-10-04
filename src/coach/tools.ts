@@ -6,9 +6,12 @@ import {
   labReportRepository,
   memoryRepository,
   programRepository,
+  foodRepository,
   recipeRepository,
   type Db,
 } from '@/db';
+import type { FoodEntry } from '@/db/repositories/foodRepository';
+import { FOOD_MEALS } from '@/db/repositories/foodRepository';
 import { PROGRAM_CATEGORIES } from '@/db/repositories/programRepository';
 import { RECIPE_MEALS } from '@/db/repositories/recipeRepository';
 import { parseProgramItems } from '@/programs/parse';
@@ -101,7 +104,7 @@ export const COACH_TOOLS: ToolDefinition[] = [
   {
     name: 'save_journal_entry',
     description:
-      "Write in the user's health journal what they told you about how they feel: mood, energy, symptoms, and short notes (sleep quality, meals, stress, events). Omit entry_id to create a new entry; pass the id of an entry (from get_journal or a previous save) to update it — only the fields you send change. Use the user's own words, briefly, in their language.",
+      "Write in the user's health journal what they told you about how they feel: mood, energy, symptoms, and short notes (sleep quality, stress, events; food goes in log_food). Omit entry_id to create a new entry; pass the id of an entry (from get_journal or a previous save) to update it — only the fields you send change. Use the user's own words, briefly, in their language.",
     parameters: {
       type: 'object',
       properties: {
@@ -240,9 +243,102 @@ export const COACH_TOOLS: ToolDefinition[] = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'log_food',
+    description:
+      "Log in the user's food diary (Food tab) what they ate or drank. Split it into foods, estimate calories and macros for the portion they said (a typical portion if they gave none). Use it whenever the user tells you what they ate; check FOOD TODAY first so you never log the same thing twice.",
+    parameters: {
+      type: 'object',
+      properties: {
+        items: {
+          type: 'array',
+          minItems: 1,
+          maxItems: 15,
+          items: {
+            type: 'object',
+            properties: {
+              name: { type: 'string', description: 'Short food name in the user’s language.' },
+              quantity: { type: 'string', description: 'e.g. "2 eggs", "120 g", "1 slice".' },
+              calories: { type: 'number', description: 'Estimated kcal for that quantity.' },
+              protein: { type: 'number', description: 'Grams.' },
+              carbs: { type: 'number', description: 'Grams.' },
+              fat: { type: 'number', description: 'Grams.' },
+            },
+            required: ['name', 'calories'],
+            additionalProperties: false,
+          },
+        },
+        meal: { type: 'string', enum: [...FOOD_MEALS], description: 'Default: from the time.' },
+        eaten_at: {
+          type: 'string',
+          description: 'When they ate, local time "YYYY-MM-DD HH:MM". Default: now.',
+        },
+      },
+      required: ['items'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'delete_food_entry',
+    description:
+      'Remove a wrong entry from the food diary (ids from FOOD TODAY or get_food_log), e.g. when the user says they did not eat it or you logged it twice.',
+    parameters: {
+      type: 'object',
+      properties: { entry_id: { type: 'string' } },
+      required: ['entry_id'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'get_food_log',
+    description:
+      'Read the food diary: daily calories and macros for a period, and the foods of one day.',
+    parameters: {
+      type: 'object',
+      properties: {
+        from: { ...DATE, description: 'First day (YYYY-MM-DD). Default: 7 days ago.' },
+        to: { ...DATE, description: 'Last day (YYYY-MM-DD). Default: today.' },
+        day: { ...DATE, description: 'Day whose single foods you want (YYYY-MM-DD).' },
+      },
+      additionalProperties: false,
+    },
+  },
 ];
 
 class ToolInputError extends Error {}
+
+/**
+ * Apple Salute per le voci del diario alimentare create o cancellate dal coach. Registrati
+ * all'avvio da src/food/healthWrite.ts: qui niente moduli nativi (i tool girano anche nei test).
+ */
+let onFoodLogged: ((entryId: string) => Promise<void>) | null = null;
+let onFoodDeleted: ((entry: FoodEntry) => Promise<void>) | null = null;
+
+export function setFoodHealthHooks(hooks: {
+  logged: (entryId: string) => Promise<void>;
+  deleted: (entry: FoodEntry) => Promise<void>;
+}) {
+  onFoodLogged = hooks.logged;
+  onFoodDeleted = hooks.deleted;
+}
+
+/** "YYYY-MM-DD HH:MM" (o con la T) in ora locale → millisecondi; null se non valido o nel futuro. */
+export function parseLocalDateTime(v: unknown, now = Date.now()): number | null {
+  if (typeof v !== 'string') return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?/.exec(v.trim());
+  if (!m) return null;
+  const d = new Date(
+    Number(m[1]),
+    Number(m[2]) - 1,
+    Number(m[3]),
+    Number(m[4] ?? 12),
+    Number(m[5] ?? 0),
+  );
+  const t = d.getTime();
+  if (Number.isNaN(t)) return null;
+  // Un orario poco più avanti di adesso (orologi, arrotondamenti) diventa adesso.
+  return t > now + 15 * 60 * 1000 ? null : Math.min(t, now);
+}
 
 function parseDate(v: unknown, field: string): number {
   if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(v)) {
@@ -465,6 +561,75 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
           favorite: typeof args.favorite === 'boolean' ? args.favorite : undefined,
         });
         return ok({ updated: true, recipe_id: id });
+      }
+      case 'log_food': {
+        const items = Array.isArray(args.items) ? args.items : [];
+        if (!items.length) throw new ToolInputError('"items" needs at least one food');
+        const eatenAt = parseLocalDateTime(args.eaten_at) ?? Date.now();
+        const meal =
+          args.meal !== undefined
+            ? foodRepository.asFoodMeal(args.meal)
+            : foodRepository.mealForTime(new Date(eatenAt));
+        const num = (v: unknown) => (typeof v === 'number' ? v : null);
+        const ids: string[] = [];
+        for (const raw of items.slice(0, 15)) {
+          const it = (raw ?? {}) as Record<string, unknown>;
+          if (typeof it.name !== 'string' || !it.name.trim()) continue;
+          ids.push(
+            await foodRepository.createEntry(
+              db,
+              {
+                name: it.name,
+                quantity: typeof it.quantity === 'string' ? it.quantity : null,
+                calories: num(it.calories),
+                protein: num(it.protein),
+                carbs: num(it.carbs),
+                fat: num(it.fat),
+                meal,
+                eatenAt,
+              },
+              'coach',
+            ),
+          );
+        }
+        if (!ids.length) throw new ToolInputError('every item needs a "name"');
+        for (const id of ids) void onFoodLogged?.(id);
+        const day = await foodRepository.listDay(db, localIsoDate(new Date(eatenAt)));
+        return ok({
+          logged: ids.length,
+          entry_ids: ids,
+          meal,
+          day_total_kcal: foodRepository.totals(day).calories,
+          note: 'Shown in the Food tab, where the user can correct it. Values are estimates.',
+        });
+      }
+      case 'delete_food_entry': {
+        const id = typeof args.entry_id === 'string' ? args.entry_id : '';
+        const entry = id ? await foodRepository.getEntry(db, id) : null;
+        if (!entry) throw new ToolInputError('entry not found: use an id from FOOD TODAY');
+        await onFoodDeleted?.(entry);
+        await foodRepository.deleteEntry(db, id);
+        return ok({ deleted: true });
+      }
+      case 'get_food_log': {
+        const today = localIsoDate(new Date());
+        const to = typeof args.to === 'string' ? args.to : today;
+        const from =
+          typeof args.from === 'string'
+            ? args.from
+            : localIsoDate(new Date(Date.now() - 6 * DAY_MS));
+        const days = await foodRepository.dailyTotals(db, from, to);
+        const day = typeof args.day === 'string' ? args.day : null;
+        const foods = day
+          ? (await foodRepository.listDay(db, day)).map((e) => ({
+              id: e.id,
+              meal: e.meal,
+              name: e.name,
+              quantity: e.quantity,
+              kcal: e.calories,
+            }))
+          : undefined;
+        return ok({ from, to, days, ...(day ? { day, foods } : {}) });
       }
       default:
         return { content: JSON.stringify({ error: `unknown tool: ${call.name}` }), isError: true };

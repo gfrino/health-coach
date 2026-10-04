@@ -60,6 +60,7 @@ ${contact}. The Swiss Federal Act on Data Protection (FADP) applies and, for use
 
 ## What data the app processes (on your phone)
 - **Health data** you authorise from Apple Health or Health Connect (e.g. steps, sleep, heart rate, weight, workouts).
+- **Food diary**: the foods you or the coach log, with estimated calories and nutrients. On iPhone, if you turn it on, the app also saves them to Apple Health, which stays on your phone.
 - **Profile**: name, age, height, goals, conditions, medications and allergies you enter.
 - **Journal**: mood, energy, symptoms and notes (written by you or noted by the coach at your request).
 - **Documents**: reports, lab results and photos you add or share with the app, with the values and summary the AI reads from them.

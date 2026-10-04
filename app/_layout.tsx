@@ -14,6 +14,8 @@ import { NotificationRouter } from '@/proactive/NotificationRouter';
 import { ShareIntentImporter } from '@/records/ShareIntentImporter';
 import { HealthSyncManager } from '@/sources/HealthSyncManager';
 import { bootstrap } from '@/lib/bootstrap';
+// Registra il salvataggio in Apple Salute delle voci del diario alimentare create dal coach.
+import '@/food/healthWrite';
 import { useSettingsStore } from '@/store/settingsStore';
 import { AppThemeProvider, toNavigationTheme, useTheme } from '@/theme';
 

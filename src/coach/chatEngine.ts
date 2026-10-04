@@ -11,17 +11,19 @@ import {
   memoryRepository,
   profileRepository,
   recipeRepository,
+  foodRepository,
   type Db,
 } from '@/db';
 import type { MessageAttachment, StoredMessage } from '@/db/repositories/conversationRepository';
 import { loadAttachmentContent } from '@/records/attachmentContent';
 import { fileTypeOf } from '@/records/fileMeta';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
-import { DAY_MS } from '@/lib/dates';
+import { DAY_MS, localIsoDate } from '@/lib/dates';
+import { loadCalorieTarget } from '@/food/target';
 import { loadProgramContext } from '@/programs/summary';
 import { getTodayTotalsAt } from '@/sources/freshness';
 
-import { composeSystemPrompt, recentHistory } from './context';
+import { composeSystemPrompt, recentHistory, type FoodContext } from './context';
 import { loadCycle, loadExtraMeasures } from './extraMeasures';
 import { buildHealthSnapshot } from './snapshot';
 import { COACH_TOOLS, executeTool } from './tools';
@@ -95,6 +97,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     loadCycle(db, now),
     recipeRepository.listRecipes(db),
   ]);
+  const food = await loadFoodContext(db, settings, now);
   const records = reports.map((r) => ({
     id: r.id,
     title: r.title,
@@ -137,10 +140,49 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
       favorite: r.favorite,
       cooked: r.cookedCount,
     })),
+    food,
     todayTotalsAt: getTodayTotalsAt(),
     now,
     compact,
   });
+}
+
+/** Diario alimentare per il coach: voci di oggi, media degli ultimi giorni, obiettivo dell'app. */
+async function loadFoodContext(
+  db: Db,
+  settings: AppSettings,
+  now: Date,
+): Promise<FoodContext | null> {
+  const today = localIsoDate(now);
+  const [entries, week, estimated] = await Promise.all([
+    foodRepository.listDay(db, today),
+    foodRepository.dailyTotals(db, localIsoDate(new Date(now.getTime() - 7 * DAY_MS)), today),
+    loadCalorieTarget(db, now).catch(() => null),
+  ]);
+  const past = week.filter((d) => d.day < today);
+  if (!entries.length && !past.length) return null;
+  const custom = settings.food.calorieTarget;
+  return {
+    today: entries.map((e) => ({
+      id: e.id,
+      meal: e.meal,
+      name: e.name,
+      quantity: e.quantity,
+      kcal: e.calories,
+    })),
+    todayTotals: foodRepository.totals(entries),
+    avg7: past.length
+      ? {
+          calories: Math.round(past.reduce((a, d) => a + d.calories, 0) / past.length),
+          days: past.length,
+        }
+      : null,
+    target: custom
+      ? { kcal: custom, custom: true }
+      : estimated
+        ? { kcal: estimated.kcal, custom: false }
+        : null,
+  };
 }
 
 export async function resolveAI(settings: AppSettings) {

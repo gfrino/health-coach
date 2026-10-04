@@ -10,6 +10,7 @@ const EXPECTED_TABLES = [
   'conversations',
   'daily_checkins',
   'entitlements',
+  'food_entries',
   'integration_interest',
   'journal_entries',
   'lab_report_files',

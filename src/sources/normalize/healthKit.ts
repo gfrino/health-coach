@@ -80,7 +80,25 @@ export interface HKSampleLike {
   startDate: Date;
   endDate: Date;
   sourceRevision?: { source?: { name?: string; bundleIdentifier?: string } };
+  metadata?: Record<string, unknown>;
 }
+
+/**
+ * Metadato dei campioni che l'app scrive in Apple Salute dal diario alimentare (valore: id della
+ * voce). Rileggendoli si conterebbero due volte: si escludono nelle query e qui.
+ */
+export const FOOD_ENTRY_METADATA_KEY = 'AlbAFoodEntry';
+
+export const isOwnFoodSample = (s: HKSampleLike): boolean =>
+  s.metadata?.[FOOD_ENTRY_METADATA_KEY] !== undefined;
+
+/** Tipi che l'app scrive dal diario alimentare (e che quindi vanno filtrati in lettura). */
+export const FOOD_WRITE_TYPES = [
+  'HKQuantityTypeIdentifierDietaryEnergyConsumed',
+  'HKQuantityTypeIdentifierDietaryProtein',
+  'HKQuantityTypeIdentifierDietaryCarbohydrates',
+  'HKQuantityTypeIdentifierDietaryFatTotal',
+] as const;
 
 const origin = (s: HKSampleLike) => {
   const src = s.sourceRevision?.source;
@@ -92,7 +110,7 @@ export function normalizeQuantitySample(
   sample: HKSampleLike & { quantity: number },
 ): NormalizedMetric | null {
   const m = HK_QUANTITY[identifier];
-  if (!m || !Number.isFinite(sample.quantity)) return null;
+  if (!m || !Number.isFinite(sample.quantity) || isOwnFoodSample(sample)) return null;
   return {
     type: m.type,
     value: round(sample.quantity * (m.scale ?? 1)),

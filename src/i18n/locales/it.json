@@ -23,6 +23,7 @@
     "integrations": "Servizi",
     "me": "Io",
     "programs": "Programmi",
+    "food": "Diario alimentare",
     "recipes": "Ricette"
   },
   "coach": {
@@ -362,7 +363,7 @@
     "title": "Collega i tuoi dati",
     "subtitle": "Il coach legge i tuoi dati da {{source}}. Puoi scegliere tipo per tipo cosa condividere.",
     "skip": "Salta per ora",
-    "readOnly": "Solo lettura: {{name}} non scrive e non modifica nulla.",
+    "readOnly": "Legge i tuoi dati di salute. Scrive solo i pasti del diario alimentare, se lo attivi nella scheda Cibo.",
     "categories": {
       "activity": {
         "title": "Attività",
@@ -591,7 +592,8 @@
     "removeAttachment": "Rimuovi {{name}}",
     "savingProgram": "Aggiorno il tuo programma…",
     "savingMemory": "Me lo segno…",
-    "savingRecipe": "Salvo la ricetta…"
+    "savingRecipe": "Salvo la ricetta…",
+    "savingFood": "Lo segno nel diario alimentare…"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",
@@ -694,6 +696,7 @@
     "settings": "Opzioni",
     "me": "Io",
     "programs": "Programmi",
+    "food": "Cibo",
     "journal": "Diario",
     "recipes": "Ricette"
   },
@@ -954,5 +957,68 @@
     "delete": "Elimina ricetta",
     "deleteTitle": "Eliminare la ricetta?",
     "deleteBody": "La ricetta verrà eliminata da questo telefono."
+  },
+  "food": {
+    "today": "Oggi",
+    "yesterday": "Ieri",
+    "prevDay": "Giorno prima",
+    "nextDay": "Giorno dopo",
+    "addTitle": "Aggiungi cibo",
+    "add": "+ Aggiungi",
+    "ofTarget": "di {{kcal}} kcal",
+    "kcalEaten": "kcal oggi",
+    "remaining": "Ancora {{kcal}} kcal per oggi 🌱",
+    "over": "{{kcal}} kcal oltre l'obiettivo, nessun dramma 🙂",
+    "noTarget": "Aggiungi età, altezza e peso nel profilo e ti suggerisco un obiettivo.",
+    "protein": "Proteine",
+    "carbs": "Carboidrati",
+    "fat": "Grassi",
+    "grams": "{{value}} g",
+    "kcal": "{{value}} kcal",
+    "meals": {
+      "breakfast": "Colazione",
+      "lunch": "Pranzo",
+      "dinner": "Cena",
+      "snack": "Spuntini"
+    },
+    "byCoach": "aggiunto da {{name}}",
+    "nothingYet": "Ancora niente qui.",
+    "targetTitle": "Il tuo obiettivo",
+    "targetLabel": "Calorie al giorno",
+    "targetCustom": "{{kcal}} kcal al giorno, scelto da te.",
+    "targetEstimated": "Circa {{kcal}} kcal al giorno, stimate dal tuo profilo e da quanto ti muovi.",
+    "targetEdit": "Cambia",
+    "targetReset": "Usa la stima",
+    "writeHealth": "Salva anche in Apple Salute",
+    "writeHealthHint": "Così calorie e nutrienti si vedono anche nelle altre app. Restano sul telefono.",
+    "writeHealthNotConnected": "Collega Apple Salute in Servizi per usarlo.",
+    "meal": "Pasto",
+    "whatAte": "Cosa hai mangiato?",
+    "whatAtePlaceholder": "Es. 2 uova strapazzate, una fetta di pane integrale e un caffè",
+    "estimate": "Calcola con {{name}} ✨",
+    "estimateNone": "Non ho trovato cibi nel testo: prova a scriverlo in un altro modo.",
+    "estimateFailed": "Non sono riuscito a calcolare. Riprova o inserisci i valori a mano.",
+    "estimateNote": "Sono stime: se qualcosa non torna, correggilo pure.",
+    "saveCount_one": "Salva {{count}} alimento",
+    "saveCount_other": "Salva {{count}} alimenti",
+    "remove": "Togli",
+    "addManual": "Inserisci a mano",
+    "recent": "Mangiati di recente",
+    "addRecent": "Aggiungi {{name}}",
+    "edit": "Alimento",
+    "deleteTitle": "Togliere dal diario?",
+    "deleteBody": "L'alimento verrà eliminato dal diario.",
+    "delete": "Elimina",
+    "name": "Cosa",
+    "quantity": "Quanto",
+    "quantityPlaceholder": "Es. 1 porzione",
+    "kcalLabel": "Calorie",
+    "proteinG": "Proteine (g)",
+    "carbsG": "Carboidrati (g)",
+    "fatG": "Grassi (g)",
+    "moreDetails": "Più dettagli (proteine, carboidrati, grassi)",
+    "done": "Fatto",
+    "tapToEdit": "Tocca per modificare",
+    "untitled": "Senza nome"
   }
 }

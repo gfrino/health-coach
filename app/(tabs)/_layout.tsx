@@ -3,17 +3,20 @@ import { Tabs } from 'expo-router/js-tabs';
 import { useTranslation } from 'react-i18next';
 
 import { Icon, Sidebar, type AppIconName } from '@/components';
+import { CoachTabButton } from '@/components/CoachTabButton';
 import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/theme';
 
 const TABS: {
   name: string;
   icon: AppIconName;
-  labelKey: `tabs.${'coach' | 'programs' | 'journal' | 'recipes'}`;
+  labelKey: `tabs.${'coach' | 'programs' | 'food' | 'journal' | 'recipes'}`;
 }[] = [
-  { name: 'coach', icon: 'coach', labelKey: 'tabs.coach' },
   { name: 'programs', icon: 'programs', labelKey: 'tabs.programs' },
   { name: 'journal', icon: 'journal', labelKey: 'tabs.journal' },
+  // Il Coach al centro, con il pulsante rialzato (CoachTabButton).
+  { name: 'coach', icon: 'coach', labelKey: 'tabs.coach' },
+  { name: 'food', icon: 'food', labelKey: 'tabs.food' },
   { name: 'recipes', icon: 'recipes', labelKey: 'tabs.recipes' },
 ];
 
@@ -55,6 +58,9 @@ export default function TabLayout() {
               tabBarLabel: t(`tabsShort.${tab.name}` as 'tabsShort.coach'),
               tabBarAccessibilityLabel: t(tab.labelKey),
               tabBarIcon: ({ color, size }) => <Icon name={tab.icon} color={color} size={size} />,
+              ...(tab.name === 'coach'
+                ? { tabBarButton: (props) => <CoachTabButton {...(props as object)} /> }
+                : {}),
             }}
           />
         ))}

@@ -60,6 +60,7 @@ ${contact}. La loi fédérale suisse sur la protection des données (LPD) s'appl
 
 ## Quelles données l'app traite (sur le téléphone)
 - **Données de santé** que tu autorises depuis Apple Health ou Health Connect (p. ex. pas, sommeil, fréquence cardiaque, poids, entraînements).
+- **Journal alimentaire** : les aliments que toi ou le coach enregistrez, avec calories et nutriments estimés. Sur iPhone, si tu l'actives, l'app les enregistre aussi dans Apple Health, qui reste sur ton téléphone.
 - **Profil** : nom, âge, taille, objectifs, affections, médicaments et allergies que tu saisis.
 - **Journal** : humeur, énergie, symptômes et notes (écrits par toi ou notés par le coach à ta demande).
 - **Documents** : rapports, analyses et photos que tu ajoutes ou partages avec l'app, avec les valeurs et le résumé que l'IA en tire.

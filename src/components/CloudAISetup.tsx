@@ -140,7 +140,8 @@ export function CloudAISetup({
     }
     const key = extractKey(provider, text);
     if (!key) {
-      if (!auto) setPasteNotice(t('ai.pasteNothing', { provider: info.name }));
+      // Chiave già inserita (e appunti già svuotati dall'app): nessun avviso che confonde.
+      if (!auto && !activeKey) setPasteNotice(t('ai.pasteNothing', { provider: info.name }));
       return;
     }
     setKeyInput(key);

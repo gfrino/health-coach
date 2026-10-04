@@ -52,7 +52,9 @@ export function ChatView({
           ? t('chat.savingMemory')
           : tool === 'create_recipe' || tool === 'update_recipe'
             ? t('chat.savingRecipe')
-            : t('chat.readingData');
+            : tool === 'log_food' || tool === 'delete_food_entry'
+              ? t('chat.savingFood')
+              : t('chat.readingData');
   const { spacing } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const [messages, setMessages] = useState<StoredMessage[]>([]);

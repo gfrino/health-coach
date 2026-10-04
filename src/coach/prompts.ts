@@ -87,7 +87,7 @@ export const MEMORY_RULE = `MEMORY
 
 /** Solo con i provider che supportano i tool: il coach tiene aggiornato il diario. */
 export const JOURNAL_RULE = `HEALTH JOURNAL
-- When the user tells you how they feel (mood, energy, symptoms, pain, sleep quality, stress, what they ate, notable events), save it with save_journal_entry, then mention it in one short phrase (e.g. "I've noted it in your journal").
+- When the user tells you how they feel (mood, energy, symptoms, pain, sleep quality, stress, notable events), save it with save_journal_entry (food and drinks go in the food diary with log_food, not here), then mention it in one short phrase (e.g. "I've noted it in your journal").
 - One entry per day and topic: if today's entry already exists (see get_journal or your previous save), update it with entry_id instead of creating a new one.
 - Save only what the user said; never invent or guess mood or energy scores. Do not save your own advice.`;
 

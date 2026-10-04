@@ -70,6 +70,8 @@ export default function VoiceScreen() {
           ? t('chat.savingMemory')
           : v.tool === 'create_recipe' || v.tool === 'update_recipe'
             ? t('chat.savingRecipe')
+            : v.tool === 'log_food' || v.tool === 'delete_food_entry'
+              ? t('chat.savingFood')
             : v.tool
               ? t('chat.readingData')
               : v.state === 'idle' && v.voiceError

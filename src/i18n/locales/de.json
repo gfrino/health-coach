@@ -23,6 +23,7 @@
     "integrations": "Dienste",
     "me": "Ich",
     "programs": "Programme",
+    "food": "Ernährungstagebuch",
     "recipes": "Rezepte"
   },
   "coach": {
@@ -362,7 +363,7 @@
     "title": "Deine Daten verbinden",
     "subtitle": "Der Coach liest deine Daten aus {{source}}. Du entscheidest für jeden Datentyp, was du teilst.",
     "skip": "Vorerst überspringen",
-    "readOnly": "Nur Lesen: {{name}} schreibt und ändert nichts.",
+    "readOnly": "Liest deine Gesundheitsdaten. Es schreibt nur die Mahlzeiten aus deinem Ernährungstagebuch, wenn du das im Tab Essen einschaltest.",
     "categories": {
       "activity": {
         "title": "Aktivität",
@@ -591,7 +592,8 @@
     "removeAttachment": "{{name}} entfernen",
     "savingProgram": "Dein Programm wird aktualisiert…",
     "savingMemory": "Ich merke es mir…",
-    "savingRecipe": "Rezept wird gespeichert…"
+    "savingRecipe": "Rezept wird gespeichert…",
+    "savingFood": "Ich trage es ins Ernährungstagebuch ein…"
   },
   "integrations": {
     "healthTitle": "Gesundheitsdaten des Telefons",
@@ -694,6 +696,7 @@
     "settings": "Optionen",
     "me": "Ich",
     "programs": "Programme",
+    "food": "Essen",
     "journal": "Tagebuch",
     "recipes": "Rezepte"
   },
@@ -954,5 +957,68 @@
     "delete": "Rezept löschen",
     "deleteTitle": "Rezept löschen?",
     "deleteBody": "Das Rezept wird von diesem Telefon gelöscht."
+  },
+  "food": {
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "prevDay": "Vorheriger Tag",
+    "nextDay": "Nächster Tag",
+    "addTitle": "Essen hinzufügen",
+    "add": "+ Hinzufügen",
+    "ofTarget": "von {{kcal}} kcal",
+    "kcalEaten": "kcal heute",
+    "remaining": "Noch {{kcal}} kcal für heute 🌱",
+    "over": "{{kcal}} kcal über deinem Ziel, kein Drama 🙂",
+    "noTarget": "Trage Alter, Größe und Gewicht im Profil ein, dann schlage ich dir ein Ziel vor.",
+    "protein": "Eiweiß",
+    "carbs": "Kohlenhydrate",
+    "fat": "Fett",
+    "grams": "{{value}} g",
+    "kcal": "{{value}} kcal",
+    "meals": {
+      "breakfast": "Frühstück",
+      "lunch": "Mittagessen",
+      "dinner": "Abendessen",
+      "snack": "Snacks"
+    },
+    "byCoach": "hinzugefügt von {{name}}",
+    "nothingYet": "Noch nichts hier.",
+    "targetTitle": "Dein Ziel",
+    "targetLabel": "Kalorien pro Tag",
+    "targetCustom": "{{kcal}} kcal pro Tag, von dir gewählt.",
+    "targetEstimated": "Etwa {{kcal}} kcal pro Tag, geschätzt aus deinem Profil und wie viel du dich bewegst.",
+    "targetEdit": "Ändern",
+    "targetReset": "Schätzung verwenden",
+    "writeHealth": "Auch in Apple Health speichern",
+    "writeHealthHint": "So siehst du Kalorien und Nährstoffe auch in deinen anderen Apps. Sie bleiben auf deinem Telefon.",
+    "writeHealthNotConnected": "Verbinde Apple Health unter Dienste, um das zu nutzen.",
+    "meal": "Mahlzeit",
+    "whatAte": "Was hast du gegessen?",
+    "whatAtePlaceholder": "Z. B. 2 Rühreier, eine Scheibe Vollkornbrot und ein Kaffee",
+    "estimate": "Mit {{name}} berechnen ✨",
+    "estimateNone": "Ich habe im Text kein Essen gefunden: versuch es anders zu schreiben.",
+    "estimateFailed": "Das hat nicht geklappt. Versuch es erneut oder gib die Werte selbst ein.",
+    "estimateNote": "Das sind Schätzungen: Wenn etwas nicht passt, korrigier es einfach.",
+    "saveCount_one": "{{count}} Lebensmittel speichern",
+    "saveCount_other": "{{count}} Lebensmittel speichern",
+    "remove": "Entfernen",
+    "addManual": "Selbst eingeben",
+    "recent": "Kürzlich gegessen",
+    "addRecent": "{{name}} hinzufügen",
+    "edit": "Lebensmittel",
+    "deleteTitle": "Aus dem Tagebuch entfernen?",
+    "deleteBody": "Das Lebensmittel wird aus deinem Tagebuch gelöscht.",
+    "delete": "Löschen",
+    "name": "Was",
+    "quantity": "Wie viel",
+    "quantityPlaceholder": "Z. B. 1 Portion",
+    "kcalLabel": "Kalorien",
+    "proteinG": "Eiweiß (g)",
+    "carbsG": "Kohlenhydrate (g)",
+    "fatG": "Fett (g)",
+    "moreDetails": "Mehr Details (Eiweiß, Kohlenhydrate, Fett)",
+    "done": "Fertig",
+    "tapToEdit": "Tippen zum Bearbeiten",
+    "untitled": "Ohne Namen"
   }
 }

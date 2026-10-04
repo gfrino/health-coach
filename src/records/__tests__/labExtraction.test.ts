@@ -4,6 +4,7 @@ import { createTestDb } from '@/test/nodeSqliteDb';
 
 import {
   countValueLines,
+  keepValuesInSource,
   linesExtractionInstruction,
   parseDeviceExtraction,
   parseExtraction,
@@ -228,8 +229,59 @@ describe('formato a righe per tutti i modelli', () => {
   });
 
   it('conta solo le righe di valori complete durante lo streaming', () => {
-    expect(countValueLines('SUMMARY: x\nVALUES:\nname | value | unit | range\nWeight | 77')).toBe(0);
+    expect(countValueLines('SUMMARY: x\nVALUES:\nname | value | unit | range\nWeight | 77')).toBe(
+      0,
+    );
     expect(countValueLines('VALUES:\nWeight | 77.7 | kg |\nBMI | 24')).toBe(1);
     expect(countValueLines('VALUES:\nWeight | 77.7 | kg |\nBMI | 24.9 | |\n')).toBe(2);
+  });
+});
+
+describe('controllo dei valori letti dal telefono', () => {
+  // Testo come lo produce l'OCR: le colonne della tabella una dopo l'altra.
+  const ocr = [
+    'Esame',
+    'Emoglobina',
+    'Vitamina D',
+    'TSH',
+    'Passi',
+    'Risultato',
+    '14.2',
+    '24',
+    '1.8',
+    '9,676',
+    'Valori di riferimento',
+    '13.0 - 17.0',
+    '30 - 100',
+    '0.4-4.0',
+  ].join('\n');
+  const r = (name: string, value: number | null) => ({
+    name,
+    value,
+    valueText: value === null ? 'negativo' : null,
+    unit: null,
+    refLow: null,
+    refHigh: null,
+    refText: null,
+  });
+
+  it('scarta il numero copiato da un altro esame (TSH 24) e quelli inesistenti', () => {
+    const kept = keepValuesInSource(
+      [
+        r('Emoglobina', 14.2),
+        r('Vitamina D', 24),
+        r('TSH', 24),
+        r('Ferritina', 86),
+        r('Passi', 9676),
+        r('Urine', null),
+      ],
+      ocr,
+    );
+    expect(kept.map((x) => x.name)).toEqual(['Emoglobina', 'Vitamina D', 'Passi', 'Urine']);
+  });
+
+  it('non confonde 4 con 14.2 o 0.4', () => {
+    expect(keepValuesInSource([r('X', 4)], 'Emoglobina 14.2 Ferritina 0.4')).toEqual([]);
+    expect(keepValuesInSource([r('Y', 4)], '0.4-4.0')).toHaveLength(1);
   });
 });

@@ -23,6 +23,7 @@
     "integrations": "Services",
     "me": "Moi",
     "programs": "Programmes",
+    "food": "Journal alimentaire",
     "recipes": "Recettes"
   },
   "coach": {
@@ -362,7 +363,7 @@
     "title": "Connectez vos données",
     "subtitle": "Le coach lit vos données depuis {{source}}. Vous choisissez, type par type, ce que vous partagez.",
     "skip": "Passer pour l'instant",
-    "readOnly": "Lecture seule : {{name}} n'écrit et ne modifie rien.",
+    "readOnly": "Lit tes données de santé. Il n'écrit que les repas de ton journal alimentaire, si tu l'actives dans l'onglet Repas.",
     "categories": {
       "activity": {
         "title": "Activité",
@@ -591,7 +592,8 @@
     "removeAttachment": "Retirer {{name}}",
     "savingProgram": "Mise à jour de ton programme…",
     "savingMemory": "Je le note…",
-    "savingRecipe": "J'enregistre la recette…"
+    "savingRecipe": "J'enregistre la recette…",
+    "savingFood": "Je l'ajoute à ton journal alimentaire…"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",
@@ -694,6 +696,7 @@
     "settings": "Réglages",
     "me": "Moi",
     "programs": "Programmes",
+    "food": "Repas",
     "journal": "Journal",
     "recipes": "Recettes"
   },
@@ -954,5 +957,68 @@
     "delete": "Supprimer la recette",
     "deleteTitle": "Supprimer la recette ?",
     "deleteBody": "La recette sera supprimée de ce téléphone."
+  },
+  "food": {
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "prevDay": "Jour précédent",
+    "nextDay": "Jour suivant",
+    "addTitle": "Ajouter un aliment",
+    "add": "+ Ajouter",
+    "ofTarget": "sur {{kcal}} kcal",
+    "kcalEaten": "kcal aujourd'hui",
+    "remaining": "Encore {{kcal}} kcal pour aujourd'hui 🌱",
+    "over": "{{kcal}} kcal au-dessus de ton objectif, pas de drame 🙂",
+    "noTarget": "Ajoute ton âge, ta taille et ton poids dans ton profil et je te proposerai un objectif.",
+    "protein": "Protéines",
+    "carbs": "Glucides",
+    "fat": "Lipides",
+    "grams": "{{value}} g",
+    "kcal": "{{value}} kcal",
+    "meals": {
+      "breakfast": "Petit-déjeuner",
+      "lunch": "Déjeuner",
+      "dinner": "Dîner",
+      "snack": "En-cas"
+    },
+    "byCoach": "ajouté par {{name}}",
+    "nothingYet": "Rien ici pour l'instant.",
+    "targetTitle": "Ton objectif",
+    "targetLabel": "Calories par jour",
+    "targetCustom": "{{kcal}} kcal par jour, choisi par toi.",
+    "targetEstimated": "Environ {{kcal}} kcal par jour, estimées à partir de ton profil et de ton activité.",
+    "targetEdit": "Modifier",
+    "targetReset": "Utiliser l'estimation",
+    "writeHealth": "Enregistrer aussi dans Santé",
+    "writeHealthHint": "Ainsi, calories et nutriments apparaissent aussi dans tes autres apps. Ils restent sur ton téléphone.",
+    "writeHealthNotConnected": "Connecte Apple Santé dans Services pour l'utiliser.",
+    "meal": "Repas",
+    "whatAte": "Qu'as-tu mangé ?",
+    "whatAtePlaceholder": "Ex. 2 œufs brouillés, une tranche de pain complet et un café",
+    "estimate": "Calculer avec {{name}} ✨",
+    "estimateNone": "Je n'ai trouvé aucun aliment dans le texte : essaie de l'écrire autrement.",
+    "estimateFailed": "Le calcul n'a pas marché. Réessaie ou saisis les valeurs toi-même.",
+    "estimateNote": "Ce sont des estimations : si quelque chose cloche, corrige-le.",
+    "saveCount_one": "Enregistrer {{count}} aliment",
+    "saveCount_other": "Enregistrer {{count}} aliments",
+    "remove": "Retirer",
+    "addManual": "Saisir moi-même",
+    "recent": "Mangés récemment",
+    "addRecent": "Ajouter {{name}}",
+    "edit": "Aliment",
+    "deleteTitle": "Retirer du journal ?",
+    "deleteBody": "Cet aliment sera supprimé de ton journal.",
+    "delete": "Supprimer",
+    "name": "Quoi",
+    "quantity": "Combien",
+    "quantityPlaceholder": "Ex. 1 portion",
+    "kcalLabel": "Calories",
+    "proteinG": "Protéines (g)",
+    "carbsG": "Glucides (g)",
+    "fatG": "Lipides (g)",
+    "moreDetails": "Plus de détails (protéines, glucides, lipides)",
+    "done": "OK",
+    "tapToEdit": "Touche pour modifier",
+    "untitled": "Sans nom"
   }
 }

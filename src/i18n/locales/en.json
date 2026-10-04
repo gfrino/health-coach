@@ -23,6 +23,7 @@
     "integrations": "Services",
     "me": "Me",
     "programs": "Programs",
+    "food": "Food diary",
     "recipes": "Recipes"
   },
   "coach": {
@@ -362,7 +363,7 @@
     "title": "Connect your data",
     "subtitle": "The coach reads your data from {{source}}. You can choose, type by type, what to share.",
     "skip": "Skip for now",
-    "readOnly": "Read-only: {{name}} never writes or changes anything.",
+    "readOnly": "Reads your health data. It only writes the meals from your food diary, if you turn it on in the Food tab.",
     "categories": {
       "activity": {
         "title": "Activity",
@@ -591,7 +592,8 @@
     "removeAttachment": "Remove {{name}}",
     "savingProgram": "Updating your program…",
     "savingMemory": "Noting this…",
-    "savingRecipe": "Saving the recipe…"
+    "savingRecipe": "Saving the recipe…",
+    "savingFood": "Adding it to your food diary…"
   },
   "integrations": {
     "healthTitle": "Phone health data",
@@ -694,6 +696,7 @@
     "settings": "Settings",
     "me": "Me",
     "programs": "Programs",
+    "food": "Food",
     "journal": "Journal",
     "recipes": "Recipes"
   },
@@ -954,5 +957,68 @@
     "delete": "Delete recipe",
     "deleteTitle": "Delete the recipe?",
     "deleteBody": "The recipe will be deleted from this phone."
+  },
+  "food": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "prevDay": "Previous day",
+    "nextDay": "Next day",
+    "addTitle": "Add food",
+    "add": "+ Add",
+    "ofTarget": "of {{kcal}} kcal",
+    "kcalEaten": "kcal today",
+    "remaining": "{{kcal}} kcal left for today 🌱",
+    "over": "{{kcal}} kcal over your target, no big deal 🙂",
+    "noTarget": "Add your age, height and weight in your profile and I'll suggest a target.",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "grams": "{{value}} g",
+    "kcal": "{{value}} kcal",
+    "meals": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snacks"
+    },
+    "byCoach": "added by {{name}}",
+    "nothingYet": "Nothing here yet.",
+    "targetTitle": "Your target",
+    "targetLabel": "Calories per day",
+    "targetCustom": "{{kcal}} kcal a day, chosen by you.",
+    "targetEstimated": "About {{kcal}} kcal a day, estimated from your profile and how much you move.",
+    "targetEdit": "Change",
+    "targetReset": "Use the estimate",
+    "writeHealth": "Also save to Apple Health",
+    "writeHealthHint": "So calories and nutrients show up in your other apps too. They stay on your phone.",
+    "writeHealthNotConnected": "Connect Apple Health in Services to use this.",
+    "meal": "Meal",
+    "whatAte": "What did you eat?",
+    "whatAtePlaceholder": "E.g. 2 scrambled eggs, a slice of wholegrain bread and a coffee",
+    "estimate": "Work it out with {{name}} ✨",
+    "estimateNone": "I couldn't find any food in the text: try writing it another way.",
+    "estimateFailed": "I couldn't work it out. Try again or enter the values yourself.",
+    "estimateNote": "These are estimates: if something looks off, just fix it.",
+    "saveCount_one": "Save {{count}} food",
+    "saveCount_other": "Save {{count}} foods",
+    "remove": "Remove",
+    "addManual": "Enter it yourself",
+    "recent": "Eaten recently",
+    "addRecent": "Add {{name}}",
+    "edit": "Food",
+    "deleteTitle": "Remove from the diary?",
+    "deleteBody": "This food will be deleted from your diary.",
+    "delete": "Delete",
+    "name": "What",
+    "quantity": "How much",
+    "quantityPlaceholder": "E.g. 1 portion",
+    "kcalLabel": "Calories",
+    "proteinG": "Protein (g)",
+    "carbsG": "Carbs (g)",
+    "fatG": "Fat (g)",
+    "moreDetails": "More details (protein, carbs, fat)",
+    "done": "Done",
+    "tapToEdit": "Tap to edit",
+    "untitled": "No name"
   }
 }

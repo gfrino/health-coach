@@ -64,6 +64,7 @@ ${contact}. Si applicano la legge federale svizzera sulla protezione dei dati (n
 
 ## Quali dati tratta l'app (sul telefono)
 - **Dati di salute** che autorizzi da Apple Health o Health Connect (es. passi, sonno, frequenza cardiaca, peso, allenamenti).
+- **Diario alimentare**: i cibi che registri tu o il coach, con calorie e nutrienti stimati. Su iPhone, se lo attivi, l'app li salva anche in Apple Health, che resta sul tuo telefono.
 - **Profilo**: nome, età, altezza, obiettivi, condizioni, farmaci, allergie che inserisci.
 - **Diario**: umore, energia, sintomi e note (scritti da te o annotati dal coach su tua richiesta).
 - **Documenti**: referti, esami e foto che aggiungi o condividi con l'app, con i valori e il riassunto che l'AI ne ricava.
