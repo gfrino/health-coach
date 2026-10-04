@@ -167,6 +167,8 @@
     "askCoach": "Mit dem Coach darüber sprechen",
     "askCoachPrompt": "Lass uns meinen Befund \"{{title}}\" gemeinsam ansehen: Was steht darin und worauf sollte ich achten?",
     "extractionReading": "{{name}} liest das Dokument…",
+    "extractionProgress_one": "{{count}} Wert",
+    "extractionProgress_other": "{{count}} Werte",
     "extractionFailed": "Das Dokument konnte nicht gelesen werden. Versuche es erneut; für Fotos und Scans kannst du auch eine Online-KI in den Einstellungen wählen.",
     "extractionError": {
       "timeout": "Das Lesen hat zu lange gedauert. Versuche es erneut: Beim zweiten Mal geht es meist schneller.",

@@ -167,6 +167,8 @@
     "askCoach": "Talk about it with your coach",
     "askCoachPrompt": "Let's look at my report \"{{title}}\" together: what does it say and what should I keep an eye on?",
     "extractionReading": "{{name}} is reading the document…",
+    "extractionProgress_one": "{{count}} value",
+    "extractionProgress_other": "{{count}} values",
     "extractionFailed": "The document couldn't be read. Try again; for photos and scans you can also choose an online AI in Settings.",
     "extractionError": {
       "timeout": "Reading took too long. Try again: the second time is usually faster.",

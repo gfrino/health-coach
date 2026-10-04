@@ -167,6 +167,8 @@
     "askCoach": "Parlane con il coach",
     "askCoachPrompt": "Guardiamo insieme il mio referto \"{{title}}\": cosa dice e a cosa dovrei fare attenzione?",
     "extractionReading": "{{name}} sta leggendo il documento…",
+    "extractionProgress_one": "{{count}} valore",
+    "extractionProgress_other": "{{count}} valori",
     "extractionFailed": "Non è stato possibile leggere il documento. Riprova; per foto e scansioni puoi anche scegliere un'AI online nelle Opzioni.",
     "extractionError": {
       "timeout": "La lettura ci ha messo troppo. Riprova: di solito la seconda volta è più veloce.",

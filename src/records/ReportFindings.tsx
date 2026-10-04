@@ -25,6 +25,7 @@ export function ReportFindings({ reportId }: { reportId: string }) {
   const settings = useSettingsStore((s) => s.settings);
   const running = useExtractionStore((s) => !!s.running[reportId]);
   const failure = useExtractionStore((s) => s.failures[reportId]);
+  const progress = useExtractionStore((s) => s.progress[reportId] ?? 0);
   const version = useExtractionStore((s) => s.version);
   const [report, setReport] = useState<LabReport | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
@@ -68,6 +69,7 @@ export function ReportFindings({ reportId }: { reportId: string }) {
           <ActivityIndicator color={colors.primary} />
           <AppText variant="callout" style={{ flex: 1 }}>
             {t('records.extractionReading', { name: settings.coach.name })}
+            {progress ? ` ${t('records.extractionProgress', { count: progress })}` : ''}
           </AppText>
         </View>
       </Card>

@@ -167,6 +167,8 @@
     "askCoach": "En parler avec le coach",
     "askCoachPrompt": "Regardons ensemble mon compte rendu « {{title}} » : que dit-il et à quoi devrais-je faire attention ?",
     "extractionReading": "{{name}} lit le document…",
+    "extractionProgress_one": "{{count}} valeur",
+    "extractionProgress_other": "{{count}} valeurs",
     "extractionFailed": "Le document n'a pas pu être lu. Réessaie ; pour les photos et les scans, tu peux aussi choisir une IA en ligne dans les Réglages.",
     "extractionError": {
       "timeout": "La lecture a pris trop de temps. Réessaie : la deuxième fois est généralement plus rapide.",

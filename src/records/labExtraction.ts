@@ -26,30 +26,26 @@ export interface ParsedExtraction {
   results: LabResultInput[];
 }
 
-export function extractionInstruction(language: string): string {
-  return [
-    'Read the attached health document (lab report, medical report, imaging, prescription, device report…).',
-    'Reply ONLY with JSON, no other text, in this shape:',
-    '{"report_date":"YYYY-MM-DD or null","lab_name":"lab or clinic, or null","summary":"…","results":[{"name":"…","value":12.3,"value_text":null,"unit":"mg/dL","ref_low":3.5,"ref_high":20,"ref_text":"3.5-20"}]}',
-    `- summary: 2–4 short sentences in ${language}: what the document is and its key findings (values out of range, diagnoses, conclusions). Facts only, no advice.`,
-    '- results: EVERY measured value in the document (blood and urine tests, vitals, body composition, scores…), with the name as written. value: a number with a dot as decimal separator, or null with the original in value_text (e.g. "negative", "<0.5"). ref_low/ref_high: numeric limits of the reference range when present, otherwise null; ref_text: the range as written.',
-    '- Never invent values: leave out anything that is not in the document. If it contains no measured values, results is [].',
-  ].join('\n');
-}
-
 /**
- * Il modello sul telefono è piccolo: con il JSON sbaglia spesso la sintassi. Gli si chiede un
- * formato a righe, facile da scrivere e da leggere, e nessun giudizio sui valori (lo fa l'app).
+ * Formato a righe, per tutti i modelli: molto più corto del JSON (una riga per valore invece
+ * di un oggetto con sette campi), quindi la risposta arriva in pochi secondi anche per referti
+ * con decine di misure. Il modello sul telefono, piccolo, sbaglia spesso la sintassi del JSON.
+ * Nessun giudizio sui valori: i limiti li confronta l'app.
+ * `detailed`: riassunto con i risultati principali (modelli online); sul telefono una frase.
  */
-export function deviceExtractionInstruction(language: string): string {
+export function linesExtractionInstruction(language: string, detailed: boolean): string {
   return [
     'Read the health document below and copy its data in EXACTLY this format, nothing else:',
-    'DATE: the date of the exam as YYYY-MM-DD, or none',
-    'LAB: the laboratory or clinic, or none',
-    `SUMMARY: one sentence in ${language} saying what kind of document this is. Do not judge the values.`,
+    'DATE: the date of the exam or of the period covered, as YYYY-MM-DD, or none',
+    'LAB: the laboratory, clinic or device maker, or none',
+    detailed
+      ? `SUMMARY: 2–4 short sentences in ${language}: what the document is and its key findings (values out of range, diagnoses, conclusions). Facts only, no advice.`
+      : `SUMMARY: one sentence in ${language} saying what kind of document this is. Do not judge the values.`,
     'VALUES:',
     'name | value | unit | reference range as written',
-    'The value is the number only, with a dot for decimals and no thousands separators (1930, not 1,930).',
+    'name is the measurement (e.g. Weight, LDL cholesterol, Daily steps), never the patient.',
+    'The value is the number only, with a dot for decimals and no thousands separators (1930, not 1,930). If it is not a number, write it as in the document (e.g. negative, <0.5).',
+    'Leave the reference range empty if the document has none.',
     'Write one line per measured value, copied exactly from the document. Never invent values.',
   ].join('\n');
 }
@@ -173,7 +169,27 @@ export const useExtractionStore = create<{
   version: number;
   /** Perché l'ultima lettura non è riuscita (mostrato all'utente, utile per capire il problema). */
   failures: Record<string, ExtractionFailure>;
-}>(() => ({ running: {}, version: 0, failures: {} }));
+  /** Valori già letti durante la lettura in corso (la risposta arriva un pezzo alla volta). */
+  progress: Record<string, number>;
+}>(() => ({ running: {}, version: 0, failures: {}, progress: {} }));
+
+function setProgress(reportId: string, count: number | null) {
+  useExtractionStore.setState((s) => {
+    const progress = { ...s.progress };
+    if (count === null) delete progress[reportId];
+    else progress[reportId] = count;
+    return { progress };
+  });
+}
+
+/** Righe "nome | valore | …" complete nel testo ricevuto finora (l'ultima può essere a metà). */
+export function countValueLines(text: string): number {
+  const complete = text.split('\n').slice(0, -1);
+  return complete.filter((l) => {
+    const [name, value] = l.replace(/^[\s*•-]+/, '').split('|');
+    return value !== undefined && !!name?.trim() && !/^name$/i.test(name.trim());
+  }).length;
+}
 
 export interface ExtractionFailure {
   /** Codice AIError, oppure 'timeout' / 'unparseable' / 'unreadable'. */
@@ -191,7 +207,10 @@ function setFailure(reportId: string, failure: ExtractionFailure | null) {
 }
 
 /** Tempo massimo per leggere un referto. */
-const EXTRACTION_TIMEOUT_MS = 90_000;
+/** Lettura bloccata: nessun pezzo di risposta da così tanto tempo. */
+const EXTRACTION_IDLE_MS = 60_000;
+/** Tetto assoluto, anche se la risposta continua ad arrivare. */
+const EXTRACTION_MAX_MS = 240_000;
 
 export type ExtractionOutcome = 'ok' | 'no_ai' | 'unreadable' | 'failed';
 
@@ -205,8 +224,10 @@ export async function extractReport(
   useExtractionStore.setState((s) => ({ running: { ...s.running, [reportId]: true } }));
   setFailure(reportId, null);
   const db = await getDb();
+  const startedAt = Date.now();
   const timeout = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let maxTimer: ReturnType<typeof setTimeout> | undefined;
   try {
     const report = await labReportRepository.getReport(db, reportId);
     if (!report) return 'failed';
@@ -237,7 +258,25 @@ export async function extractReport(
         `--- Document "${d.name}" ---\n${device ? d.text.slice(0, DEVICE_MAX_CHARS) : d.text}\n--- End of document ---`,
     );
     // Mai una rotella infinita: oltre il limite la lettura risulta non riuscita (si può riprovare).
-    timer = setTimeout(() => timeout.abort(), EXTRACTION_TIMEOUT_MS);
+    // Il limite vale per le pause, non per il totale: la risposta arriva un pezzo alla volta e
+    // ogni pezzo fa ripartire il conteggio. Intanto si mostra quanti valori sono già stati letti.
+    const restartIdle = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => timeout.abort(), EXTRACTION_IDLE_MS);
+    };
+    restartIdle();
+    maxTimer = setTimeout(() => timeout.abort(), EXTRACTION_MAX_MS);
+    let streamed = '';
+    let shown = 0;
+    const onToken = (delta: string) => {
+      restartIdle();
+      streamed += delta;
+      const count = countValueLines(streamed);
+      if (count !== shown) {
+        shown = count;
+        setProgress(reportId, count);
+      }
+    };
     const result = await provider.sendMessage(
       {
         system:
@@ -247,7 +286,7 @@ export async function extractReport(
         {
           role: 'user',
           content: [
-            device ? deviceExtractionInstruction(language) : extractionInstruction(language),
+            linesExtractionInstruction(language, !device),
             ...texts,
           ].join('\n\n'),
           images: content.images.length ? content.images : undefined,
@@ -255,9 +294,11 @@ export async function extractReport(
         },
       ],
       // Copiare valori è un compito semplice: poco ragionamento, risposta in pochi secondi.
-      { apiKey, model, quick: true, maxOutputTokens: 12000, signal: timeout.signal },
+      { apiKey, model, quick: true, maxOutputTokens: 12000, signal: timeout.signal, onToken },
     );
-    const parsed = device ? parseDeviceExtraction(result.text) : parseExtraction(result.text);
+    // Righe; se un modello risponde comunque in JSON, si legge anche quello.
+    const parsed =
+      parseDeviceExtraction(result.text) ?? (device ? null : parseExtraction(result.text));
     if (!parsed) {
       if (__DEV__) console.warn(`[referti] risposta non leggibile: ${JSON.stringify(result.text)}`);
       await labReportRepository.setExtractionStatus(db, reportId, 'failed');
@@ -268,6 +309,10 @@ export async function extractReport(
       return 'failed';
     }
     await labReportRepository.saveExtraction(db, reportId, parsed);
+    if (__DEV__)
+      console.warn(
+        `[referti] letto in ${Math.round((Date.now() - startedAt) / 1000)} s: ${parsed.results.length} valori`,
+      );
     return 'ok';
   } catch (e) {
     const err = toAIError(e);
@@ -282,6 +327,8 @@ export async function extractReport(
     return 'failed';
   } finally {
     clearTimeout(timer);
+    clearTimeout(maxTimer);
+    setProgress(reportId, null);
     useExtractionStore.setState((s) => {
       const running = { ...s.running };
       delete running[reportId];

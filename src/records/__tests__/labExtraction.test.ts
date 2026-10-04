@@ -2,7 +2,14 @@ import { migrate } from '@/db/migrate';
 import * as labReportRepository from '@/db/repositories/labReportRepository';
 import { createTestDb } from '@/test/nodeSqliteDb';
 
-import { parseDeviceExtraction, parseExtraction, parseNumber, parseRange } from '../labExtraction';
+import {
+  countValueLines,
+  linesExtractionInstruction,
+  parseDeviceExtraction,
+  parseExtraction,
+  parseNumber,
+  parseRange,
+} from '../labExtraction';
 
 let mockSeq = 0;
 jest.mock('@/db/ids', () => ({ newId: () => `id-${++mockSeq}` }));
@@ -189,5 +196,40 @@ describe('parseNumber', () => {
     expect(parseNumber('0,125')).toBe(0.125);
     expect(parseNumber('abc')).toBeNull();
     expect(parseNumber('')).toBeNull();
+  });
+});
+
+describe('formato a righe per tutti i modelli', () => {
+  it('chiede un riassunto più ricco ai modelli online', () => {
+    expect(linesExtractionInstruction('Italian', true)).toContain('2–4 short sentences in Italian');
+    expect(linesExtractionInstruction('Italian', false)).toContain('one sentence in Italian');
+    expect(linesExtractionInstruction('Italian', true)).toContain('never the patient');
+  });
+
+  it('legge una risposta tipo Withings con migliaia e senza intervallo', () => {
+    const parsed = parseDeviceExtraction(
+      [
+        'DATE: 2026-08-15',
+        'LAB: Withings',
+        'SUMMARY: Rapporto Withings di un mese: passi, peso e sonno.',
+        'VALUES:',
+        'Daily steps | 9,676 | steps |',
+        'Weight | 77.7 | kg |',
+        'BMR | 1930 | kcal |',
+      ].join('\n'),
+    );
+    expect(parsed?.reportDate).toBe('2026-08-15');
+    expect(parsed?.results.map((r) => [r.name, r.value])).toEqual([
+      ['Daily steps', 9676],
+      ['Weight', 77.7],
+      ['BMR', 1930],
+    ]);
+    expect(parsed?.results[0]?.refLow).toBeNull();
+  });
+
+  it('conta solo le righe di valori complete durante lo streaming', () => {
+    expect(countValueLines('SUMMARY: x\nVALUES:\nname | value | unit | range\nWeight | 77')).toBe(0);
+    expect(countValueLines('VALUES:\nWeight | 77.7 | kg |\nBMI | 24')).toBe(1);
+    expect(countValueLines('VALUES:\nWeight | 77.7 | kg |\nBMI | 24.9 | |\n')).toBe(2);
   });
 });
