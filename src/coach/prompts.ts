@@ -42,7 +42,7 @@ export const TONE_PROMPTS: Record<(typeof COACH_TONES)[number], string> = {
   scientific: 'Tone: precise and scientific. Explain mechanisms and cite the strength of evidence.',
 };
 
-const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
+export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   it: 'Italian',
   en: 'English',
   de: 'German',
@@ -59,13 +59,14 @@ export const SAFETY_RULES = `SAFETY RULES (always apply, whatever the approach a
 - Do not invent data. If you do not have a value, say so or use the available tools to look it up.`;
 
 /**
- * Lingua del coach: quella dell'app (= del telefono, salvo scelta diversa nelle Opzioni).
- * Le istruzioni per l'AI sono in inglese e i modelli, soprattutto quello sul telefono, tendono
- * a rispondere in inglese: la regola è esplicita e ripetuta in fondo al prompt.
+ * Lingua del coach: si parte con quella dell'app (= del telefono, salvo scelta nelle Opzioni),
+ * poi si segue la lingua in cui scrive l'utente. Le istruzioni per l'AI sono in inglese e i
+ * modelli, soprattutto quello sul telefono, tendono a passare all'inglese: la regola è esplicita
+ * e ripetuta in fondo al prompt.
  */
 export function languageRule(language: SupportedLanguage): string {
   const name = LANGUAGE_NAMES[language];
-  return `Always write in ${name}: it is the language of the app and of the user's phone. Switch language only if the user clearly writes to you in another language, and then reply in that language.`;
+  return `Start in ${name}, the language of the app and of the user's phone. As soon as the user writes to you in another language, reply in the language of their latest message, whatever it is. For very short or unclear messages (e.g. "ok", a number) keep the language you were using. Never switch to English on your own.`;
 }
 
 export function coachIdentity(coach: CoachConfig, language: SupportedLanguage): string {

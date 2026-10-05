@@ -14,7 +14,7 @@ import {
   MEDICAL_PROMPTS,
   SAFETY_RULES,
   TONE_PROMPTS,
-  languageRule,
+  LANGUAGE_NAMES,
 } from './prompts';
 
 /**
@@ -393,7 +393,7 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     input.compact ? null : MEMORY_RULE,
     (input.memoryFacts?.length ?? 0) < 8 ? GETTING_TO_KNOW : null,
     todayTotalsLine(input.todayTotalsAt),
-    `LANGUAGE\n${languageRule(language)}`,
+    `LANGUAGE: start in ${LANGUAGE_NAMES[language]}, then reply in the language of the user's latest message.`,
     `CURRENT DATE: ${localIsoDate(input.now)} ${input.now.toTimeString().slice(0, 5)}`,
   ];
   return sections.filter((s): s is string => !!s).join('\n\n');

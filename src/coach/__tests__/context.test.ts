@@ -15,9 +15,10 @@ describe('composeSystemPrompt', () => {
   it('include identità, lingua, approccio, tono e regole di sicurezza fisse', () => {
     const p = composeSystemPrompt({ coach, language: 'de', now });
     expect(p).toContain('You are Aria');
-    expect(p).toContain('Always write in German: it is the language of the app');
+    expect(p).toContain('Start in German, the language of the app');
+    expect(p).toContain('reply in the language of their latest message');
     // Ripetuta in fondo, dove i modelli piccoli la "sentono" di più.
-    expect(p.lastIndexOf('Always write in German')).toBeGreaterThan(p.indexOf('SAFETY'));
+    expect(p.lastIndexOf('start in German, then reply')).toBeGreaterThan(p.indexOf('SAFETY'));
     expect(p).toContain('Traditional Chinese Medicine');
     expect(p).toContain('Tone: direct');
     expect(p).toContain(SAFETY_RULES);
