@@ -63,6 +63,8 @@ export const icons = {
   menu: { ios: 'line.3.horizontal', android: 'menu' },
   recipes: { ios: 'fork.knife', android: 'restaurant' },
   food: { ios: 'carrot.fill', android: 'nutrition' },
+  cameraOutline: { ios: 'camera', android: 'photo_camera' },
+  gallery: { ios: 'photo.on.rectangle', android: 'photo_library' },
   heartOutline: { ios: 'heart', android: 'favorite_border' },
   clock: { ios: 'clock', android: 'schedule' },
   people: { ios: 'person.2', android: 'group' },

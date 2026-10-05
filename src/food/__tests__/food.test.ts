@@ -51,7 +51,7 @@ describe('stima dei cibi dalla risposta a righe', () => {
         '- **Uova strapazzate** | 2 uova | 182 kcal | 12,6 g | 1 | 14 | 0 | 0,5 | 4,5 | 180 mg',
         'Pane integrale | 1 fetta, 30 g | 75 | 3 | 13 | 1 | 2 | 1 | 0.2 | 140',
         'Caffè | 1 tazzina | 2 | | |',
-        'Cappuccino | 1 tazza | ~90 | circa 4,5 g | 80-100 |',
+        'Cappuccino | 1 tazza | ~90 | circa 4,5 g | 8-10 |',
         'nota senza numeri',
       ].join('\n'),
     );
@@ -95,12 +95,15 @@ describe('stima dei cibi dalla risposta a righe', () => {
         quantity: '1 tazza',
         calories: 90,
         protein: 4.5,
-        carbs: 90,
+        carbs: 9,
         fat: null,
         ...none,
       },
     ]);
     expect(parseFoodEstimate('NONE')).toEqual([]);
+    // Calorie incoerenti con i macro: si usano quelle calcolate dai macro.
+    expect(parseFoodEstimate('Uova | 2 uova | 18 | 12 | 3 | 10')[0]?.calories).toBe(150);
+    expect(parseFoodEstimate('Insalata | 1 ciotola | 25 | 1 | 4 | 0')[0]?.calories).toBe(25);
   });
 });
 

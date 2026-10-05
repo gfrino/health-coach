@@ -1,10 +1,11 @@
-import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { haptic } from '@/lib/haptics';
 
 import { useTheme } from '@/theme';
 
 import { AppText } from './AppText';
 import { ButtonDecor } from './ButtonDecor';
+import { Icon, type AppIconName } from './Icon';
 
 interface Props {
   label: string;
@@ -13,6 +14,8 @@ interface Props {
   disabled?: boolean;
   loading?: boolean;
   accessibilityHint?: string;
+  /** Icona a linee prima del testo (stesso stile delle icone dell'app). */
+  icon?: AppIconName;
 }
 
 export function Button({
@@ -22,6 +25,7 @@ export function Button({
   disabled,
   loading,
   accessibilityHint,
+  icon,
 }: Props) {
   const { colors, radius, spacing } = useTheme();
   const inactive = disabled || loading;
@@ -66,6 +70,13 @@ export function Button({
       {variant === 'primary' ? <ButtonDecor color={colors.primary} /> : null}
       {loading ? (
         <ActivityIndicator color={fg} />
+      ) : icon ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+          <Icon name={icon} color={fg} size={19} />
+          <AppText variant="headline" style={{ color: fg }} align="center">
+            {label}
+          </AppText>
+        </View>
       ) : (
         <AppText variant="headline" style={{ color: fg }} align="center">
           {label}

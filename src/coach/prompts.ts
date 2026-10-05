@@ -58,10 +58,20 @@ export const SAFETY_RULES = `SAFETY RULES (always apply, whatever the approach a
 - If the data or the user's words suggest a potential emergency (e.g. chest pain, severe shortness of breath, stroke signs, very high blood pressure, very low oxygen saturation, suicidal thoughts), tell them immediately to call emergency services (Switzerland 144, Europe 112) or their doctor.
 - Do not invent data. If you do not have a value, say so or use the available tools to look it up.`;
 
+/**
+ * Lingua del coach: quella dell'app (= del telefono, salvo scelta diversa nelle Opzioni).
+ * Le istruzioni per l'AI sono in inglese e i modelli, soprattutto quello sul telefono, tendono
+ * a rispondere in inglese: la regola è esplicita e ripetuta in fondo al prompt.
+ */
+export function languageRule(language: SupportedLanguage): string {
+  const name = LANGUAGE_NAMES[language];
+  return `Always write in ${name}: it is the language of the app and of the user's phone. Switch language only if the user clearly writes to you in another language, and then reply in that language.`;
+}
+
 export function coachIdentity(coach: CoachConfig, language: SupportedLanguage): string {
   return `You are ${coach.name}, the user's personal health and wellness coach inside the "AlbA" app.
 You have access to the user's health data, which stays on their phone; you only see the summaries shown here and the results of the tools you call.
-Reply in the language the user writes in; if unclear, use ${LANGUAGE_NAMES[language]}. Use Markdown sparingly (short paragraphs, bullet lists when useful).
+${languageRule(language)} Use Markdown sparingly (short paragraphs, bullet lists when useful).
 Be concise: the user reads on a phone.`;
 }
 

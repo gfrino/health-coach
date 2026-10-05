@@ -31,7 +31,7 @@ export function estimateInstruction(language: string, text: string, fromPhoto = 
       ? 'Look at the photo of what the user ate. Identify each food and drink you can see and estimate its portion from the photo (plate size, typical servings). Reply in EXACTLY this format, one line per food, nothing else:'
       : 'Estimate the nutrition of what the user ate. Reply in EXACTLY this format, one line per food, nothing else:',
     'name | quantity | kcal | protein g | carbs g | fat g | fiber g | sugar g | saturated fat g | sodium mg',
-    `- name: short, in ${language}, starting with a capital letter.`,
+    `- name: the food itself (e.g. "Scrambled eggs"), short, in ${language}, starting with a capital letter. Never a word like "today" or "lunch".`,
     '- quantity: the amount as the user said it; if they gave none, a typical portion you assume (e.g. "1 slice, 30 g").',
     '- Numbers only (no units), with a dot for decimals and no thousands separators. Use typical values for that food and quantity.',
     '- One line for EVERY food and EVERY drink the user mentions (e.g. a coffee or a juice gets its own line). Do not split a single dish into its ingredients.',
@@ -73,8 +73,13 @@ export function parseFoodEstimate(reply: string): FoodEstimate[] {
       .map((p) => p.trim());
     if (parts.length < 3 || !parts[0] || /^name$/i.test(parts[0])) continue;
     const n = (i: number) => cellNumber(parts[i]);
-    const calories = n(2);
+    let calories = n(2);
     if (calories === null) continue;
+    // Coerenza con i macro (4 kcal/g proteine e carboidrati, 9 kcal/g grassi): i modelli piccoli
+    // a volte scrivono un numero sbagliato nella colonna delle calorie (es. 18 per due uova).
+    const fromMacros = 4 * (n(3) ?? 0) + 4 * (n(4) ?? 0) + 9 * (n(5) ?? 0);
+    if (fromMacros >= 40 && (calories < fromMacros * 0.6 || calories > fromMacros * 1.7))
+      calories = fromMacros;
     out.push({
       name: parts[0].slice(0, 120),
       quantity: parts[1] || null,

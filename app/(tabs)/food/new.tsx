@@ -150,6 +150,7 @@ export default function NewFoodScreen() {
             />
             <Button
               label={t('food.estimate', { name: settings.coach.name })}
+              icon="sparkles"
               variant={items.length ? 'secondary' : 'primary'}
               onPress={() => void estimate()}
               loading={busy === 'ai'}
@@ -160,6 +161,7 @@ export default function NewFoodScreen() {
               <View style={{ flex: 1 }}>
                 <Button
                   label={t('food.photoCamera')}
+                  icon="cameraOutline"
                   variant="secondary"
                   onPress={() => void estimate('camera')}
                   disabled={busy !== null}
@@ -168,6 +170,7 @@ export default function NewFoodScreen() {
               <View style={{ flex: 1 }}>
                 <Button
                   label={t('food.photoLibrary')}
+                  icon="gallery"
                   variant="secondary"
                   onPress={() => void estimate('library')}
                   disabled={busy !== null}
