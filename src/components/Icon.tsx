@@ -68,6 +68,7 @@ export const icons = {
   heartOutline: { ios: 'heart', android: 'favorite_border' },
   clock: { ios: 'clock', android: 'schedule' },
   people: { ios: 'person.2', android: 'group' },
+  sources: { ios: 'books.vertical', android: 'menu_book' },
 } satisfies Record<string, IconName>;
 
 export type AppIconName = keyof typeof icons;

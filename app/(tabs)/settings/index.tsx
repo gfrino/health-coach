@@ -160,10 +160,16 @@ export default function SettingsScreen() {
 
         <AppText variant="headline">{t('settings.sections.legal')}</AppText>
         <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
-          {LEGAL_DOCS.map((doc, i) => (
+          <NavRow
+            first
+            icon="sources"
+            label={t('citations.title')}
+            value={t('citations.subtitle')}
+            onPress={() => router.push('/settings/sources')}
+          />
+          {LEGAL_DOCS.map((doc) => (
             <NavRow
               key={doc}
-              first={i === 0}
               icon="document"
               label={t(`legal.${doc}`)}
               onPress={() => router.push({ pathname: '/settings/legal/[doc]', params: { doc } })}

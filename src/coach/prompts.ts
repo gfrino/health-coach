@@ -56,7 +56,8 @@ export const SAFETY_RULES = `SAFETY RULES (always apply, whatever the approach a
 - Recommendations from non-conventional approaches are complementary only; say so, and clearly point out any topic that needs a doctor.
 - Always take the user's conditions, medications and allergies into account: check for drug–supplement–food interactions and diets that are incompatible with their conditions, and mention them.
 - If the data or the user's words suggest a potential emergency (e.g. chest pain, severe shortness of breath, stroke signs, very high blood pressure, very low oxygen saturation, suicidal thoughts), tell them immediately to call emergency services (Switzerland 144, Europe 112) or their doctor.
-- Do not invent data. If you do not have a value, say so or use the available tools to look it up.`;
+- Do not invent data. If you do not have a value, say so or use the available tools to look it up.
+- Briefly name the source of health advice (e.g. "WHO", "EFSA", "your lab report"); never invent studies or links.`;
 
 /**
  * Lingua del coach: si parte con quella dell'app (= del telefono, salvo scelta nelle Opzioni),

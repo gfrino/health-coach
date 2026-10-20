@@ -18,6 +18,7 @@ import { useTheme } from '@/theme';
 import { AppText } from '../AppText';
 import { EmptyState } from '../EmptyState';
 import { KeyboardAvoider } from '../KeyboardAvoider';
+import { SourcesLink } from '../SourcesLink';
 import { Composer } from './Composer';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
@@ -231,6 +232,8 @@ export function ChatView({
         contentContainerStyle={{ padding: spacing.lg, gap: spacing.md, flexGrow: 1 }}
         onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
         keyboardShouldPersistTaps="handled"
+        // Sempre in cima alla chat: da dove vengono le informazioni di salute del coach.
+        ListHeaderComponent={<SourcesLink />}
         ListEmptyComponent={
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <EmptyState

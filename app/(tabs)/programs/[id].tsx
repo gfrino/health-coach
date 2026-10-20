@@ -13,6 +13,7 @@ import {
   ProgressBar,
   Screen,
   SegmentedControl,
+  SourcesLink,
   TextField,
 } from '@/components';
 import { getDb, programRepository } from '@/db';
@@ -339,6 +340,7 @@ export default function ProgramScreen() {
               />
             )}
             <Button label={t('programs.delete')} variant="danger" onPress={remove} />
+            <SourcesLink topic="activity" />
           </>
         )}
       </Screen>

@@ -1030,5 +1030,38 @@
     "photoNotSaved": "La foto serve solo per il calcolo: non viene salvata.",
     "photoNeedsOnlineAI": "Per riconoscere il cibo dalle foto serve un'AI online (Servizi → Provider AI). Intanto puoi scrivere cosa hai mangiato.",
     "cameraDenied": "Consenti l'accesso alla fotocamera nelle Impostazioni del telefono."
+  },
+  "citations": {
+    "title": "Fonti scientifiche",
+    "subtitle": "Linee guida e studi alla base delle informazioni di salute",
+    "link": "Fonti scientifiche",
+    "intro": "Le informazioni di salute di AlbA (formule, valori di riferimento e consigli) si basano sulle linee guida e sugli studi qui sotto. Anche il coach cita le sue fonti nelle risposte. AlbA non sostituisce il medico: per le decisioni sulla tua salute parla con un professionista.",
+    "footer": "I valori degli esami sono sempre confrontati con l'intervallo di riferimento stampato sul tuo referto.",
+    "topics": {
+      "energy": "Obiettivo calorico e metabolismo",
+      "nutrition": "Alimentazione",
+      "hydration": "Idratazione",
+      "activity": "Attività fisica e passi",
+      "sleep": "Sonno",
+      "heart": "Pressione, frequenza cardiaca e HRV",
+      "glucose": "Glicemia",
+      "body": "Peso e IMC",
+      "labs": "Esami di laboratorio",
+      "mind": "Stress e mindfulness",
+      "diets": "Diete e stili alimentari"
+    },
+    "usedFor": {
+      "energy": "Usate per l'obiettivo calorico del diario alimentare (equazione di Mifflin-St Jeor).",
+      "nutrition": "Usate per i consigli su pasti equilibrati, zuccheri, sale, fibre e nutrienti.",
+      "hydration": "Usate per i consigli su quanto bere.",
+      "activity": "Usate per gli obiettivi di attività, i passi e i programmi di allenamento.",
+      "sleep": "Usate per i consigli su durata e abitudini del sonno.",
+      "heart": "Usate per spiegare l'andamento di pressione, frequenza a riposo e HRV.",
+      "glucose": "Usate per spiegare i valori di glicemia.",
+      "body": "Usate per l'andamento del peso e l'IMC.",
+      "labs": "Usate per spiegare cosa misurano gli esami.",
+      "mind": "Usate per i suggerimenti di respirazione, rilassamento e mindfulness.",
+      "diets": "Usate per lo stile alimentare che scegli (mediterranea, chetogenica, vegetariana, digiuno…)."
+    }
   }
 }

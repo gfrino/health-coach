@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Pressable, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Icon, Screen, SegmentedControl } from '@/components';
+import { Icon, Screen, SegmentedControl, SourcesLink } from '@/components';
 import { RecordsSection, useAddReport } from '@/features/RecordsSection';
 import { TodaySection } from '@/features/today/TodaySection';
 import { syncHealthData, useSyncStore } from '@/sources/syncService';
@@ -85,7 +85,14 @@ export default function MeScreen() {
             { value: 'records', label: t('tabs.records') },
           ]}
         />
-        {current === 'today' ? <TodaySection /> : <RecordsSection reloadKey={reloadKey} />}
+        {current === 'today' ? (
+          <>
+            <TodaySection />
+            <SourcesLink />
+          </>
+        ) : (
+          <RecordsSection reloadKey={reloadKey} />
+        )}
       </Screen>
     </>
   );

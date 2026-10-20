@@ -11,6 +11,7 @@ import {
   Icon,
   ProgressBar,
   Screen,
+  SourcesLink,
   SwitchRow,
   TextField,
 } from '@/components';
@@ -208,6 +209,7 @@ export default function FoodScreen() {
             {macro(t('food.carbs'), totals.carbs)}
             {macro(t('food.fat'), totals.fat)}
           </View>
+          <SourcesLink topic="energy" />
         </Card>
 
         {/* Pasti */}

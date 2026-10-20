@@ -1030,5 +1030,38 @@
     "photoNotSaved": "La photo sert seulement au calcul : elle n'est pas enregistrée.",
     "photoNeedsOnlineAI": "Pour reconnaître les aliments sur une photo, il faut une IA en ligne (Services → Fournisseur IA). En attendant, tu peux écrire ce que tu as mangé.",
     "cameraDenied": "Autorise l'accès à l'appareil photo dans les Réglages du téléphone."
+  },
+  "citations": {
+    "title": "Sources scientifiques",
+    "subtitle": "Recommandations et études derrière les informations santé",
+    "link": "Sources scientifiques",
+    "intro": "Les informations santé d'AlbA (formules, valeurs de référence et conseils) reposent sur les recommandations et études ci-dessous. Le coach cite aussi ses sources dans ses réponses. AlbA ne remplace pas un médecin : pour les décisions concernant ta santé, parles-en à un professionnel.",
+    "footer": "Les valeurs d'analyses sont toujours comparées à l'intervalle de référence imprimé sur ton propre compte rendu.",
+    "topics": {
+      "energy": "Objectif calorique et métabolisme",
+      "nutrition": "Alimentation",
+      "hydration": "Hydratation",
+      "activity": "Activité physique et pas",
+      "sleep": "Sommeil",
+      "heart": "Tension, fréquence cardiaque et VFC",
+      "glucose": "Glycémie",
+      "body": "Poids et IMC",
+      "labs": "Analyses de laboratoire",
+      "mind": "Stress et pleine conscience",
+      "diets": "Régimes et modes alimentaires"
+    },
+    "usedFor": {
+      "energy": "Pour l'objectif calorique du journal alimentaire (équation de Mifflin-St Jeor).",
+      "nutrition": "Pour les conseils sur les repas équilibrés, les sucres, le sel, les fibres et les nutriments.",
+      "hydration": "Pour les conseils sur la quantité à boire.",
+      "activity": "Pour les objectifs d'activité, les pas et les programmes d'entraînement.",
+      "sleep": "Pour les conseils sur la durée et les habitudes de sommeil.",
+      "heart": "Pour expliquer l'évolution de la tension, de la fréquence au repos et de la VFC.",
+      "glucose": "Pour expliquer les valeurs de glycémie.",
+      "body": "Pour l'évolution du poids et l'IMC.",
+      "labs": "Pour expliquer ce que mesurent les analyses.",
+      "mind": "Pour les suggestions de respiration, de relaxation et de pleine conscience.",
+      "diets": "Pour le mode alimentaire que tu choisis (méditerranéen, cétogène, végétarien, jeûne…)."
+    }
   }
 }

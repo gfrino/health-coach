@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AppText, Button, Card } from '@/components';
+import { AppText, Button, Card, SourcesLink } from '@/components';
 import { getDb, labReportRepository } from '@/db';
 import type { LabReport, LabResult } from '@/db/repositories/labReportRepository';
 import { haptic } from '@/lib/haptics';
@@ -184,6 +184,7 @@ export function ReportFindings({ reportId }: { reportId: string }) {
       <AppText variant="caption" tone="textMuted">
         {t('records.extractionNote')}
       </AppText>
+      <SourcesLink topic="labs" />
       {hasAI ? (
         <Button label={t('records.extractionAgain')} variant="ghost" onPress={read} />
       ) : null}

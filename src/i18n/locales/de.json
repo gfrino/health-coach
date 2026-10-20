@@ -1030,5 +1030,38 @@
     "photoNotSaved": "Das Foto dient nur der Schätzung: Es wird nicht gespeichert.",
     "photoNeedsOnlineAI": "Um Essen auf Fotos zu erkennen, brauchst du eine Online-KI (Dienste → KI-Anbieter). Bis dahin kannst du aufschreiben, was du gegessen hast.",
     "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen deines Telefons."
+  },
+  "citations": {
+    "title": "Wissenschaftliche Quellen",
+    "subtitle": "Leitlinien und Studien hinter den Gesundheitsinformationen",
+    "link": "Wissenschaftliche Quellen",
+    "intro": "Die Gesundheitsinformationen in AlbA (Formeln, Referenzwerte und Empfehlungen) beruhen auf den unten aufgeführten Leitlinien und Studien. Auch der Coach nennt in seinen Antworten seine Quellen. AlbA ersetzt keinen Arzt: Sprich für Entscheidungen über deine Gesundheit mit einer Fachperson.",
+    "footer": "Laborwerte werden immer mit dem Referenzbereich auf deinem eigenen Laborbefund verglichen.",
+    "topics": {
+      "energy": "Kalorienziel und Stoffwechsel",
+      "nutrition": "Ernährung",
+      "hydration": "Flüssigkeitszufuhr",
+      "activity": "Bewegung und Schritte",
+      "sleep": "Schlaf",
+      "heart": "Blutdruck, Herzfrequenz und HRV",
+      "glucose": "Blutzucker",
+      "body": "Gewicht und BMI",
+      "labs": "Laborwerte",
+      "mind": "Stress und Achtsamkeit",
+      "diets": "Ernährungsformen"
+    },
+    "usedFor": {
+      "energy": "Für das tägliche Kalorienziel im Ernährungstagebuch (Mifflin-St-Jeor-Formel).",
+      "nutrition": "Für Tipps zu ausgewogenen Mahlzeiten, Zucker, Salz, Ballaststoffen und Nährstoffen.",
+      "hydration": "Für Tipps, wie viel du trinken solltest.",
+      "activity": "Für Bewegungsziele, Schritte und Trainingsprogramme.",
+      "sleep": "Für Tipps zu Schlafdauer und Schlafgewohnheiten.",
+      "heart": "Um den Verlauf von Blutdruck, Ruhepuls und HRV zu erklären.",
+      "glucose": "Um Blutzuckerwerte zu erklären.",
+      "body": "Für den Gewichtsverlauf und den BMI.",
+      "labs": "Um zu erklären, was Laborwerte messen.",
+      "mind": "Für Atem-, Entspannungs- und Achtsamkeitsübungen.",
+      "diets": "Für die Ernährungsform, die du wählst (mediterran, ketogen, vegetarisch, Fasten…)."
+    }
   }
 }

@@ -1030,5 +1030,38 @@
     "photoNotSaved": "The photo is only used for the estimate: it isn't saved.",
     "photoNeedsOnlineAI": "Recognising food from photos needs an online AI (Services → AI provider). For now you can write what you ate.",
     "cameraDenied": "Allow camera access in your phone's Settings."
+  },
+  "citations": {
+    "title": "Scientific sources",
+    "subtitle": "Guidelines and studies behind the health information",
+    "link": "Scientific sources",
+    "intro": "The health information in AlbA (formulas, reference values and recommendations) is based on the guidelines and studies below. The coach also names its sources in its answers. AlbA does not replace a doctor: for decisions about your health, talk to a professional.",
+    "footer": "Lab values are always compared with the reference range printed on your own lab report.",
+    "topics": {
+      "energy": "Calorie target and metabolism",
+      "nutrition": "Nutrition",
+      "hydration": "Hydration",
+      "activity": "Physical activity and steps",
+      "sleep": "Sleep",
+      "heart": "Blood pressure, heart rate and HRV",
+      "glucose": "Blood glucose",
+      "body": "Weight and BMI",
+      "labs": "Lab tests",
+      "mind": "Stress and mindfulness",
+      "diets": "Diets and eating patterns"
+    },
+    "usedFor": {
+      "energy": "Used for the daily calorie target in the food diary (Mifflin-St Jeor equation).",
+      "nutrition": "Used for advice on balanced meals, sugars, salt, fibre and nutrients.",
+      "hydration": "Used for advice on how much to drink.",
+      "activity": "Used for activity goals, steps and training programs.",
+      "sleep": "Used for sleep duration and sleep habit advice.",
+      "heart": "Used to explain blood pressure, resting heart rate and HRV trends.",
+      "glucose": "Used to explain glucose readings.",
+      "body": "Used for weight trends and BMI.",
+      "labs": "Used to explain what lab tests measure.",
+      "mind": "Used for breathing, relaxation and mindfulness suggestions.",
+      "diets": "Used for the eating approach you choose (Mediterranean, keto, vegetarian, fasting…)."
+    }
   }
 }

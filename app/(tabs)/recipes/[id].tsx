@@ -12,6 +12,7 @@ import {
   EmptyState,
   Icon,
   Screen,
+  SourcesLink,
   TextField,
 } from '@/components';
 import { getDb, recipeRepository } from '@/db';
@@ -300,6 +301,7 @@ export default function RecipeScreen() {
             ) : null}
             <Button label={t('recipes.askCoach')} variant="secondary" onPress={askCoach} />
             <Button label={t('recipes.delete')} variant="danger" onPress={remove} />
+            <SourcesLink topic="nutrition" />
           </>
         )}
       </Screen>
