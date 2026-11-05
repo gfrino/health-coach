@@ -958,7 +958,8 @@
     "askCoachPrompt": "Let's talk about my recipe \"{{title}}\": how can I adapt or vary it for me?",
     "delete": "Delete recipe",
     "deleteTitle": "Delete the recipe?",
-    "deleteBody": "The recipe will be deleted from this phone."
+    "deleteBody": "The recipe will be deleted from this phone.",
+    "leftOutTitle": "Ingredient left out for your health"
   },
   "food": {
     "today": "Today",

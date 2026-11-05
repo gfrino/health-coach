@@ -200,7 +200,7 @@ export const COACH_TOOLS: ToolDefinition[] = [
   {
     name: 'create_recipe',
     description:
-      "Save a recipe in the user's Recipes tab. Use it when the user asks for a recipe or a meal idea they want to keep. Build it around what the user asked for: every ingredient they named must be in it, even if it does not fit their diet (then say so in the description). Allergies, intolerances, conditions and medications are hard limits. Metric quantities, in the user's language.",
+      "Save a recipe in the user's Recipes tab. Use it when the user asks for a recipe or a meal idea they want to keep. Build it around what the user asked for: every ingredient they named must be in it, even if it does not fit their diet (then say so in the description). Allergies, intolerances, conditions and medications are hard limits: if you leave out something they asked for because of them, tell them clearly in your reply and in the description. Metric quantities, in the user's language.",
     parameters: {
       type: 'object',
       properties: {

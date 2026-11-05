@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Stack } from 'expo-router/stack';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Button, Card, ChipGroup, Screen, TextField } from '@/components';
@@ -54,14 +54,28 @@ export default function NewRecipeScreen() {
       // chiede una volta di nuovo indicando cosa manca.
       const missing = missingRequested(parsed, parsed.requested);
       if (missing.length) parsed = (await ask(missing).catch(() => null)) ?? parsed;
-      const { requested: _requested, ...recipe } = parsed;
+      const { requested: _requested, warning, ...recipe } = parsed;
       const id = await recipeRepository.createRecipe(
         await getDb(),
-        { ...recipe, meal: recipe.meal === 'any' ? meal : recipe.meal },
+        {
+          ...recipe,
+          // L'avviso resta anche nella ricetta salvata, in testa alla descrizione.
+          description: warning
+            ? [warning, recipe.description].filter(Boolean).join(' ')
+            : recipe.description,
+          meal: recipe.meal === 'any' ? meal : recipe.meal,
+        },
         'coach',
       );
       haptic.success();
-      open(id);
+      if (warning) {
+        // Ingrediente chiesto ma tolto per allergia, intolleranza, patologia o farmaci: va detto.
+        Alert.alert(t('recipes.leftOutTitle'), warning, [
+          { text: t('common.continue'), onPress: () => open(id) },
+        ]);
+      } else {
+        open(id);
+      }
     } catch (e) {
       haptic.error();
       const err = e instanceof Error && e.message === 'parse' ? null : toAIError(e);

@@ -39,6 +39,7 @@ describe('ricette', () => {
       ingredients: ['240 g ceci cotti', '1 carota'],
       steps: ['Soffriggi la carota.', 'Aggiungi i ceci.'],
       requested: [],
+      warning: null,
     });
     expect(parseRecipe('TITLE: x')).toBeNull();
   });
@@ -70,6 +71,22 @@ describe('ricette', () => {
     expect(
       missingRequested({ ingredients: ['150 g riso basmati', '2 pomodori'] }, ['riso', 'pomodoro']),
     ).toEqual([]);
+
+    // Tolto per allergia e segnalato: è avvisato, non si richiede di nuovo.
+    const allergy = parseRecipe(
+      [
+        'TITLE: Insalata',
+        'REQUESTED: noci, rucola',
+        'WARNING: Ho tolto le noci perché sei allergico.',
+        'INGREDIENTS:',
+        '- 50 g rucola',
+        'STEPS:',
+        '1. Condisci.',
+      ].join('\n'),
+    );
+    expect(allergy?.warning).toBe('Ho tolto le noci perché sei allergico.');
+    expect(missingRequested(allergy!, allergy!.requested)).toEqual([]);
+    expect(prompt).toContain('WARNING:');
 
     const retry = recipeInstruction({
       wish: 'riso',

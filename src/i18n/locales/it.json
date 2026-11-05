@@ -958,7 +958,8 @@
     "askCoachPrompt": "Parliamo della mia ricetta \"{{title}}\": come posso adattarla o variarla per me?",
     "delete": "Elimina ricetta",
     "deleteTitle": "Eliminare la ricetta?",
-    "deleteBody": "La ricetta verrà eliminata da questo telefono."
+    "deleteBody": "La ricetta verrà eliminata da questo telefono.",
+    "leftOutTitle": "Ingrediente tolto per la tua salute"
   },
   "food": {
     "today": "Oggi",

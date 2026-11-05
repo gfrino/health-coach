@@ -313,7 +313,7 @@ export function foodSection(
 }
 
 const RECIPE_RULE = `RECIPES
-When the user asks for a recipe or a meal idea they may want to keep, save it with create_recipe (they find it in the Recipes tab). Build it around what they asked for: every ingredient they name goes in, even if it does not fit their diet (mention it briefly). Allergies, intolerances, conditions and medications are hard limits; diet, approach and tastes (see what you remember) guide the rest, and it should suit their goals and lab results. When suggesting meals, prefer their favourite and most cooked recipes from SAVED RECIPES.`;
+When the user asks for a recipe or a meal idea they may want to keep, save it with create_recipe (they find it in the Recipes tab). Build it around what they asked for: every ingredient they name goes in, even if it does not fit their diet (mention it briefly). Allergies, intolerances, conditions and medications are hard limits (if you leave out a requested ingredient for that, tell the user clearly why); diet, approach and tastes (see what you remember) guide the rest, and it should suit their goals and lab results. When suggesting meals, prefer their favourite and most cooked recipes from SAVED RECIPES.`;
 
 export function recipesSection(
   recipes: CoachContextInput['recipes'],

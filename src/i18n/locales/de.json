@@ -958,7 +958,8 @@
     "askCoachPrompt": "Lass uns über mein Rezept \"{{title}}\" sprechen: Wie kann ich es für mich anpassen oder abwandeln?",
     "delete": "Rezept löschen",
     "deleteTitle": "Rezept löschen?",
-    "deleteBody": "Das Rezept wird von diesem Telefon gelöscht."
+    "deleteBody": "Das Rezept wird von diesem Telefon gelöscht.",
+    "leftOutTitle": "Zutat wegen deiner Gesundheit weggelassen"
   },
   "food": {
     "today": "Heute",
