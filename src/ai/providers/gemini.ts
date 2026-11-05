@@ -1,4 +1,4 @@
-import { AIError } from '../errors';
+import { AIError, classifyHttpError } from '../errors';
 import { request } from '../http';
 import { readSSE } from '../sse';
 import type {
@@ -34,7 +34,7 @@ interface GeminiChunk {
     thoughtsTokenCount?: number;
   };
   promptFeedback?: { blockReason?: string };
-  error?: { message?: string };
+  error?: { code?: number; message?: string; status?: string };
 }
 
 const headers = (apiKey: string) => ({
@@ -150,7 +150,11 @@ export async function collectGeminiStream(
     } catch {
       continue;
     }
-    if (chunk.error) throw new AIError('server', chunk.error.message);
+    // Errore a metà stream: stessa classificazione degli errori HTTP (quota, chiave, sovraccarico…),
+    // non sempre "sovraccarico".
+    if (chunk.error) {
+      throw classifyHttpError(chunk.error.code ?? 500, JSON.stringify({ error: chunk.error }));
+    }
     if (chunk.promptFeedback?.blockReason) blocked = true;
     const cand = chunk.candidates?.[0];
     for (const p of cand?.content?.parts ?? []) {
@@ -191,6 +195,44 @@ function versionOf(id: string): number {
   return m?.[1] ? parseFloat(m[1]) : 0;
 }
 
+async function sendGemini(
+  context: CoachContext,
+  messages: ChatMessage[],
+  options: SendOptions,
+): Promise<SendResult> {
+  const res = await request(`${BASE}/${modelPath(options.model)}:streamGenerateContent?alt=sse`, {
+    method: 'POST',
+    headers: headers(options.apiKey),
+    signal: options.signal,
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: context.system }] },
+      contents: toGeminiContents(messages, options.model),
+      tools: toGeminiTools(context.tools),
+      generationConfig: {
+        maxOutputTokens: options.maxOutputTokens ?? 16000,
+        ...(options.quick ? { thinkingConfig: { thinkingLevel: 'low' } } : {}),
+      },
+    }),
+  });
+  if (!res.body) throw new AIError('network', 'Risposta senza body');
+  return collectGeminiStream(readSSE(res.body), options.model, options.onToken);
+}
+
+/** Flash stabile (non lite, non preview) più recente, diverso dal modello che ha fallito. */
+export function fallbackModel(models: ModelInfo[], failed: string): string | null {
+  const ok = models.filter(
+    (m) =>
+      m.id !== failed.replace(/^models\//, '') &&
+      /flash/.test(m.id) &&
+      !/(lite|preview|exp|latest|thinking)/.test(m.id),
+  );
+  return ok.sort((a, b) => versionOf(b.id) - versionOf(a.id))[0]?.id ?? null;
+}
+
+async function pickFallbackModel(apiKey: string, failed: string): Promise<string | null> {
+  return fallbackModel(await geminiProvider.listModels(apiKey), failed);
+}
+
 export const geminiProvider: AIProvider = {
   id: 'gemini',
 
@@ -199,22 +241,26 @@ export const geminiProvider: AIProvider = {
     messages: ChatMessage[],
     options: SendOptions,
   ): Promise<SendResult> {
-    const res = await request(`${BASE}/${modelPath(options.model)}:streamGenerateContent?alt=sse`, {
-      method: 'POST',
-      headers: headers(options.apiKey),
-      signal: options.signal,
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: context.system }] },
-        contents: toGeminiContents(messages, options.model),
-        tools: toGeminiTools(context.tools),
-        generationConfig: {
-          maxOutputTokens: options.maxOutputTokens ?? 16000,
-          ...(options.quick ? { thinkingConfig: { thinkingLevel: 'low' } } : {}),
-        },
-      }),
-    });
-    if (!res.body) throw new AIError('network', 'Risposta senza body');
-    return collectGeminiStream(readSSE(res.body), options.model, options.onToken);
+    let streamed = false;
+    const onToken = options.onToken
+      ? (d: string) => {
+          streamed = true;
+          options.onToken?.(d);
+        }
+      : () => {
+          streamed = true;
+        };
+    try {
+      return await sendGemini(context, messages, { ...options, onToken });
+    } catch (e) {
+      // Modello sovraccarico o non disponibile anche dopo i nuovi tentativi (capita spesso con i
+      // modelli Pro e preview): si riprova una volta, in silenzio, con il Flash stabile più recente.
+      if (!(e instanceof AIError) || e.code !== 'server' || streamed || options.signal?.aborted)
+        throw e;
+      const fallback = await pickFallbackModel(options.apiKey, options.model).catch(() => null);
+      if (!fallback) throw e;
+      return sendGemini(context, messages, { ...options, model: fallback });
+    }
   },
 
   async testConnection(apiKey, model) {
