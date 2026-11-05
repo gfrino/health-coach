@@ -1,6 +1,6 @@
 import { migrate } from '@/db/migrate';
 import * as recipeRepository from '@/db/repositories/recipeRepository';
-import { parseRecipe } from '@/recipes/generate';
+import { missingRequested, parseRecipe, recipeInstruction } from '@/recipes/generate';
 import { createTestDb } from '@/test/nodeSqliteDb';
 
 import { executeTool } from '@/coach/tools';
@@ -38,8 +38,47 @@ describe('ricette', () => {
       tags: ['vegetariana', 'veloce'],
       ingredients: ['240 g ceci cotti', '1 carota'],
       steps: ['Soffriggi la carota.', 'Aggiungi i ceci.'],
+      requested: [],
     });
     expect(parseRecipe('TITLE: x')).toBeNull();
+  });
+
+  it('la richiesta viene prima della dieta e gli ingredienti chiesti vanno verificati', () => {
+    const prompt = recipeInstruction({
+      wish: 'riso e semi di chia',
+      meal: 'lunch',
+      maxMinutes: 30,
+      servings: 2,
+    });
+    expect(prompt).toContain('MY REQUEST (most important): riso e semi di chia');
+    expect(prompt).toMatch(/my request comes first/);
+    expect(prompt).toContain('REQUESTED:');
+
+    const r = parseRecipe(
+      [
+        'TITLE: Budino di chia',
+        'REQUESTED: riso, semi di chia',
+        'INGREDIENTS:',
+        '- 30 g semi di chia',
+        '- 200 ml latte di cocco',
+        'STEPS:',
+        '1. Mescola e lascia riposare.',
+      ].join('\n'),
+    );
+    expect(r?.requested).toEqual(['riso', 'semi di chia']);
+    expect(missingRequested(r!, r!.requested)).toEqual(['riso']);
+    expect(
+      missingRequested({ ingredients: ['150 g riso basmati', '2 pomodori'] }, ['riso', 'pomodoro']),
+    ).toEqual([]);
+
+    const retry = recipeInstruction({
+      wish: 'riso',
+      meal: 'lunch',
+      maxMinutes: null,
+      servings: 1,
+      missing: ['riso'],
+    });
+    expect(retry).toContain('Your previous recipe left out: riso');
   });
 
   it('crea dal coach, aggiorna, preferita, cucinata, elimina', async () => {

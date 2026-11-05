@@ -9,7 +9,7 @@ import { toAIError } from '@/ai/errors';
 import { completeOnce } from '@/coach/chatEngine';
 import { getDb, recipeRepository } from '@/db';
 import { haptic } from '@/lib/haptics';
-import { parseRecipe, recipeInstruction } from '@/recipes/generate';
+import { missingRequested, parseRecipe, recipeInstruction } from '@/recipes/generate';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
 
@@ -37,17 +37,24 @@ export default function NewRecipeScreen() {
     setBusy('ai');
     setError(null);
     try {
-      const text = await completeOnce(
-        settings,
-        recipeInstruction({
-          wish,
-          meal,
-          maxMinutes: time === 'any' ? null : Number(time),
-          servings: Number(servings),
-        }),
-      );
-      const recipe = parseRecipe(text);
-      if (!recipe) throw new Error('parse');
+      const ask = (missing?: string[]) =>
+        completeOnce(
+          settings,
+          recipeInstruction({
+            wish,
+            meal,
+            maxMinutes: time === 'any' ? null : Number(time),
+            servings: Number(servings),
+            missing,
+          }),
+        ).then(parseRecipe);
+      let parsed = await ask();
+      if (!parsed) throw new Error('parse');
+      // Se ha lasciato fuori un ingrediente chiesto (es. il riso con la dieta chetogenica), si
+      // chiede una volta di nuovo indicando cosa manca.
+      const missing = missingRequested(parsed, parsed.requested);
+      if (missing.length) parsed = (await ask(missing).catch(() => null)) ?? parsed;
+      const { requested: _requested, ...recipe } = parsed;
       const id = await recipeRepository.createRecipe(
         await getDb(),
         { ...recipe, meal: recipe.meal === 'any' ? meal : recipe.meal },
