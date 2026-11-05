@@ -15,7 +15,7 @@ TaskManager.defineTask(HEALTH_SYNC_TASK, async () => {
     const { bootstrapHeadless } = await import('@/lib/bootstrap');
     await bootstrapHeadless();
     const { syncHealthData } = await import('./syncService');
-    await syncHealthData({ force: true });
+    await syncHealthData({ force: true, background: true });
     return BackgroundTask.BackgroundTaskResult.Success;
   } catch {
     return BackgroundTask.BackgroundTaskResult.Failed;
@@ -41,17 +41,20 @@ export async function enableHealthKitBackgroundDelivery(onChange: () => void): P
   const hk =
     require('@kingstinct/react-native-healthkit') as typeof import('@kingstinct/react-native-healthkit');
   /* eslint-enable @typescript-eslint/no-require-imports */
+  // Il sonno arriva dal Watch una volta, dopo il risveglio: "immediato" fa entrare la notte appena
+  // finita prima che l'utente apra l'app (iOS può comunque raggruppare gli avvisi). Gli altri tipi
+  // cambiano di continuo: basta una volta all'ora.
   const types = [
-    'HKQuantityTypeIdentifierStepCount',
-    'HKQuantityTypeIdentifierRestingHeartRate',
-    'HKQuantityTypeIdentifierBodyMass',
-    'HKCategoryTypeIdentifierSleepAnalysis',
-    'HKWorkoutTypeIdentifier',
+    ['HKQuantityTypeIdentifierStepCount', hk.UpdateFrequency.hourly],
+    ['HKQuantityTypeIdentifierRestingHeartRate', hk.UpdateFrequency.hourly],
+    ['HKQuantityTypeIdentifierBodyMass', hk.UpdateFrequency.hourly],
+    ['HKCategoryTypeIdentifierSleepAnalysis', hk.UpdateFrequency.immediate],
+    ['HKWorkoutTypeIdentifier', hk.UpdateFrequency.hourly],
   ] as const;
   const subs: { remove: () => void }[] = [];
-  for (const t of types) {
+  for (const [t, frequency] of types) {
     try {
-      await hk.enableBackgroundDelivery(t, hk.UpdateFrequency.hourly);
+      await hk.enableBackgroundDelivery(t, frequency);
       // HealthKit chiama l'observer anche subito dopo l'iscrizione: quel primo avviso si ignora
       // (la sincronizzazione all'apertura c'è già).
       let first = true;

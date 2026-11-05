@@ -37,9 +37,33 @@ describe('loadToday', () => {
     expect(d.steps).toBeGreaterThan(1000);
     expect(d.sleep?.asleepMin).toBeGreaterThan(200);
     expect(d.sleep?.deepMin).toBeGreaterThan(0);
+    expect(d.sleep?.isLastNight).toBe(true);
     expect(d.series.steps.values).toHaveLength(7);
     expect(d.series.steps.values.every((v) => v !== null)).toBe(true);
     expect(d.restingHeartRate?.value).toBeGreaterThan(40);
     expect(d.workouts.length).toBeGreaterThan(0);
+  });
+
+  it('se la notte appena finita non è ancora arrivata, mostra la precedente segnandola', async () => {
+    const db = createTestDb();
+    await migrate(db);
+    const now = new Date(2026, 8, 29, 8);
+    // Unica notte registrata: risveglio ieri mattina.
+    const start = new Date(2026, 8, 27, 23).getTime();
+    const end = new Date(2026, 8, 28, 7).getTime();
+    await repo.upsertSleepSessions(db, [
+      {
+        startAt: start,
+        endAt: end,
+        inBedS: 8 * 3600,
+        asleepS: 7 * 3600,
+        stages: [],
+        source: 'apple_health',
+        sourceId: 'night:test',
+      },
+    ]);
+    const d = await loadToday(db, now);
+    expect(d.sleep?.asleepMin).toBe(420);
+    expect(d.sleep?.isLastNight).toBe(false);
   });
 });

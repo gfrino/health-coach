@@ -43,6 +43,8 @@
     "chartLabel": "{{title}}, last 7 days",
     "steps": "Steps",
     "sleep": "Sleep",
+    "sleepOn": "Sleep · night of {{date}}",
+    "sleepNotYet": "Last night hasn't arrived from {{source}} yet: your watch usually sends it shortly after you wake up. Pull down to refresh.",
     "sleepStages": "Deep {{deep}} · REM {{rem}} · Light {{light}}",
     "activeEnergy": "Active calories",
     "floors": "{{count}} floors",

@@ -64,10 +64,13 @@ async function runPlatformSync(onProgress: (p: SyncProgress) => void): Promise<S
  * Avvia una sincronizzazione (una sola alla volta).
  * - `force`: ignora il limite di frequenza;
  * - `minIntervalMs`: limite personalizzato (es. aggiornamenti da HealthKit);
- * - `manual`: richiesta dall'utente, mostra lo spinner.
+ * - `manual`: richiesta dall'utente, mostra lo spinner;
+ * - `background`: task di sistema, aspetta anche i controlli successivi (iOS sospende l'app appena
+ *   il task finisce). In primo piano invece la sync finisce appena i dati sono scritti: l'analisi
+ *   del mattino del coach (una chiamata all'AI) non deve tenere ferma la rotellina.
  */
 export function syncHealthData(
-  opts: { force?: boolean; manual?: boolean; minIntervalMs?: number } = {},
+  opts: { force?: boolean; manual?: boolean; minIntervalMs?: number; background?: boolean } = {},
 ): Promise<SyncReport | null> {
   if (running) {
     if (opts.manual) useSyncStore.setState({ manual: true });
@@ -87,10 +90,8 @@ export function syncHealthData(
       if (report.upserted > 0) await clearDemoData().catch(() => undefined);
       useSyncStore.setState({ lastSyncAt: Date.now(), lastReport: report });
       // Frequenza cardiaca: oltre 30 giorni basta un riassunto per giorno (il DB non cresce senza limite).
+      // Resta qui dentro: scrive nel DB e non deve sovrapporsi a un'altra sincronizzazione.
       await compactOldHeartRate().catch(() => undefined);
-      // Dati aggiornati: c'è qualcosa di utile da segnalare? (notifica locale, vedi proactive/)
-      // Atteso: in background iOS sospende l'app appena finisce il task.
-      await runProactiveCheck(await getDb());
       if (__DEV__) {
         console.warn(
           `[sync] ${Date.now() - startedAt} ms · ${report.upserted} scritti · ${report.deleted} eliminati · ${report.errors.length} tipi non disponibili`,
@@ -106,7 +107,14 @@ export function syncHealthData(
       useSyncStore.setState({ syncing: false, manual: false, progress: null });
       running = null;
     });
-  return running;
+  const data = running;
+  const followUps = data.then(async (report) => {
+    if (!report) return report;
+    // Dati aggiornati: c'è qualcosa di utile da segnalare? (notifica locale, vedi proactive/)
+    await runProactiveCheck(await getDb()).catch(() => null);
+    return report;
+  });
+  return opts.background ? followUps : data;
 }
 
 /** Legge l'ora dell'ultima sincronizzazione salvata (dopo un riavvio dell'app). */
@@ -146,6 +154,7 @@ let refreshingToday: Promise<void> | null = null;
 /**
  * Totali di oggi e di ieri letti subito dalla sorgente (pochi decimi di secondo), senza la
  * sincronizzazione completa: prima di ogni risposta del coach i passi devono essere quelli veri.
+ * Su iOS si rilegge anche il sonno, così la mattina il coach vede la notte appena finita.
  */
 export function refreshTodayTotals(): Promise<void> {
   const { settings } = useSettingsStore.getState();
@@ -155,9 +164,11 @@ export function refreshTodayTotals(): Promise<void> {
     const db = await getDb();
     /* eslint-disable @typescript-eslint/no-require-imports -- moduli nativi caricati solo sulla loro piattaforma */
     if (Platform.OS === 'ios') {
-      const { refreshTodayAppleHealth } =
+      const { refreshTodayAppleHealth, syncAppleHealthSleep } =
         require('./appleHealth/sync') as typeof import('./appleHealth/sync');
       await refreshTodayAppleHealth(db);
+      // Anche la notte appena finita (query veloce), se non c'è già una sincronizzazione che la legge.
+      if (!running) await syncAppleHealthSleep(db).catch(() => undefined);
     } else {
       const { refreshTodayHealthConnect } =
         require('./healthConnect/sync') as typeof import('./healthConnect/sync');

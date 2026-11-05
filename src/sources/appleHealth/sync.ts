@@ -41,6 +41,8 @@ const RECENT_DAYS = 3;
 const DEEP_REFRESH_DAYS = 30;
 const DEEP_REFRESH_EVERY_MS = 7 * DAY_MS;
 const PAGE = 5000;
+/** Letture da HealthKit in parallelo (le scritture nel DB restano una alla volta). */
+const READ_CONCURRENCY = 4;
 /** Versione del calcolo delle notti: se cambia, alla sync successiva si ricostruiscono tutte. */
 const SLEEP_ALGORITHM = '2';
 
@@ -49,6 +51,20 @@ const startOfDay = (ms: number) => {
   d.setHours(0, 0, 0, 0);
   return d;
 };
+
+/** Esegue `fn` su tutti gli elementi con al massimo `limit` chiamate contemporanee, in ordine. */
+async function mapPool<T, R>(items: readonly T[], limit: number, fn: (item: T) => Promise<R>) {
+  const out = new Array<R>(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await fn(items[i]!);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return out;
+}
 
 /** Query con anchor paginata: restituisce tutti i campioni nuovi, le cancellazioni e il nuovo anchor. */
 async function anchored<T>(
@@ -68,6 +84,53 @@ async function anchored<T>(
     if (res.items.length < PAGE) break;
   }
   return { items, deleted, anchor };
+}
+
+/**
+ * Sonno: legge le nuove fasi e ricostruisce le notti cambiate. Veloce (query con anchor), per
+ * questo si fa per primo nella sincronizzazione e anche prima delle risposte del coach: la mattina
+ * conta avere la notte appena finita appena Apple Salute la riceve dal Watch.
+ */
+export async function syncAppleHealthSleep(db: Db, now = Date.now()): Promise<number> {
+  const state = await healthDataRepository.getSyncState(db, SRC, HK_SLEEP);
+  const res = await anchored(async (anchor) => {
+    const r = await queryCategorySamplesWithAnchor(HK_SLEEP as CategoryTypeIdentifier, {
+      limit: PAGE,
+      anchor,
+      filter: anchor ? undefined : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
+    });
+    return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
+  }, state?.anchor ?? undefined);
+  const rows = res.items
+    .map((s) => normalizeSleepSample({ ...s, value: Number(s.value) }))
+    .filter((m): m is NormalizedMetric => m !== null);
+  let written = await healthDataRepository.upsertMetrics(db, rows);
+  await healthDataRepository.deleteBySourceIds(db, SRC, res.deleted);
+  const algo = await healthDataRepository.getSyncState(db, SRC, 'sleep_algorithm');
+  const rebuildAll = algo?.anchor !== SLEEP_ALGORITHM;
+  if (rows.length || res.deleted.length || rebuildAll) {
+    const changedFrom = rebuildAll
+      ? now - INITIAL_DAYS * DAY_MS
+      : rows.length
+        ? Math.min(...rows.map((r) => r.startAt))
+        : now - 2 * DAY_MS;
+    const from = changedFrom - DAY_MS;
+    const samples = await healthDataRepository.stageSamplesSince(db, SRC, from - DAY_MS);
+    const sessions = buildSleepSessions(samples, SRC).filter((s) => s.endAt >= from);
+    await healthDataRepository.replaceSleepSessions(db, SRC, from, sessions);
+    written += sessions.length;
+    if (rebuildAll) {
+      await healthDataRepository.setSyncState(db, SRC, 'sleep_algorithm', {
+        anchor: SLEEP_ALGORITHM,
+      });
+    }
+  }
+  await healthDataRepository.setSyncState(db, SRC, HK_SLEEP, {
+    anchor: res.anchor ?? null,
+    lastSyncedAt: Date.now(),
+    lastError: null,
+  });
+  return written;
 }
 
 export async function syncAppleHealth(
@@ -98,13 +161,18 @@ export async function syncAppleHealth(
     }
   };
 
-  // 1) Quantità
-  for (const id of quantityIds) {
-    const mapping = HK_QUANTITY[id];
-    if (!mapping) continue;
-    await guard(id, async () => {
-      const state = await healthDataRepository.getSyncState(db, SRC, id);
+  // 1) Sonno per primo: la mattina è il dato che serve subito.
+  await guard(HK_SLEEP, async () => {
+    report.upserted += await syncAppleHealthSleep(db, now);
+  });
+  tick('sleep');
 
+  // 2) Quantità: le letture da HealthKit vanno in parallelo, le scritture nel DB una alla volta.
+  const ids = quantityIds.filter((id) => HK_QUANTITY[id]);
+  const reads = await mapPool(ids, READ_CONCURRENCY, async (id) => {
+    const mapping = HK_QUANTITY[id]!;
+    try {
+      const state = await healthDataRepository.getSyncState(db, SRC, id);
       if (mapping.cumulative) {
         // Totali giornalieri deduplicati da HealthKit (iPhone + Watch non vengono sommati due volte).
         const deep = !state?.anchor || now - Number(state.anchor) > DEEP_REFRESH_EVERY_MS;
@@ -127,13 +195,10 @@ export async function syncAppleHealth(
           },
         );
         const rows = stats
-          .map((s) => normalizeDailyStatistic(id, s))
+          .map((x) => normalizeDailyStatistic(id, x))
           .filter((m): m is NormalizedMetric => m !== null);
-        report.upserted += await healthDataRepository.upsertMetrics(db, rows);
-        if (deep || !state?.lastSyncedAt) {
-          await healthDataRepository.setSyncState(db, SRC, id, { anchor: String(now) });
-        }
-        return;
+        const anchor = deep || !state?.lastSyncedAt ? String(now) : undefined;
+        return { id, rows, deleted: [] as string[], anchor, error: null };
       }
 
       const initialDays = mapping.type === 'heartRate' ? INITIAL_DAYS_HEART_RATE : INITIAL_DAYS;
@@ -149,53 +214,24 @@ export async function syncAppleHealth(
         return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
       }, state?.anchor ?? undefined);
       const rows = res.items
-        .map((s) => normalizeQuantitySample(id, s))
+        .map((x) => normalizeQuantitySample(id, x))
         .filter((m): m is NormalizedMetric => m !== null);
-      report.upserted += await healthDataRepository.upsertMetrics(db, rows);
-      report.deleted += await healthDataRepository.deleteBySourceIds(db, SRC, res.deleted);
-      await healthDataRepository.setSyncState(db, SRC, id, { anchor: res.anchor ?? null });
-    });
-    tick(mapping.type);
-  }
-
-  // 2) Sonno: fasi → notti ricostruite
-  await guard(HK_SLEEP, async () => {
-    const state = await healthDataRepository.getSyncState(db, SRC, HK_SLEEP);
-    const res = await anchored(async (anchor) => {
-      const r = await queryCategorySamplesWithAnchor(HK_SLEEP as CategoryTypeIdentifier, {
-        limit: PAGE,
-        anchor,
-        filter: anchor ? undefined : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
-      });
-      return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
-    }, state?.anchor ?? undefined);
-    const rows = res.items
-      .map((s) => normalizeSleepSample({ ...s, value: Number(s.value) }))
-      .filter((m): m is NormalizedMetric => m !== null);
-    report.upserted += await healthDataRepository.upsertMetrics(db, rows);
-    report.deleted += await healthDataRepository.deleteBySourceIds(db, SRC, res.deleted);
-    const algo = await healthDataRepository.getSyncState(db, SRC, 'sleep_algorithm');
-    const rebuildAll = algo?.anchor !== SLEEP_ALGORITHM;
-    if (rows.length || res.deleted.length || rebuildAll) {
-      const changedFrom = rebuildAll
-        ? now - INITIAL_DAYS * DAY_MS
-        : rows.length
-          ? Math.min(...rows.map((r) => r.startAt))
-          : now - 2 * DAY_MS;
-      const from = changedFrom - DAY_MS;
-      const samples = await healthDataRepository.stageSamplesSince(db, SRC, from - DAY_MS);
-      const sessions = buildSleepSessions(samples, SRC).filter((s) => s.endAt >= from);
-      await healthDataRepository.replaceSleepSessions(db, SRC, from, sessions);
-      report.upserted += sessions.length;
-      if (rebuildAll) {
-        await healthDataRepository.setSyncState(db, SRC, 'sleep_algorithm', {
-          anchor: SLEEP_ALGORITHM,
-        });
-      }
+      return { id, rows, deleted: res.deleted, anchor: res.anchor ?? null, error: null };
+    } catch (e) {
+      return { id, rows: [], deleted: [], anchor: undefined, error: e };
     }
-    await healthDataRepository.setSyncState(db, SRC, HK_SLEEP, { anchor: res.anchor ?? null });
   });
-  tick('sleep');
+  for (const r of reads) {
+    await guard(r.id, async () => {
+      if (r.error) throw r.error;
+      report.upserted += await healthDataRepository.upsertMetrics(db, r.rows);
+      report.deleted += await healthDataRepository.deleteBySourceIds(db, SRC, r.deleted);
+      if (r.anchor !== undefined) {
+        await healthDataRepository.setSyncState(db, SRC, r.id, { anchor: r.anchor });
+      }
+    });
+    tick(HK_QUANTITY[r.id]!.type);
+  }
 
   // 3) Mindfulness e ciclo mestruale
   for (const [id, normalize] of [

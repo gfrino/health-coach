@@ -142,7 +142,17 @@ export function TodaySection() {
 
       <MetricCard
         icon="sleep"
-        title={t('today.sleep')}
+        title={
+          data.sleep && !data.sleep.isLastNight
+            ? t('today.sleepOn', {
+                date: new Date(data.sleep.endAt).toLocaleDateString(locale, {
+                  weekday: 'short',
+                  day: 'numeric',
+                  month: 'short',
+                }),
+              })
+            : t('today.sleep')
+        }
         value={data.sleep ? formatDuration(data.sleep.asleepMin) : null}
         subtitle={
           data.sleep && (data.sleep.deepMin || data.sleep.remMin)
@@ -155,7 +165,13 @@ export function TodaySection() {
         }
         emptyText={t('today.noData')}
         chart={spark(s.sleep.values, t('today.sleep'))}
-      />
+      >
+        {data.sleep && !data.sleep.isLastNight ? (
+          <AppText variant="caption" tone="textMuted">
+            {t('today.sleepNotYet', { source })}
+          </AppText>
+        ) : null}
+      </MetricCard>
 
       <MetricCard
         icon="flame"

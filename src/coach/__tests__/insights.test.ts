@@ -29,6 +29,14 @@ describe('buildInsights', () => {
     expect(r.recent[0]).toContain('5 h 30 min');
   });
 
+  it('non chiama "stanotte" una notte più vecchia se quella appena finita non è ancora arrivata', () => {
+    const nights = [2, 1].map((n) => ({ day: day(n), asleepMin: 420, stages: [] as StageInterval[] }));
+    const r = buildInsights({ today, nights });
+    expect(r.lines[0]).toContain('last night is not in the health data yet');
+    expect(r.lines[0]).toContain(`most recent recorded night woke up on ${day(1)}`);
+    expect(r.lines[0]).not.toMatch(/last night \(/);
+  });
+
   it('esclude oggi (parziale) dalla media dei passi', () => {
     const steps = series((n) => (n === 0 ? 1200 : 9000));
     const r = buildInsights({ today, steps });

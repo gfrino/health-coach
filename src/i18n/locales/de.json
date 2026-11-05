@@ -43,6 +43,8 @@
     "chartLabel": "{{title}}, letzte 7 Tage",
     "steps": "Schritte",
     "sleep": "Schlaf",
+    "sleepOn": "Schlaf · Nacht zum {{date}}",
+    "sleepNotYet": "Die letzte Nacht ist noch nicht in {{source}} angekommen: Die Uhr sendet sie meist kurz nach dem Aufwachen. Zum Aktualisieren nach unten ziehen.",
     "sleepStages": "Tief {{deep}} · REM {{rem}} · Leicht {{light}}",
     "activeEnergy": "Aktive Kalorien",
     "floors": "{{count}} Stockwerke",

@@ -43,6 +43,8 @@
     "chartLabel": "{{title}}, 7 derniers jours",
     "steps": "Pas",
     "sleep": "Sommeil",
+    "sleepOn": "Sommeil · nuit du {{date}}",
+    "sleepNotYet": "La nuit dernière n'est pas encore arrivée depuis {{source}} : ta montre l'envoie en général peu après le réveil. Tire vers le bas pour actualiser.",
     "sleepStages": "Profond {{deep}} · REM {{rem}} · Léger {{light}}",
     "activeEnergy": "Calories actives",
     "floors": "{{count}} étages",

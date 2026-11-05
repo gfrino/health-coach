@@ -17,7 +17,15 @@ export interface TodayData {
   distance: number | null;
   floors: number | null;
   sleep:
-    (NightSummary & { deepMin: number; remMin: number; lightMin: number; awakeMin: number }) | null;
+    | (NightSummary & {
+        deepMin: number;
+        remMin: number;
+        lightMin: number;
+        awakeMin: number;
+        /** Risveglio oggi: è la notte appena finita (altrimenti è quella prima, non ancora arrivata). */
+        isLastNight: boolean;
+      })
+    | null;
   restingHeartRate: { value: number; at: number } | null;
   hrv: { value: number; at: number } | null;
   weight: { value: number; at: number; delta30: number | null } | null;
@@ -126,6 +134,7 @@ export async function loadToday(db: Db, now = new Date()): Promise<TodayData> {
           remMin: mins[SleepStage.REM] ?? 0,
           lightMin: mins[SleepStage.Light] ?? 0,
           awakeMin: mins[SleepStage.Awake] ?? 0,
+          isLastNight: lastNight.day === today,
         }
       : null,
     restingHeartRate: rhr,

@@ -43,6 +43,8 @@
     "chartLabel": "{{title}}, ultimi 7 giorni",
     "steps": "Passi",
     "sleep": "Sonno",
+    "sleepOn": "Sonno · notte del {{date}}",
+    "sleepNotYet": "La notte appena finita non è ancora arrivata da {{source}}: di solito l'orologio la invia poco dopo il risveglio. Tira giù per aggiornare.",
     "sleepStages": "Profondo {{deep}} · REM {{rem}} · Leggero {{light}}",
     "activeEnergy": "Calorie attive",
     "floors": "{{count}} piani",

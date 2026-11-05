@@ -110,7 +110,13 @@ export function buildInsights(input: InsightInput): Insights {
     const last = nights.at(-1)!;
     const a7 = avg(week.map((n) => n.asleepMin));
     const a30 = avg(nights.map((n) => n.asleepMin));
-    const parts = [`last night (${last.day}) ${hm(last.asleepMin)} asleep`];
+    // La notte appena finita è quella con risveglio oggi. Se non c'è ancora (il Watch la invia ad
+    // Apple Salute dopo il risveglio, a volte più tardi), l'ultima registrata NON è "stanotte".
+    const parts = [
+      last.day === today
+        ? `last night (${last.day}) ${hm(last.asleepMin)} asleep`
+        : `last night is not in the health data yet (the watch may not have synced it): do not describe an older night as last night; most recent recorded night woke up on ${last.day}, ${hm(last.asleepMin)} asleep`,
+    ];
     const st = stageMinutes(last.stages);
     const deep = st[SleepStage.Deep];
     const rem = st[SleepStage.REM];
