@@ -36,6 +36,7 @@
     "connectedNoData": "{{source}} is connected but there's no data yet. Pull down to sync.",
     "syncNow": "Sync now",
     "syncing": "Syncing data from {{source}}…",
+    "syncingProgress": "Syncing data from {{source}}… {{done}}/{{total}}",
     "lastSync": "Updated at {{time}}",
     "loadDemo": "Load sample data (development)",
     "noData": "—",

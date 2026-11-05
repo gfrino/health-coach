@@ -38,6 +38,21 @@ export const useSyncStore = create<SyncState>(() => ({
 
 let running: Promise<SyncReport | null> | null = null;
 
+/**
+ * Tempo massimo di una sincronizzazione: oltre, la si considera finita (errore) e la rotellina si
+ * ferma. Ogni query a HealthKit ha già il suo limite; questo è il paracadute finale, perché una
+ * sync rimasta appesa (es. app sospesa da iOS a metà) bloccherebbe anche tutte le successive.
+ */
+export const SYNC_MAX_MS = 3 * 60 * 1000;
+
+function withDeadline<T>(p: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error('sync timeout')), ms);
+  });
+  return Promise.race([p, deadline]).finally(() => clearTimeout(timer));
+}
+
 async function compactOldHeartRate(): Promise<void> {
   const cutoff = new Date();
   cutoff.setHours(0, 0, 0, 0);
@@ -84,7 +99,10 @@ export function syncHealthData(
 
   const startedAt = Date.now();
   useSyncStore.setState({ syncing: true, manual: !!opts.manual, progress: null, error: null });
-  running = runPlatformSync((progress) => useSyncStore.setState({ progress }))
+  running = withDeadline(
+    runPlatformSync((progress) => useSyncStore.setState({ progress })),
+    SYNC_MAX_MS,
+  )
     .then(async (report) => {
       // Arrivati i dati veri, i dati di esempio (sviluppo) non devono mescolarsi con loro.
       if (report.upserted > 0) await clearDemoData().catch(() => undefined);

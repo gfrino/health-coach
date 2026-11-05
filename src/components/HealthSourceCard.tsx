@@ -30,7 +30,7 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
   const update = useSettingsStore((s) => s.update);
   const [availability, setAvailability] = useState<HealthAvailability | null>(null);
   const [busy, setBusy] = useState(false);
-  const { syncing, lastSyncAt } = useSyncStore();
+  const { syncing, lastSyncAt, progress } = useSyncStore();
 
   const isIOS = Platform.OS === 'ios';
   const sourceName = isIOS ? 'Apple Health' : 'Health Connect';
@@ -99,7 +99,13 @@ export function HealthSourceCard({ showCategories = true }: { showCategories?: b
           <AppText tone="success">{t('sources.connected', { source: sourceName })}</AppText>
           <AppText variant="caption" tone="textMuted">
             {syncing
-              ? t('today.syncing', { source: sourceName })
+              ? progress
+                ? t('today.syncingProgress', {
+                    source: sourceName,
+                    done: progress.done,
+                    total: progress.total,
+                  })
+                : t('today.syncing', { source: sourceName })
               : lastSyncAt
                 ? t('integrations.lastSync', {
                     when: new Date(lastSyncAt).toLocaleString(i18n.language, {

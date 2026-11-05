@@ -3,7 +3,7 @@
  * (che la mattina chiede un'analisi all'AI) non deve tenere ferma la rotellina. Il task in
  * background invece lo aspetta, perché iOS sospende l'app appena il task finisce.
  */
-import { syncHealthData, useSyncStore } from '../syncService';
+import { SYNC_MAX_MS, syncHealthData, useSyncStore } from '../syncService';
 
 let mockReleaseProactive: () => void = () => undefined;
 const mockRunProactiveCheck = jest.fn(
@@ -30,8 +30,9 @@ jest.mock('@/store/settingsStore', () => ({
 }));
 jest.mock('../platformHealth', () => ({ platformHealthSource: 'apple_health' }));
 jest.mock('../demo/demoData', () => ({ generateDemoData: jest.fn(), SOURCE_DEMO: 'demo' }));
+const mockSyncAppleHealth = jest.fn(async () => ({ upserted: 0, deleted: 0, errors: [] }));
 jest.mock('../appleHealth/sync', () => ({
-  syncAppleHealth: jest.fn(async () => ({ upserted: 0, deleted: 0, errors: [] })),
+  syncAppleHealth: () => mockSyncAppleHealth(),
 }));
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
@@ -61,5 +62,24 @@ describe('syncHealthData', () => {
     mockReleaseProactive();
     await p;
     expect(done).toBe(true);
+  });
+
+  it('una sync appesa (HealthKit che non risponde) si chiude da sola e non blocca le successive', async () => {
+    jest.useFakeTimers();
+    try {
+      mockSyncAppleHealth.mockImplementationOnce(() => new Promise(() => undefined));
+      const p = syncHealthData({ force: true, manual: true });
+      expect(useSyncStore.getState().syncing).toBe(true);
+      await jest.advanceTimersByTimeAsync(SYNC_MAX_MS + 1);
+      await expect(p).resolves.toBeNull();
+      expect(useSyncStore.getState().syncing).toBe(false);
+      expect(useSyncStore.getState().error).toBe('sync timeout');
+
+      // La sincronizzazione successiva parte davvero (non si aggancia a quella appesa).
+      const next = await syncHealthData({ force: true, manual: true });
+      expect(next).toEqual({ upserted: 0, deleted: 0, errors: [] });
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });

@@ -46,6 +46,22 @@ const READ_CONCURRENCY = 4;
 /** Versione del calcolo delle notti: se cambia, alla sync successiva si ricostruiscono tutte. */
 const SLEEP_ALGORITHM = '2';
 
+/**
+ * Tempo massimo per una singola query a HealthKit. Se iOS sospende l'app mentre una query è in
+ * corso (sync in background), la risposta può non arrivare mai: senza limite la sincronizzazione
+ * resterebbe appesa e ogni "Sincronizza ora" successivo aspetterebbe lei, rotellina per sempre.
+ */
+export const HK_TIMEOUT_MS = 60 * 1000;
+
+/** Query HealthKit con limite di tempo: oltre `HK_TIMEOUT_MS` fallisce e il tipo viene saltato. */
+export function hk<T>(query: Promise<T>, what: string, ms = HK_TIMEOUT_MS): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`HealthKit timeout: ${what}`)), ms);
+  });
+  return Promise.race([query, timeout]).finally(() => clearTimeout(timer));
+}
+
 const startOfDay = (ms: number) => {
   const d = new Date(ms);
   d.setHours(0, 0, 0, 0);
@@ -94,11 +110,14 @@ async function anchored<T>(
 export async function syncAppleHealthSleep(db: Db, now = Date.now()): Promise<number> {
   const state = await healthDataRepository.getSyncState(db, SRC, HK_SLEEP);
   const res = await anchored(async (anchor) => {
-    const r = await queryCategorySamplesWithAnchor(HK_SLEEP as CategoryTypeIdentifier, {
-      limit: PAGE,
-      anchor,
-      filter: anchor ? undefined : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
-    });
+    const r = await hk(
+      queryCategorySamplesWithAnchor(HK_SLEEP as CategoryTypeIdentifier, {
+        limit: PAGE,
+        anchor,
+        filter: anchor ? undefined : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
+      }),
+      HK_SLEEP,
+    );
     return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
   }, state?.anchor ?? undefined);
   const rows = res.items
@@ -178,21 +197,24 @@ export async function syncAppleHealth(
         const deep = !state?.anchor || now - Number(state.anchor) > DEEP_REFRESH_EVERY_MS;
         const days = !state?.lastSyncedAt ? INITIAL_DAYS : deep ? DEEP_REFRESH_DAYS : RECENT_DAYS;
         const from = startOfDay(now - (days - 1) * DAY_MS);
-        const stats = await queryStatisticsCollectionForQuantity(
-          id,
-          ['cumulativeSum'],
-          from,
-          { day: 1 },
-          {
-            filter: {
-              date: { startDate: from, endDate: new Date(now) },
-              // Le voci del diario alimentare scritte dall'app sono già nel DB: non si contano due volte.
-              ...(ownFood(id)
-                ? { NOT: [{ metadata: { withMetadataKey: FOOD_ENTRY_METADATA_KEY } }] }
-                : {}),
+        const stats = await hk(
+          queryStatisticsCollectionForQuantity(
+            id,
+            ['cumulativeSum'],
+            from,
+            { day: 1 },
+            {
+              filter: {
+                date: { startDate: from, endDate: new Date(now) },
+                // Le voci del diario alimentare scritte dall'app sono già nel DB: non si contano due volte.
+                ...(ownFood(id)
+                  ? { NOT: [{ metadata: { withMetadataKey: FOOD_ENTRY_METADATA_KEY } }] }
+                  : {}),
+              },
+              unit: mapping.unit as never,
             },
-            unit: mapping.unit as never,
-          },
+          ),
+          id,
         );
         const rows = stats
           .map((x) => normalizeDailyStatistic(id, x))
@@ -203,14 +225,17 @@ export async function syncAppleHealth(
 
       const initialDays = mapping.type === 'heartRate' ? INITIAL_DAYS_HEART_RATE : INITIAL_DAYS;
       const res = await anchored(async (anchor) => {
-        const r = await queryQuantitySamplesWithAnchor(id, {
-          limit: PAGE,
-          unit: mapping.unit as never,
-          anchor,
-          filter: anchor
-            ? undefined
-            : { date: { startDate: new Date(now - initialDays * DAY_MS) } },
-        });
+        const r = await hk(
+          queryQuantitySamplesWithAnchor(id, {
+            limit: PAGE,
+            unit: mapping.unit as never,
+            anchor,
+            filter: anchor
+              ? undefined
+              : { date: { startDate: new Date(now - initialDays * DAY_MS) } },
+          }),
+          id,
+        );
         return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
       }, state?.anchor ?? undefined);
       const rows = res.items
@@ -244,13 +269,16 @@ export async function syncAppleHealth(
     await guard(id, async () => {
       const state = await healthDataRepository.getSyncState(db, SRC, id);
       const res = await anchored(async (anchor) => {
-        const r = await queryCategorySamplesWithAnchor(id as CategoryTypeIdentifier, {
-          limit: PAGE,
-          anchor,
-          filter: anchor
-            ? undefined
-            : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
-        });
+        const r = await hk(
+          queryCategorySamplesWithAnchor(id as CategoryTypeIdentifier, {
+            limit: PAGE,
+            anchor,
+            filter: anchor
+              ? undefined
+              : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
+          }),
+          id,
+        );
         return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
       }, state?.anchor ?? undefined);
       const rows = res.items
@@ -267,11 +295,14 @@ export async function syncAppleHealth(
   await guard('workouts', async () => {
     const state = await healthDataRepository.getSyncState(db, SRC, 'workouts');
     const res = await anchored(async (anchor) => {
-      const r = await queryWorkoutSamplesWithAnchor({
-        limit: PAGE,
-        anchor,
-        filter: anchor ? undefined : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
-      });
+      const r = await hk(
+        queryWorkoutSamplesWithAnchor({
+          limit: PAGE,
+          anchor,
+          filter: anchor ? undefined : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
+        }),
+        'workouts',
+      );
       return { items: r.workouts, deleted: r.deletedSamples, newAnchor: r.newAnchor };
     }, state?.anchor ?? undefined);
     const rows = res.items.map((w) => normalizeWorkout(w.toJSON()));
@@ -298,20 +329,24 @@ export async function refreshTodayAppleHealth(db: Db): Promise<number> {
   const results = await Promise.all(
     ids.map(async (id) => {
       try {
-        const stats = await queryStatisticsCollectionForQuantity(
-          id,
-          ['cumulativeSum'],
-          from,
-          { day: 1 },
-          {
-            filter: {
-              date: { startDate: from, endDate: new Date(now) },
-              ...(ownFood(id)
-                ? { NOT: [{ metadata: { withMetadataKey: FOOD_ENTRY_METADATA_KEY } }] }
-                : {}),
+        const stats = await hk(
+          queryStatisticsCollectionForQuantity(
+            id,
+            ['cumulativeSum'],
+            from,
+            { day: 1 },
+            {
+              filter: {
+                date: { startDate: from, endDate: new Date(now) },
+                ...(ownFood(id)
+                  ? { NOT: [{ metadata: { withMetadataKey: FOOD_ENTRY_METADATA_KEY } }] }
+                  : {}),
+              },
+              unit: HK_QUANTITY[id]!.unit as never,
             },
-            unit: HK_QUANTITY[id]!.unit as never,
-          },
+          ),
+          id,
+          15 * 1000,
         );
         return stats
           .map((s) => normalizeDailyStatistic(id, s))

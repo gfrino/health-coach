@@ -36,6 +36,7 @@
     "connectedNoData": "{{source}} est connecté mais il n'y a pas encore de données. Tirez vers le bas pour synchroniser.",
     "syncNow": "Synchroniser",
     "syncing": "Synchronisation des données de {{source}}…",
+    "syncingProgress": "Synchronisation des données de {{source}}… {{done}}/{{total}}",
     "lastSync": "Mis à jour à {{time}}",
     "loadDemo": "Charger des données d'exemple (développement)",
     "noData": "—",
