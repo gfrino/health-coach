@@ -123,25 +123,31 @@ export async function deleteBySourceIds(
 ): Promise<number> {
   if (!sourceIds.length) return 0;
   let deleted = 0;
-  for (let i = 0; i < sourceIds.length; i += CHUNK) {
-    const chunk = sourceIds.slice(i, i + CHUNK);
-    const placeholders = chunk.map(() => '?').join(',');
-    for (const table of ['metrics', 'workouts', 'sleep_sessions']) {
-      const r = await db.runAsync(
-        `DELETE FROM ${table} WHERE source = ? AND source_id IN (${placeholders})`,
-        [source, ...chunk],
-      );
-      deleted += r.changes;
+  // Una sola transazione: con migliaia di campioni cancellati (es. frequenza cardiaca) una scrittura
+  // su disco per ogni DELETE rendeva la sincronizzazione lentissima.
+  await db.withTransactionAsync(async () => {
+    for (let i = 0; i < sourceIds.length; i += CHUNK) {
+      const chunk = sourceIds.slice(i, i + CHUNK);
+      const placeholders = chunk.map(() => '?').join(',');
+      for (const table of ['metrics', 'workouts', 'sleep_sessions']) {
+        const r = await db.runAsync(
+          `DELETE FROM ${table} WHERE source = ? AND source_id IN (${placeholders})`,
+          [source, ...chunk],
+        );
+        deleted += r.changes;
+      }
+      // Health Connect: una misura multipla (es. pressione "id:sys"/"id:dia") ha id con suffisso.
+      // Intervallo ["id:", "id;") invece di LIKE: usa l'indice UNIQUE (source, source_id), mentre
+      // LIKE leggeva tutta la tabella per ogni id (minuti con molti campioni cancellati).
+      for (const id of chunk) {
+        const r = await db.runAsync(
+          'DELETE FROM metrics WHERE source = ? AND source_id >= ? AND source_id < ?',
+          [source, `${id}:`, `${id};`],
+        );
+        deleted += r.changes;
+      }
     }
-    // Health Connect: una misura multipla (es. pressione "id:sys"/"id:dia") ha id con suffisso.
-    for (const id of chunk) {
-      const r = await db.runAsync(
-        "DELETE FROM metrics WHERE source = ? AND source_id LIKE ? ESCAPE '\\'",
-        [source, `${id.replace(/[\\%_]/g, (c) => `\\${c}`)}:%`],
-      );
-      deleted += r.changes;
-    }
-  }
+  });
   return deleted;
 }
 

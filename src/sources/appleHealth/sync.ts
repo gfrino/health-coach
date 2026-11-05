@@ -155,6 +155,7 @@ export async function syncAppleHealthSleep(db: Db, now = Date.now()): Promise<nu
 export async function syncAppleHealth(
   db: Db,
   onProgress?: (p: SyncProgress) => void,
+  signal?: AbortSignal,
 ): Promise<SyncReport> {
   const now = Date.now();
   const report: SyncReport = { upserted: 0, deleted: 0, errors: [] };
@@ -186,45 +187,68 @@ export async function syncAppleHealth(
   });
   tick('sleep');
 
-  // 2) Quantità: le letture da HealthKit vanno in parallelo, le scritture nel DB una alla volta.
+  // 2a) Totali giornalieri (passi, calorie…): letture veloci da HealthKit in parallelo, scritture
+  //     nel DB una alla volta.
   const ids = quantityIds.filter((id) => HK_QUANTITY[id]);
-  const reads = await mapPool(ids, READ_CONCURRENCY, async (id) => {
+  const cumulativeIds = ids.filter((id) => HK_QUANTITY[id]!.cumulative);
+  const reads = await mapPool(cumulativeIds, READ_CONCURRENCY, async (id) => {
     const mapping = HK_QUANTITY[id]!;
     try {
       const state = await healthDataRepository.getSyncState(db, SRC, id);
-      if (mapping.cumulative) {
-        // Totali giornalieri deduplicati da HealthKit (iPhone + Watch non vengono sommati due volte).
-        const deep = !state?.anchor || now - Number(state.anchor) > DEEP_REFRESH_EVERY_MS;
-        const days = !state?.lastSyncedAt ? INITIAL_DAYS : deep ? DEEP_REFRESH_DAYS : RECENT_DAYS;
-        const from = startOfDay(now - (days - 1) * DAY_MS);
-        const stats = await hk(
-          queryStatisticsCollectionForQuantity(
-            id,
-            ['cumulativeSum'],
-            from,
-            { day: 1 },
-            {
-              filter: {
-                date: { startDate: from, endDate: new Date(now) },
-                // Le voci del diario alimentare scritte dall'app sono già nel DB: non si contano due volte.
-                ...(ownFood(id)
-                  ? { NOT: [{ metadata: { withMetadataKey: FOOD_ENTRY_METADATA_KEY } }] }
-                  : {}),
-              },
-              unit: mapping.unit as never,
-            },
-          ),
+      // Totali giornalieri deduplicati da HealthKit (iPhone + Watch non vengono sommati due volte).
+      const deep = !state?.anchor || now - Number(state.anchor) > DEEP_REFRESH_EVERY_MS;
+      const days = !state?.lastSyncedAt ? INITIAL_DAYS : deep ? DEEP_REFRESH_DAYS : RECENT_DAYS;
+      const from = startOfDay(now - (days - 1) * DAY_MS);
+      const stats = await hk(
+        queryStatisticsCollectionForQuantity(
           id,
-        );
-        const rows = stats
-          .map((x) => normalizeDailyStatistic(id, x))
-          .filter((m): m is NormalizedMetric => m !== null);
-        const anchor = deep || !state?.lastSyncedAt ? String(now) : undefined;
-        return { id, rows, deleted: [] as string[], anchor, error: null };
+          ['cumulativeSum'],
+          from,
+          { day: 1 },
+          {
+            filter: {
+              date: { startDate: from, endDate: new Date(now) },
+              // Le voci del diario alimentare scritte dall'app sono già nel DB: non si contano due volte.
+              ...(ownFood(id)
+                ? { NOT: [{ metadata: { withMetadataKey: FOOD_ENTRY_METADATA_KEY } }] }
+                : {}),
+            },
+            unit: mapping.unit as never,
+          },
+        ),
+        id,
+      );
+      const rows = stats
+        .map((x) => normalizeDailyStatistic(id, x))
+        .filter((m): m is NormalizedMetric => m !== null);
+      const anchor = deep || !state?.lastSyncedAt ? String(now) : undefined;
+      return { id, rows, anchor, error: null };
+    } catch (e) {
+      return { id, rows: [], anchor: undefined, error: e };
+    }
+  });
+  for (const r of reads) {
+    await guard(r.id, async () => {
+      if (r.error) throw r.error;
+      report.upserted += await healthDataRepository.upsertMetrics(db, r.rows);
+      if (r.anchor !== undefined) {
+        await healthDataRepository.setSyncState(db, SRC, r.id, { anchor: r.anchor });
       }
+    });
+    tick(HK_QUANTITY[r.id]!.type);
+  }
 
+  // 2b) Campioni singoli (frequenza cardiaca, peso, pressione…): pagina per pagina, salvando
+  //     l'anchor dopo ogni pagina. Se la sincronizzazione si interrompe (app chiusa, sospesa da iOS),
+  //     la volta dopo riparte da lì invece di rileggere e riscrivere tutto da capo.
+  for (const id of ids.filter((x) => !HK_QUANTITY[x]!.cumulative)) {
+    const mapping = HK_QUANTITY[id]!;
+    await guard(id, async () => {
+      const state = await healthDataRepository.getSyncState(db, SRC, id);
       const initialDays = mapping.type === 'heartRate' ? INITIAL_DAYS_HEART_RATE : INITIAL_DAYS;
-      const res = await anchored(async (anchor) => {
+      let anchor = state?.anchor ?? undefined;
+      for (let page = 0; page < 200; page++) {
+        if (signal?.aborted) throw new Error('sync aborted');
         const r = await hk(
           queryQuantitySamplesWithAnchor(id, {
             limit: PAGE,
@@ -236,26 +260,23 @@ export async function syncAppleHealth(
           }),
           id,
         );
-        return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
-      }, state?.anchor ?? undefined);
-      const rows = res.items
-        .map((x) => normalizeQuantitySample(id, x))
-        .filter((m): m is NormalizedMetric => m !== null);
-      return { id, rows, deleted: res.deleted, anchor: res.anchor ?? null, error: null };
-    } catch (e) {
-      return { id, rows: [], deleted: [], anchor: undefined, error: e };
-    }
-  });
-  for (const r of reads) {
-    await guard(r.id, async () => {
-      if (r.error) throw r.error;
-      report.upserted += await healthDataRepository.upsertMetrics(db, r.rows);
-      report.deleted += await healthDataRepository.deleteBySourceIds(db, SRC, r.deleted);
-      if (r.anchor !== undefined) {
-        await healthDataRepository.setSyncState(db, SRC, r.id, { anchor: r.anchor });
+        const rows = r.samples
+          .map((x) => normalizeQuantitySample(id, x))
+          .filter((m): m is NormalizedMetric => m !== null);
+        report.upserted += await healthDataRepository.upsertMetrics(db, rows);
+        report.deleted += await healthDataRepository.deleteBySourceIds(
+          db,
+          SRC,
+          r.deletedSamples.map((d) => d.uuid),
+        );
+        anchor = r.newAnchor;
+        await healthDataRepository.setSyncState(db, SRC, id, { anchor: anchor ?? null });
+        // Segno di vita per il controllo dei blocchi (la sync sta andando avanti).
+        onProgress?.({ done, total: steps, label: mapping.type });
+        if (r.samples.length < PAGE) break;
       }
     });
-    tick(HK_QUANTITY[r.id]!.type);
+    tick(mapping.type);
   }
 
   // 3) Mindfulness e ciclo mestruale
@@ -299,7 +320,9 @@ export async function syncAppleHealth(
         queryWorkoutSamplesWithAnchor({
           limit: PAGE,
           anchor,
-          filter: anchor ? undefined : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
+          filter: anchor
+            ? undefined
+            : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
         }),
         'workouts',
       );

@@ -3,7 +3,7 @@
  * (che la mattina chiede un'analisi all'AI) non deve tenere ferma la rotellina. Il task in
  * background invece lo aspetta, perché iOS sospende l'app appena il task finisce.
  */
-import { SYNC_MAX_MS, syncHealthData, useSyncStore } from '../syncService';
+import { SYNC_STALL_MS, syncHealthData, useSyncStore } from '../syncService';
 
 let mockReleaseProactive: () => void = () => undefined;
 const mockRunProactiveCheck = jest.fn(
@@ -32,7 +32,7 @@ jest.mock('../platformHealth', () => ({ platformHealthSource: 'apple_health' }))
 jest.mock('../demo/demoData', () => ({ generateDemoData: jest.fn(), SOURCE_DEMO: 'demo' }));
 const mockSyncAppleHealth = jest.fn(async () => ({ upserted: 0, deleted: 0, errors: [] }));
 jest.mock('../appleHealth/sync', () => ({
-  syncAppleHealth: () => mockSyncAppleHealth(),
+  syncAppleHealth: (...args: unknown[]) => (mockSyncAppleHealth as jest.Mock)(...args),
 }));
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
@@ -64,13 +64,36 @@ describe('syncHealthData', () => {
     expect(done).toBe(true);
   });
 
+  it('una sync lunga che avanza non viene interrotta', async () => {
+    jest.useFakeTimers();
+    try {
+      mockSyncAppleHealth.mockImplementationOnce(
+        ((_db: unknown, onProgress: (p: { done: number; total: number; label: string }) => void) =>
+          new Promise((resolve) => {
+            let n = 0;
+            const step = () => {
+              onProgress({ done: ++n, total: 5, label: 'x' });
+              if (n < 5) setTimeout(step, SYNC_STALL_MS - 1000);
+              else resolve({ upserted: 5, deleted: 0, errors: [] });
+            };
+            step();
+          })) as never,
+      );
+      const p = syncHealthData({ force: true, manual: true });
+      await jest.advanceTimersByTimeAsync(5 * SYNC_STALL_MS);
+      await expect(p).resolves.toEqual({ upserted: 5, deleted: 0, errors: [] });
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('una sync appesa (HealthKit che non risponde) si chiude da sola e non blocca le successive', async () => {
     jest.useFakeTimers();
     try {
       mockSyncAppleHealth.mockImplementationOnce(() => new Promise(() => undefined));
       const p = syncHealthData({ force: true, manual: true });
       expect(useSyncStore.getState().syncing).toBe(true);
-      await jest.advanceTimersByTimeAsync(SYNC_MAX_MS + 1);
+      await jest.advanceTimersByTimeAsync(SYNC_STALL_MS + 1);
       await expect(p).resolves.toBeNull();
       expect(useSyncStore.getState().syncing).toBe(false);
       expect(useSyncStore.getState().error).toBe('sync timeout');

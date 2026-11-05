@@ -39,19 +39,12 @@ export const useSyncStore = create<SyncState>(() => ({
 let running: Promise<SyncReport | null> | null = null;
 
 /**
- * Tempo massimo di una sincronizzazione: oltre, la si considera finita (errore) e la rotellina si
- * ferma. Ogni query a HealthKit ha già il suo limite; questo è il paracadute finale, perché una
- * sync rimasta appesa (es. app sospesa da iOS a metà) bloccherebbe anche tutte le successive.
+ * Se una sincronizzazione non fa progressi per questo tempo la si considera bloccata: si ferma
+ * (errore) e la rotellina sparisce. Ogni query a HealthKit ha già il suo limite (60 s); questo è
+ * il paracadute finale. Una sync lunga ma che avanza (primo import, molti campioni) non viene
+ * interrotta, e i dati scritti restano: la volta dopo riparte da lì.
  */
-export const SYNC_MAX_MS = 3 * 60 * 1000;
-
-function withDeadline<T>(p: Promise<T>, ms: number): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const deadline = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new Error('sync timeout')), ms);
-  });
-  return Promise.race([p, deadline]).finally(() => clearTimeout(timer));
-}
+export const SYNC_STALL_MS = 90 * 1000;
 
 async function compactOldHeartRate(): Promise<void> {
   const cutoff = new Date();
@@ -61,13 +54,16 @@ async function compactOldHeartRate(): Promise<void> {
   if (__DEV__ && days) console.warn(`[sync] frequenza cardiaca compattata: ${days} giorni`);
 }
 
-async function runPlatformSync(onProgress: (p: SyncProgress) => void): Promise<SyncReport> {
+async function runPlatformSync(
+  onProgress: (p: SyncProgress) => void,
+  signal: AbortSignal,
+): Promise<SyncReport> {
   const db = await getDb();
   /* eslint-disable @typescript-eslint/no-require-imports -- moduli nativi caricati solo sulla loro piattaforma */
   if (Platform.OS === 'ios') {
     const { syncAppleHealth } =
       require('./appleHealth/sync') as typeof import('./appleHealth/sync');
-    return syncAppleHealth(db, onProgress);
+    return syncAppleHealth(db, onProgress, signal);
   }
   const { syncHealthConnect } =
     require('./healthConnect/sync') as typeof import('./healthConnect/sync');
@@ -99,10 +95,23 @@ export function syncHealthData(
 
   const startedAt = Date.now();
   useSyncStore.setState({ syncing: true, manual: !!opts.manual, progress: null, error: null });
-  running = withDeadline(
-    runPlatformSync((progress) => useSyncStore.setState({ progress })),
-    SYNC_MAX_MS,
-  )
+  const controller = new AbortController();
+  let stallTimer: ReturnType<typeof setTimeout> | undefined;
+  let rejectStall: (e: Error) => void = () => undefined;
+  const stalled = new Promise<never>((_, reject) => (rejectStall = reject));
+  const alive = () => {
+    clearTimeout(stallTimer);
+    stallTimer = setTimeout(() => {
+      controller.abort();
+      rejectStall(new Error('sync timeout'));
+    }, SYNC_STALL_MS);
+  };
+  alive();
+  const work = runPlatformSync((progress) => {
+    alive();
+    useSyncStore.setState({ progress });
+  }, controller.signal);
+  running = Promise.race([work, stalled])
     .then(async (report) => {
       // Arrivati i dati veri, i dati di esempio (sviluppo) non devono mescolarsi con loro.
       if (report.upserted > 0) await clearDemoData().catch(() => undefined);
@@ -122,6 +131,7 @@ export function syncHealthData(
       return null;
     })
     .finally(() => {
+      clearTimeout(stallTimer);
       useSyncStore.setState({ syncing: false, manual: false, progress: null });
       running = null;
     });
