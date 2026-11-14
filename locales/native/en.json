@@ -7,6 +7,6 @@
     "NSCameraUsageDescription": "AlbA uses the camera only to photograph your medical reports.",
     "NSMicrophoneUsageDescription": "AlbA uses the microphone only while you talk to your coach.",
     "NSSpeechRecognitionUsageDescription": "AlbA transcribes your voice so you can talk to your coach. When possible, transcription happens on your phone.",
-    "NSHealthUpdateUsageDescription": "AlbA never writes or changes your data in Health: it only reads it to give you personalised advice."
+    "NSHealthUpdateUsageDescription": "AlbA saves to Health only the meals from your food diary (calories and nutrients), and only if you turn this on in the Food tab. It never changes your other data."
   }
 }

@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.10.0',
+  version: '1.23.2',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
@@ -211,11 +211,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         NSHealthShareUsageDescription:
           'AlbA legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.',
-        // v1.0 legge soltanto: nessuna richiesta di scrittura.
-        // Obbligatoria per l'App Store anche se l'app legge soltanto: la libreria HealthKit
-        // referenzia anche le API di scrittura. L'app non chiede mai il permesso di scrivere.
+        // Scrittura solo dei pasti del diario alimentare, se l'utente la attiva (scheda Cibo).
+        // Il testo deve dirlo: Apple rifiuta le descrizioni non veritiere.
         NSHealthUpdateUsageDescription:
-          'AlbA non scrive né modifica i tuoi dati in Salute: li legge soltanto per darti consigli personalizzati.',
+          'AlbA salva in Salute solo i pasti del tuo diario alimentare (calorie e nutrienti), e soltanto se attivi questa opzione nella scheda Cibo. Non modifica gli altri dati.',
         background: true,
       },
     ],
