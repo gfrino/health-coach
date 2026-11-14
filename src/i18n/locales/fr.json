@@ -505,6 +505,9 @@
     "height": "Taille (cm)",
     "weight": "Poids ({{unit}})",
     "goalsLabel": "Objectifs",
+    "targetWeight": "Poids cible ({{unit}})",
+    "targetDate": "Pour quand ? (facultatif)",
+    "targetHint": "Ton coach t'aide à l'atteindre et l'objectif calorique s'adapte au rythme, jamais au-delà d'un rythme sûr (environ 0,5–1 % du poids par semaine).",
     "goals": {
       "loseWeight": "Perdre du poids",
       "gainWeight": "Prendre du poids",
@@ -1001,6 +1004,10 @@
     "targetLabel": "Calories par jour",
     "targetCustom": "{{kcal}} kcal par jour, choisi par toi.",
     "targetEstimated": "Environ {{kcal}} kcal par jour, estimées à partir de ton profil et de ton activité.",
+    "targetPaceLose": "Inclut {{kcal}} kcal de moins par jour pour perdre environ {{pace}} kg par semaine vers ton objectif.",
+    "targetPaceGain": "Inclut {{kcal}} kcal de plus par jour pour prendre environ {{pace}} kg par semaine vers ton objectif.",
+    "targetDeficit": "Inclut {{kcal}} kcal de moins par jour car tu veux perdre du poids. Fixe un poids cible dans ton profil pour un calcul précis.",
+    "targetSurplus": "Inclut {{kcal}} kcal de plus par jour car tu veux prendre du poids. Fixe un poids cible dans ton profil pour un calcul précis.",
     "targetEdit": "Modifier",
     "targetReset": "Utiliser l'estimation",
     "writeHealth": "Enregistrer aussi dans Santé",
@@ -1077,5 +1084,19 @@
       "mind": "Pour les suggestions de respiration, de relaxation et de pleine conscience.",
       "diets": "Pour le mode alimentaire que tu choisis (méditerranéen, cétogène, végétarien, jeûne…)."
     }
+  },
+  "goal": {
+    "title": "Objectif : {{target}}",
+    "setTitle": "Fixe ton poids cible",
+    "setBody": "Dis-nous où tu veux arriver (et pour quand, si tu veux) : ton coach te guide pas à pas et les calories s'adaptent.",
+    "editHint": "Ouvre ton profil pour changer l'objectif",
+    "progress": "De {{start}} à {{now}} : encore {{left}}",
+    "reached": "Objectif atteint : tu pèses {{now}}. Ton coach t'aide à le garder.",
+    "noTrend": "Pèse-toi 2 à 3 fois par semaine pour voir la tendance.",
+    "trendEta": "Tendance {{trend}} par semaine : tu y arrives vers le {{eta}}.",
+    "trendWrong": "Tendance {{trend}} par semaine : tu ne t'en rapproches pas encore.",
+    "needed": "Pour y arriver d'ici le {{date}}, il faut environ {{needed}} par semaine.",
+    "behind": "Un peu en retard : pour le {{date}}, il faut environ {{needed}} par semaine.",
+    "tooFast": "Le rythme nécessaire est trop rapide pour être sûr : envisage une date plus lointaine."
   }
 }

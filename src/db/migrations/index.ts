@@ -7,6 +7,7 @@ import { migration006 } from './006_recipes';
 import { migration007 } from './007_food_log';
 import { migration008 } from './008_food_details';
 import { migration009 } from './009_program_schedule';
+import { migration010 } from './010_weight_goal';
 import type { Migration } from './types';
 
 /**
@@ -24,6 +25,7 @@ export const migrations: readonly Migration[] = [
   migration007,
   migration008,
   migration009,
+  migration010,
 ];
 
 export type { Migration } from './types';

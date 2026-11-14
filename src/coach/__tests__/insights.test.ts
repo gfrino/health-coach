@@ -30,7 +30,11 @@ describe('buildInsights', () => {
   });
 
   it('non chiama "stanotte" una notte più vecchia se quella appena finita non è ancora arrivata', () => {
-    const nights = [2, 1].map((n) => ({ day: day(n), asleepMin: 420, stages: [] as StageInterval[] }));
+    const nights = [2, 1].map((n) => ({
+      day: day(n),
+      asleepMin: 420,
+      stages: [] as StageInterval[],
+    }));
     const r = buildInsights({ today, nights });
     expect(r.lines[0]).toContain('last night is not in the health data yet');
     expect(r.lines[0]).toContain(`most recent recorded night woke up on ${day(1)}`);

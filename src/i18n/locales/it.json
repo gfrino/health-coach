@@ -505,6 +505,9 @@
     "height": "Altezza (cm)",
     "weight": "Peso ({{unit}})",
     "goalsLabel": "Obiettivi",
+    "targetWeight": "Peso obiettivo ({{unit}})",
+    "targetDate": "Entro quando? (facoltativo)",
+    "targetHint": "Il coach ti aiuta a raggiungerlo e l'obiettivo di calorie si adatta al ritmo, senza mai superare una perdita sicura (circa 0,5–1% del peso a settimana).",
     "goals": {
       "loseWeight": "Perdere peso",
       "gainWeight": "Aumentare di peso",
@@ -1001,6 +1004,10 @@
     "targetLabel": "Calorie al giorno",
     "targetCustom": "{{kcal}} kcal al giorno, scelto da te.",
     "targetEstimated": "Circa {{kcal}} kcal al giorno, stimate dal tuo profilo e da quanto ti muovi.",
+    "targetPaceLose": "Include {{kcal}} kcal in meno al giorno per perdere circa {{pace}} kg a settimana verso il tuo obiettivo.",
+    "targetPaceGain": "Include {{kcal}} kcal in più al giorno per aumentare di circa {{pace}} kg a settimana verso il tuo obiettivo.",
+    "targetDeficit": "Include {{kcal}} kcal in meno al giorno perché vuoi perdere peso. Fissa un peso obiettivo nel profilo per un calcolo preciso.",
+    "targetSurplus": "Include {{kcal}} kcal in più al giorno perché vuoi aumentare di peso. Fissa un peso obiettivo nel profilo per un calcolo preciso.",
     "targetEdit": "Cambia",
     "targetReset": "Usa la stima",
     "writeHealth": "Salva anche in Apple Salute",
@@ -1077,5 +1084,19 @@
       "mind": "Usate per i suggerimenti di respirazione, rilassamento e mindfulness.",
       "diets": "Usate per lo stile alimentare che scegli (mediterranea, chetogenica, vegetariana, digiuno…)."
     }
+  },
+  "goal": {
+    "title": "Obiettivo: {{target}}",
+    "setTitle": "Fissa il tuo peso obiettivo",
+    "setBody": "Indica a quanto vuoi arrivare (ed entro quando, se vuoi): il coach ti guida passo per passo e le calorie si adattano.",
+    "editHint": "Apre il profilo per cambiare l'obiettivo",
+    "progress": "Da {{start}} a {{now}}: mancano {{left}}",
+    "reached": "Obiettivo raggiunto: ora pesi {{now}}. Il coach ti aiuta a mantenerlo.",
+    "noTrend": "Pesati 2–3 volte a settimana per vedere l'andamento.",
+    "trendEta": "Andamento {{trend}} a settimana: ci arrivi verso il {{eta}}.",
+    "trendWrong": "Andamento {{trend}} a settimana: non ti stai ancora avvicinando.",
+    "needed": "Per arrivarci entro il {{date}} servono circa {{needed}} a settimana.",
+    "behind": "Sei un po' indietro: per il {{date}} servono circa {{needed}} a settimana.",
+    "tooFast": "Il ritmo richiesto è troppo rapido per essere sicuro: valuta una data più lontana."
   }
 }

@@ -1,5 +1,6 @@
 import type { ChatMessage } from '@/ai/types';
 import type { CoachConfig, SupportedLanguage } from '@/config/settingsSchema';
+import { goalsForPrompt } from '@/goals/goals';
 import { localIsoDate } from '@/lib/dates';
 import { extraMeasuresSection, type CycleInfo, type ExtraMeasure } from './extraMeasuresText';
 
@@ -37,6 +38,8 @@ export interface ProfileContext {
     frequency?: string | null;
   }[];
   allergies?: { substance: string; reaction?: string | null }[];
+  /** Righe già calcolate dall'app sul progresso verso il peso obiettivo. */
+  weightGoal?: string[] | null;
 }
 
 export interface MetricSummary {
@@ -155,7 +158,7 @@ function profileSection(p: ProfileContext | undefined, now: Date): string | null
   if (p.weightKg) basics.push(`weight: ${fmt(p.weightKg)} kg`);
   if (p.heightCm && p.weightKg) basics.push(`BMI: ${fmt(p.weightKg / (p.heightCm / 100) ** 2)}`);
   if (basics.length) lines.push(`- ${basics.join(', ')}`);
-  if (p.goals?.length) lines.push(`- Goals: ${p.goals.join('; ')}`);
+  if (p.goals?.length) lines.push(`- Goals: ${goalsForPrompt(p.goals).join('; ')}`);
   if (p.conditions?.length) {
     lines.push(
       `- Conditions: ${p.conditions.map((c) => (c.notes ? `${c.name} (${c.notes})` : c.name)).join('; ')}`,
@@ -173,6 +176,15 @@ function profileSection(p: ProfileContext | undefined, now: Date): string | null
     );
   }
   return lines.length ? `USER PROFILE\n${lines.join('\n')}` : null;
+}
+
+/** Obiettivi in primo piano: l'app è orientata al risultato che l'utente vuole raggiungere. */
+function goalSection(p: ProfileContext | undefined): string | null {
+  if (!p?.goals?.length && !p?.weightGoal?.length) return null;
+  const lines: string[] = [];
+  if (p.goals?.length) lines.push(`- They want to: ${goalsForPrompt(p.goals).join('; ')}.`);
+  for (const l of p.weightGoal ?? []) lines.push(`- ${l}`);
+  return `THEIR GOALS (the reason they use the app: steer every answer toward them)\n${lines.join('\n')}`;
 }
 
 function metricsSection(
@@ -298,7 +310,7 @@ export interface FoodContext {
   };
   /** Media sui giorni con voci negli ultimi 7 (oggi escluso). */
   avg7: { calories: number; days: number } | null;
-  target: { kcal: number; custom: boolean } | null;
+  target: { kcal: number; custom: boolean; paceKgWeek?: number | null } | null;
 }
 
 const FOOD_RULE = `FOOD DIARY
@@ -313,7 +325,7 @@ export function foodSection(
   const head = [
     `Today so far: ${t.calories} kcal (protein ${t.protein} g, carbs ${t.carbs} g, fat ${t.fat} g${t.saturatedFat ? ` of which saturated ${t.saturatedFat} g` : ''}${t.fiber ? `, fiber ${t.fiber} g` : ''}${t.sugar ? `, sugar ${t.sugar} g` : ''}${t.sodium ? `, sodium ${t.sodium} mg` : ''}; estimates) in ${food.today.length} foods`,
     food.target
-      ? `daily target ${food.target.kcal} kcal (${food.target.custom ? 'set by the user' : 'estimated by the app from profile and activity'})`
+      ? `daily target ${food.target.kcal} kcal (${food.target.custom ? 'set by the user' : `estimated by the app from profile and activity${food.target.paceKgWeek ? `, for about ${food.target.paceKgWeek} kg/week toward their weight goal` : ''}`})`
       : null,
     food.avg7
       ? `average of the last ${food.avg7.days} logged days: ${food.avg7.calories} kcal`
@@ -398,6 +410,7 @@ export function composeSystemPrompt(full: CoachContextInput): string {
     `APPROACH\n${MEDICAL_PROMPTS[coach.medicalApproach]}\n${dietGuideText(coach.nutritionApproach, input.compact)}\n${TONE_PROMPTS[coach.tone]}`,
     SAFETY_RULES,
     profileSection(input.profile, input.now),
+    goalSection(input.profile),
     input.memoryFacts?.length
       ? `WHAT YOU REMEMBER ABOUT THE USER (from previous conversations)\n${input.memoryFacts.map((f) => `- ${input.compact ? '' : `[${f.id}] `}${f.text}`).join('\n')}`
       : null,

@@ -5,22 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { AppText, Card, ChipGroup, DateField, TextField } from '@/components';
 import { getDb, profileRepository } from '@/db';
 import type { Profile } from '@/db/repositories/profileRepository';
+import { GOALS } from '@/goals/goals';
 import { readHealthProfilePrefill } from '@/sources/platformHealth';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
-
-const GOALS = [
-  'loseWeight',
-  'gainWeight',
-  'gainMuscle',
-  'sleepBetter',
-  'moreEnergy',
-  'reduceStress',
-  'fitness',
-  'heartHealth',
-  'eatBetter',
-  'manageCondition',
-] as const;
 
 const LB_PER_KG = 2.20462;
 
@@ -43,6 +31,7 @@ export function useProfileForm() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
+  const [targetWeight, setTargetWeight] = useState('');
   const [prefilled, setPrefilled] = useState(false);
 
   useEffect(() => {
@@ -68,9 +57,10 @@ export function useProfileForm() {
       if (!active) return;
       setProfile(p);
       setHeight(p.heightCm ? String(p.heightCm) : '');
-      setWeight(
-        p.weightKg ? String(Math.round((lb ? p.weightKg * LB_PER_KG : p.weightKg) * 10) / 10) : '',
-      );
+      const show = (kg: number | null) =>
+        kg ? String(Math.round((lb ? kg * LB_PER_KG : kg) * 10) / 10) : '';
+      setWeight(show(p.weightKg));
+      setTargetWeight(show(p.targetWeightKg));
     })();
     return () => {
       active = false;
@@ -79,27 +69,35 @@ export function useProfileForm() {
 
   const set = (patch: Partial<Profile>) => setProfile((cur) => (cur ? { ...cur, ...patch } : cur));
 
-  const goalLabels = GOALS.map((g) => t(`profileSetup.goals.${g}`));
-  const toggleGoal = (label: string) =>
+  const toggleGoal = (goal: string) =>
     setProfile((cur) =>
       cur
         ? {
             ...cur,
-            goals: cur.goals.includes(label)
-              ? cur.goals.filter((x) => x !== label)
-              : [...cur.goals, label],
+            goals: cur.goals.includes(goal)
+              ? cur.goals.filter((x) => x !== goal)
+              : [...cur.goals, goal],
           }
         : cur,
     );
+  // Peso obiettivo: solo se l'utente vuole perdere o aumentare di peso.
+  const weightGoal =
+    !!profile && (profile.goals.includes('loseWeight') || profile.goals.includes('gainWeight'));
 
   const save = async () => {
     if (!profile) return;
     const db = await getDb();
-    const w = parseNumber(weight);
+    const kg = (v: string) => {
+      const n = parseNumber(v);
+      return n === null ? null : Math.round((lb ? n / LB_PER_KG : n) * 10) / 10;
+    };
+    const target = weightGoal ? kg(targetWeight) : null;
     await profileRepository.saveProfile(db, {
       ...profile,
       heightCm: parseNumber(height),
-      weightKg: w === null ? null : Math.round((lb ? w / LB_PER_KG : w) * 10) / 10,
+      weightKg: kg(weight),
+      targetWeightKg: target,
+      targetDate: target ? profile.targetDate : null,
     });
   };
 
@@ -149,8 +147,27 @@ export function useProfileForm() {
         label={t('profileSetup.goalsLabel')}
         value={profile.goals}
         onChange={toggleGoal}
-        options={goalLabels.map((l) => ({ value: l, label: l }))}
+        options={GOALS.map((g) => ({ value: g, label: t(`profileSetup.goals.${g}`) }))}
       />
+      {weightGoal ? (
+        <Card tone="soft">
+          <TextField
+            label={t('profileSetup.targetWeight', { unit: units.weight })}
+            value={targetWeight}
+            onChangeText={setTargetWeight}
+            keyboardType="decimal-pad"
+            placeholder={lb ? '150' : '70'}
+          />
+          <DateField
+            label={t('profileSetup.targetDate')}
+            value={profile.targetDate}
+            onChange={(targetDate) => set({ targetDate })}
+          />
+          <AppText variant="caption" tone="textMuted">
+            {t('profileSetup.targetHint')}
+          </AppText>
+        </Card>
+      ) : null}
     </>
   ) : null;
 

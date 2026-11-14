@@ -5,6 +5,7 @@ import { LayoutAnimation, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Card, EmptyState, Icon, NavRow, ProgressBar, Screen } from '@/components';
+import { GoalCard } from '@/goals/GoalCard';
 import { haptic } from '@/lib/haptics';
 import { CATEGORY_ICONS } from '@/programs/ProgramItemRow';
 import { ProgramTodayList, todayProgress } from '@/programs/ProgramTodayList';
@@ -47,6 +48,7 @@ export default function ProgramsScreen() {
           </Pressable>
         }
       >
+        <GoalCard />
         {active === null ? null : active.length === 0 && finished.length === 0 ? (
           <EmptyState
             icon="programs"

@@ -1,10 +1,13 @@
 import { healthQueries, profileRepository, type Db } from '@/db';
+import { weightGoalProgress, type WeightGoalProgress } from '@/goals/progress';
 import { DAY_MS, localIsoDate } from '@/lib/dates';
 
 /**
  * Obiettivo calorico giornaliero stimato dall'app (mai inventato dal modello):
  * metabolismo basale (Mifflin-St Jeor) × 1,2 per la vita quotidiana, più la media delle calorie
  * attive degli ultimi 7 giorni se c'è, corretto per l'obiettivo (dimagrire / aumentare di peso).
+ * Con un peso obiettivo e una data il deficit segue il ritmo necessario, entro limiti sicuri
+ * (0,25–0,75 kg a settimana e mai oltre l'1% del peso; per aumentare 0,1–0,4 kg).
  * È una stima indicativa: l'utente può impostare il suo numero nella scheda Cibo.
  */
 
@@ -16,6 +19,8 @@ export interface TargetInput {
   /** Media giornaliera delle calorie attive (Apple Salute / Health Connect), se disponibile. */
   activeKcal: number | null;
   goals: string[];
+  /** Obiettivo di peso (se fissato): direzione, ritmo necessario, raggiunto. */
+  weightGoal?: Pick<WeightGoalProgress, 'direction' | 'neededKgWeek' | 'reached'> | null;
 }
 
 export interface CalorieTarget {
@@ -23,6 +28,34 @@ export interface CalorieTarget {
   bmr: number;
   activeKcal: number | null;
   adjustment: number;
+  /** Ritmo su cui è calcolato il deficit/surplus (kg a settimana), se c'è un obiettivo. */
+  paceKgWeek: number | null;
+}
+
+/** Calorie per kg di peso corporeo (approssimazione usata comunemente). */
+const KCAL_PER_KG = 7700;
+const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+
+function goalAdjustment(i: TargetInput): { adjustment: number; pace: number | null } {
+  const g = i.weightGoal;
+  const lose = g ? g.direction === 'lose' : i.goals.includes('loseWeight');
+  const gain = g ? g.direction === 'gain' : i.goals.includes('gainWeight');
+  if (g?.reached) return { adjustment: 0, pace: null };
+  if (lose) {
+    if (!g) return { adjustment: -400, pace: null };
+    const max = Math.min(0.75, (i.weightKg ?? 70) * 0.01);
+    const pace = clamp(g.neededKgWeek ?? 0.4, 0.25, max);
+    return {
+      adjustment: -Math.round((pace * KCAL_PER_KG) / 7),
+      pace: Math.round(pace * 100) / 100,
+    };
+  }
+  if (gain) {
+    if (!g) return { adjustment: 300, pace: null };
+    const pace = clamp(g.neededKgWeek ?? 0.25, 0.1, 0.4);
+    return { adjustment: Math.round((pace * KCAL_PER_KG) / 7), pace: Math.round(pace * 100) / 100 };
+  }
+  return { adjustment: 0, pace: null };
 }
 
 /** Sotto questa soglia non si scende: diete molto basse vanno seguite da un medico. */
@@ -35,13 +68,9 @@ export function estimateTarget(i: TargetInput): CalorieTarget | null {
   const bmr = Math.round(i.sex === 'male' ? base + 5 : i.sex === 'female' ? base - 161 : base - 78);
   const active = i.activeKcal && i.activeKcal > 0 ? Math.round(i.activeKcal) : null;
   const maintenance = bmr * 1.2 + (active ?? 0);
-  const adjustment = i.goals.includes('loseWeight')
-    ? -400
-    : i.goals.includes('gainWeight')
-      ? 300
-      : 0;
+  const { adjustment, pace } = goalAdjustment(i);
   const kcal = Math.max(MIN_TARGET, Math.round((maintenance + adjustment) / 10) * 10);
-  return { kcal, bmr, activeKcal: active, adjustment };
+  return { kcal, bmr, activeKcal: active, adjustment, paceKgWeek: pace };
 }
 
 function ageOn(birthDate: string | null, now: Date): number | null {
@@ -61,7 +90,7 @@ export async function loadCalorieTarget(db: Db, now = new Date()): Promise<Calor
   const profile = await profileRepository.getProfile(db);
   const to = now.getTime() + 1;
   const [weight, active] = await Promise.all([
-    healthQueries.dailyMetric(db, 'weight', to - 60 * DAY_MS, to),
+    healthQueries.dailyMetric(db, 'weight', to - 180 * DAY_MS, to),
     healthQueries.dailyMetric(db, 'activeEnergy', to - 8 * DAY_MS, to),
   ]);
   // Oggi è parziale: si usano i 7 giorni completi precedenti.
@@ -77,5 +106,6 @@ export async function loadCalorieTarget(db: Db, now = new Date()): Promise<Calor
     heightCm: profile.heightCm,
     activeKcal,
     goals: profile.goals,
+    weightGoal: weightGoalProgress(profile, weight.days, today),
   });
 }

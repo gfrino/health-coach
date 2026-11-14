@@ -312,6 +312,18 @@ export default function FoodScreen() {
                     ? t('food.targetEstimated', { kcal: num(estimated.kcal, locale, 0) })
                     : t('food.noTarget')}
               </AppText>
+              {!custom && estimated?.adjustment ? (
+                <AppText variant="caption" tone="textMuted">
+                  {estimated.paceKgWeek
+                    ? t(estimated.adjustment < 0 ? 'food.targetPaceLose' : 'food.targetPaceGain', {
+                        kcal: num(Math.abs(estimated.adjustment), locale, 0),
+                        pace: num(estimated.paceKgWeek, locale, 2),
+                      })
+                    : t(estimated.adjustment < 0 ? 'food.targetDeficit' : 'food.targetSurplus', {
+                        kcal: num(Math.abs(estimated.adjustment), locale, 0),
+                      })}
+                </AppText>
+              ) : null}
               <View style={{ flexDirection: 'row', gap: spacing.sm }}>
                 <View style={{ flex: 1 }}>
                   <Button

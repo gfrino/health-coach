@@ -505,6 +505,9 @@
     "height": "Height (cm)",
     "weight": "Weight ({{unit}})",
     "goalsLabel": "Goals",
+    "targetWeight": "Target weight ({{unit}})",
+    "targetDate": "By when? (optional)",
+    "targetHint": "Your coach helps you get there and the calorie target adapts to the pace, never beyond a safe rate (about 0.5–1% of body weight a week).",
     "goals": {
       "loseWeight": "Lose weight",
       "gainWeight": "Gain weight",
@@ -1001,6 +1004,10 @@
     "targetLabel": "Calories per day",
     "targetCustom": "{{kcal}} kcal a day, chosen by you.",
     "targetEstimated": "About {{kcal}} kcal a day, estimated from your profile and how much you move.",
+    "targetPaceLose": "Includes {{kcal}} kcal less a day to lose about {{pace}} kg a week toward your goal.",
+    "targetPaceGain": "Includes {{kcal}} kcal more a day to gain about {{pace}} kg a week toward your goal.",
+    "targetDeficit": "Includes {{kcal}} kcal less a day because you want to lose weight. Set a target weight in your profile for a precise plan.",
+    "targetSurplus": "Includes {{kcal}} kcal more a day because you want to gain weight. Set a target weight in your profile for a precise plan.",
     "targetEdit": "Change",
     "targetReset": "Use the estimate",
     "writeHealth": "Also save to Apple Health",
@@ -1077,5 +1084,19 @@
       "mind": "Used for breathing, relaxation and mindfulness suggestions.",
       "diets": "Used for the eating approach you choose (Mediterranean, keto, vegetarian, fasting…)."
     }
+  },
+  "goal": {
+    "title": "Goal: {{target}}",
+    "setTitle": "Set your target weight",
+    "setBody": "Tell us where you want to get (and by when, if you like): your coach guides you step by step and calories adapt.",
+    "editHint": "Opens your profile to change the goal",
+    "progress": "From {{start}} to {{now}}: {{left}} to go",
+    "reached": "Goal reached: you weigh {{now}}. Your coach helps you keep it.",
+    "noTrend": "Weigh yourself 2–3 times a week to see your trend.",
+    "trendEta": "Trend {{trend}} a week: you get there around {{eta}}.",
+    "trendWrong": "Trend {{trend}} a week: not moving toward the goal yet.",
+    "needed": "To get there by {{date}} you need about {{needed}} a week.",
+    "behind": "A bit behind: for {{date}} you need about {{needed}} a week.",
+    "tooFast": "The pace needed is too fast to be safe: consider a later date."
   }
 }

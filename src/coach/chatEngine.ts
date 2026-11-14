@@ -20,6 +20,7 @@ import { fileTypeOf } from '@/records/fileMeta';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS, localIsoDate } from '@/lib/dates';
 import { loadCalorieTarget } from '@/food/target';
+import { loadWeightGoal, weightGoalLines } from '@/goals/progress';
 import { loadProgramContext } from '@/programs/summary';
 import { getTodayTotalsAt } from '@/sources/freshness';
 
@@ -84,6 +85,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     extras,
     cycle,
     recipeList,
+    weightGoal,
   ] = await Promise.all([
     profileRepository.loadProfileContext(db),
     memoryRepository.listFacts(db),
@@ -96,6 +98,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     loadExtraMeasures(db, now),
     loadCycle(db, now),
     recipeRepository.listRecipes(db),
+    loadWeightGoal(db, now).catch(() => null),
   ]);
   const food = await loadFoodContext(db, settings, now);
   const records = reports.map((r) => ({
@@ -121,7 +124,7 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
   return composeSystemPrompt({
     coach: settings.coach,
     language: resolveLanguage(settings.language, deviceLanguageCodes()),
-    profile,
+    profile: { ...profile, weightGoal: weightGoal ? weightGoalLines(weightGoal) : null },
     memoryFacts: memoryFacts.map((f) => ({ id: f.id, text: f.text })),
     summaries,
     metrics: snapshot.metrics,
@@ -180,7 +183,7 @@ async function loadFoodContext(
     target: custom
       ? { kcal: custom, custom: true }
       : estimated
-        ? { kcal: estimated.kcal, custom: false }
+        ? { kcal: estimated.kcal, custom: false, paceKgWeek: estimated.paceKgWeek }
         : null,
   };
 }
