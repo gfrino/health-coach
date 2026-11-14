@@ -3,6 +3,8 @@ import type { AppSettings } from '@/config/settingsSchema';
 import { deviceLanguageCodes, resolveLanguage } from '@/i18n';
 import { parseNumber } from '@/records/labExtraction';
 
+import { trackerPromptName, type Tracker } from './trackers';
+
 /**
  * Stima di calorie e macronutrienti da una frase ("2 uova e una fetta di pane") con l'AI scelta
  * dall'utente, anche quella del telefono: formato a righe, corto e facile da leggere.
@@ -23,14 +25,22 @@ export interface FoodEstimate {
   saturatedFat: number | null;
   /** Milligrammi. */
   sodium: number | null;
+  /** Valori in più tracciati dall'utente, per id (solo se ce ne sono). */
+  extras?: Record<string, number>;
 }
 
-export function estimateInstruction(language: string, text: string, fromPhoto = false): string {
+export function estimateInstruction(
+  language: string,
+  text: string,
+  fromPhoto = false,
+  trackers: Tracker[] = [],
+): string {
+  const extraCols = trackers.map((t) => ` | ${trackerPromptName(t)} ${t.unit}`).join('');
   return [
     fromPhoto
       ? 'Look at the photo of what the user ate. Identify each food and drink you can see and estimate its portion from the photo (plate size, typical servings). Reply in EXACTLY this format, one line per food, nothing else:'
       : 'Estimate the nutrition of what the user ate. Reply in EXACTLY this format, one line per food, nothing else:',
-    'name | quantity | kcal | protein g | carbs g | fat g | fiber g | sugar g | saturated fat g | sodium mg',
+    `name | quantity | kcal | protein g | carbs g | fat g | fiber g | sugar g | saturated fat g | sodium mg${extraCols}`,
     `- name: the food itself (e.g. "Scrambled eggs"), short, in ${language}, starting with a capital letter. Never a word like "today" or "lunch".`,
     '- quantity: the amount as the user said it; if they gave none, a typical portion you assume (e.g. "1 slice, 30 g").',
     '- Numbers only (no units), with a dot for decimals and no thousands separators. Use typical values for that food and quantity.',
@@ -63,7 +73,7 @@ function cellNumber(cell: string | undefined): number | null {
   return v !== null && v >= 0 ? v : null;
 }
 
-export function parseFoodEstimate(reply: string): FoodEstimate[] {
+export function parseFoodEstimate(reply: string, trackers: Tracker[] = []): FoodEstimate[] {
   const out: FoodEstimate[] = [];
   for (const raw of reply.split('\n')) {
     const parts = raw
@@ -91,10 +101,20 @@ export function parseFoodEstimate(reply: string): FoodEstimate[] {
       sugar: n(7),
       saturatedFat: n(8),
       sodium: n(9),
+      ...extrasFrom(trackers, (i) => n(10 + i)),
     });
     if (out.length >= 20) break;
   }
   return out;
+}
+
+function extrasFrom(trackers: Tracker[], value: (i: number) => number | null) {
+  const out: Record<string, number> = {};
+  trackers.forEach((t, i) => {
+    const v = value(i);
+    if (v !== null) out[t.id] = Math.round(v * 10) / 10;
+  });
+  return Object.keys(out).length ? { extras: out } : {};
 }
 
 /** L'AI scelta sa guardare le foto? (L'AI del telefono no: serve un servizio online.) */
@@ -116,12 +136,13 @@ export async function estimateFood(
     require('@/coach/chatEngine') as typeof import('@/coach/chatEngine');
   const { provider, model, apiKey } = await resolveAI(settings);
   const language = LANGUAGE_NAMES[resolveLanguage(settings.language, deviceLanguageCodes())];
+  const trackers = settings.food.trackers ?? [];
   const res = await provider.sendMessage(
     { system: 'You are a precise nutrition assistant. You estimate, you never refuse.' },
     [
       {
         role: 'user',
-        content: estimateInstruction(language, text, !!photo),
+        content: estimateInstruction(language, text, !!photo, trackers),
         images: photo ? [photo] : undefined,
       },
     ],
@@ -131,5 +152,5 @@ export async function estimateFood(
     console.warn(
       `[cibo] stima ${provider.id} per ${JSON.stringify(text)}: ${JSON.stringify(res.text)}`,
     );
-  return parseFoodEstimate(res.text);
+  return parseFoodEstimate(res.text, trackers);
 }

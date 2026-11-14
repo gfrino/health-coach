@@ -60,6 +60,15 @@ const PROGRAM_ITEM = {
   additionalProperties: false,
 } as const;
 
+/** Valori in più dal tool: [{ id, value }] → { id: value }. */
+function extrasArg(raw: unknown): Record<string, number> | null {
+  if (!Array.isArray(raw)) return null;
+  const out: Record<string, number> = {};
+  for (const e of raw as Record<string, unknown>[])
+    if (typeof e?.id === 'string' && typeof e.value === 'number') out[e.id] = e.value;
+  return Object.keys(out).length ? out : null;
+}
+
 export const COACH_TOOLS: ToolDefinition[] = [
   {
     name: 'get_metric',
@@ -279,6 +288,17 @@ export const COACH_TOOLS: ToolDefinition[] = [
               sugar: { type: 'number', description: 'Grams.' },
               saturated_fat: { type: 'number', description: 'Grams.' },
               sodium: { type: 'number', description: 'Milligrams.' },
+              extras: {
+                type: 'array',
+                description:
+                  'Only if FOOD TODAY lists values the user tracks: one entry per tracked value, with its id and amount in its unit.',
+                items: {
+                  type: 'object',
+                  properties: { id: { type: 'string' }, value: { type: 'number' } },
+                  required: ['id', 'value'],
+                  additionalProperties: false,
+                },
+              },
             },
             required: ['name', 'calories'],
             additionalProperties: false,
@@ -607,6 +627,7 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
                 sugar: num(it.sugar),
                 saturatedFat: num(it.saturated_fat),
                 sodium: num(it.sodium),
+                extras: extrasArg(it.extras),
                 meal,
                 eatenAt,
               },

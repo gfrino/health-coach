@@ -307,14 +307,17 @@ export interface FoodContext {
     sugar?: number;
     saturatedFat?: number;
     sodium?: number;
+    extras?: Record<string, number>;
   };
+  /** Valori in più che l'utente traccia (id, nome per il modello, unità). */
+  trackers?: { id: string; name: string; unit: string }[];
   /** Media sui giorni con voci negli ultimi 7 (oggi escluso). */
   avg7: { calories: number; days: number } | null;
   target: { kcal: number; custom: boolean; paceKgWeek?: number | null } | null;
 }
 
 const FOOD_RULE = `FOOD DIARY
-When the user tells you what they ate or drank (now or earlier today), log it with log_food in the same turn: split it into foods, estimate calories and macros for the portion they said (typical portions if not said), and pick the meal from what they say or the time. Never log something already in FOOD TODAY. Then confirm in one short phrase with the estimated total (e.g. "Logged: about 450 kcal"); they can correct it in the Food tab. Calories are estimates: say "about". Never judge or moralize about food; respect their diet and approach. Relate meals to their goals, labs and calorie target only when useful.`;
+When the user tells you what they ate or drank (now or earlier today), log it with log_food in the same turn: split it into foods, estimate calories and macros for the portion they said (typical portions if not said), and pick the meal from what they say or the time. Never log something already in FOOD TODAY. Then confirm in one short phrase with the estimated total (e.g. "Logged: about 450 kcal"); they can correct it in the Food tab. Calories are estimates: say "about". Never judge or moralize about food; respect their diet and approach. Relate meals to their goals, labs and calorie target only when useful. If FOOD TODAY lists values the user tracks (e.g. fructose, caffeine), also estimate them in log_food extras and mention them when they matter.`;
 
 export function foodSection(
   food: FoodContext | null | undefined,
@@ -333,12 +336,20 @@ export function foodSection(
   ]
     .filter(Boolean)
     .join('; ');
-  if (compact) return `FOOD DIARY\n${head}.`;
+  const tracked = food.trackers?.length
+    ? `Values the user tracks today (estimates; keep them in mind for their goals and conditions): ${food.trackers
+        .map(
+          (tr) =>
+            `${tr.name} ${t.extras?.[tr.id] ?? 0} ${tr.unit}${compact ? '' : ` [id ${tr.id}]`}`,
+        )
+        .join(', ')}.`
+    : null;
+  if (compact) return `FOOD DIARY\n${head}.${tracked ? `\n${tracked}` : ''}`;
   const lines = food.today.map(
     (f) =>
       `- [${f.id}] ${f.meal}: ${f.name}${f.quantity ? ` (${f.quantity})` : ''}${f.kcal != null ? ` · ${f.kcal} kcal` : ''}`,
   );
-  return `FOOD TODAY (food diary, Food tab)\n${head}.${lines.length ? `\n${lines.join('\n')}` : '\nNothing logged yet today.'}`;
+  return `FOOD TODAY (food diary, Food tab)\n${head}.${tracked ? `\n${tracked}` : ''}${lines.length ? `\n${lines.join('\n')}` : '\nNothing logged yet today.'}`;
 }
 
 const RECIPE_RULE = `RECIPES

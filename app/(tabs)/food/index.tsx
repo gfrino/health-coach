@@ -19,6 +19,7 @@ import { foodRepository, getDb } from '@/db';
 import { FOOD_MEALS, type FoodEntry, type FoodMeal } from '@/db/repositories/foodRepository';
 import { shiftDay } from '@/food/days';
 import { loadCalorieTarget, type CalorieTarget } from '@/food/target';
+import { TrackedTotals, TrackerSettings } from '@/food/TrackerSettings';
 import { haptic } from '@/lib/haptics';
 import { localIsoDate } from '@/lib/dates';
 import { num } from '@/lib/units';
@@ -209,6 +210,7 @@ export default function FoodScreen() {
             {macro(t('food.carbs'), totals.carbs)}
             {macro(t('food.fat'), totals.fat)}
           </View>
+          <TrackedTotals extras={totals.extras} />
           <SourcesLink topic="energy" />
         </Card>
 
@@ -368,6 +370,9 @@ export default function FoodScreen() {
               }
             />
           ) : null}
+        </Card>
+        <Card>
+          <TrackerSettings />
         </Card>
       </Screen>
     </>

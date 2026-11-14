@@ -1,3 +1,4 @@
+import { cleanExtras, sumExtras } from '@/food/trackers';
 import { localIsoDate } from '@/lib/dates';
 
 import { newId } from '../ids';
@@ -29,6 +30,8 @@ export interface FoodEntry {
   saturatedFat: number | null;
   /** Milligrammi. */
   sodium: number | null;
+  /** Valori in più tracciati dall'utente ({ fructose: 12, caffeine: 80 }). */
+  extras: Record<string, number> | null;
   source: 'user' | 'coach';
   recipeId: string | null;
   /** Id dei campioni scritti in Apple Salute, per tipo. */
@@ -50,6 +53,7 @@ export interface FoodInput {
   sugar?: number | null;
   saturatedFat?: number | null;
   sodium?: number | null;
+  extras?: Record<string, number> | null;
   recipeId?: string | null;
 }
 
@@ -62,6 +66,8 @@ export interface FoodTotals {
   sugar: number;
   saturatedFat: number;
   sodium: number;
+  /** Somme dei valori in più tracciati. */
+  extras: Record<string, number>;
   count: number;
 }
 
@@ -80,6 +86,7 @@ interface Row {
   sugar: number | null;
   saturated_fat: number | null;
   sodium: number | null;
+  extras: string | null;
   source: string;
   recipe_id: string | null;
   health_samples: string | null;
@@ -116,6 +123,15 @@ const samples = (raw: string | null): Record<string, string> | null => {
   }
 };
 
+const parseJson = (raw: string | null): unknown => {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    return null;
+  }
+};
+
 const toEntry = (r: Row): FoodEntry => ({
   id: r.id,
   day: r.day,
@@ -131,6 +147,7 @@ const toEntry = (r: Row): FoodEntry => ({
   sugar: r.sugar,
   saturatedFat: r.saturated_fat,
   sodium: r.sodium,
+  extras: cleanExtras(parseJson(r.extras)),
   source: r.source === 'coach' ? 'coach' : 'user',
   recipeId: r.recipe_id,
   healthSamples: samples(r.health_samples),
@@ -150,6 +167,7 @@ function clean(input: FoodInput) {
     sugar: amount(input.sugar, 1000, 1),
     saturatedFat: amount(input.saturatedFat, 500, 1),
     sodium: amount(input.sodium, 50000, 0),
+    extras: cleanExtras(input.extras),
   };
 }
 
@@ -165,8 +183,8 @@ export async function createEntry(
   const id = newId();
   await db.runAsync(
     `INSERT INTO food_entries (id, day, eaten_at, meal, name, quantity, calories, protein, carbs, fat,
-       fiber, sugar, saturated_fat, sodium, source, recipe_id, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       fiber, sugar, saturated_fat, sodium, extras, source, recipe_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       localIsoDate(new Date(eatenAt)),
@@ -182,6 +200,7 @@ export async function createEntry(
       c.sugar,
       c.saturatedFat,
       c.sodium,
+      c.extras ? JSON.stringify(c.extras) : null,
       source,
       input.recipeId ?? null,
       now,
@@ -200,7 +219,7 @@ export async function updateEntry(db: Db, id: string, input: FoodInput): Promise
   await db.runAsync(
     `UPDATE food_entries SET day = ?, eaten_at = ?, meal = ?, name = ?, quantity = ?, calories = ?,
        protein = ?, carbs = ?, fat = ?, fiber = ?, sugar = ?, saturated_fat = ?, sodium = ?,
-       updated_at = ? WHERE id = ?`,
+       extras = ?, updated_at = ? WHERE id = ?`,
     [
       localIsoDate(new Date(eatenAt)),
       eatenAt,
@@ -215,6 +234,14 @@ export async function updateEntry(db: Db, id: string, input: FoodInput): Promise
       c.sugar,
       c.saturatedFat,
       c.sodium,
+      // Voce modificata senza valori in più (es. dal coach): si tengono quelli già salvati.
+      input.extras === undefined
+        ? current.extras
+          ? JSON.stringify(current.extras)
+          : null
+        : c.extras
+          ? JSON.stringify(c.extras)
+          : null,
       Date.now(),
       id,
     ],
@@ -252,7 +279,7 @@ export async function listDay(db: Db, day: string): Promise<FoodEntry[]> {
 type NutrientKey =
   'calories' | 'protein' | 'carbs' | 'fat' | 'fiber' | 'sugar' | 'saturatedFat' | 'sodium';
 
-export function totals(entries: Partial<Pick<FoodEntry, NutrientKey>>[]): FoodTotals {
+export function totals(entries: Partial<Pick<FoodEntry, NutrientKey | 'extras'>>[]): FoodTotals {
   const sum = (k: NutrientKey) =>
     Math.round(entries.reduce((a, e) => a + (e[k] ?? 0), 0) * 10) / 10;
   return {
@@ -264,6 +291,7 @@ export function totals(entries: Partial<Pick<FoodEntry, NutrientKey>>[]): FoodTo
     sugar: sum('sugar'),
     saturatedFat: sum('saturatedFat'),
     sodium: Math.round(sum('sodium')),
+    extras: sumExtras(entries.map((e) => e.extras)),
     count: entries.length,
   };
 }
@@ -293,6 +321,16 @@ export async function dailyTotals(
     [fromDay, toDay],
   );
   const r1 = (v: number | null) => Math.round((v ?? 0) * 10) / 10;
+  // Valori in più: JSON per voce, sommati qui (poche righe per giorno).
+  const extraRows = await db.getAllAsync<{ day: string; extras: string }>(
+    'SELECT day, extras FROM food_entries WHERE day BETWEEN ? AND ? AND extras IS NOT NULL',
+    [fromDay, toDay],
+  );
+  const extrasByDay = new Map<string, Record<string, number>[]>();
+  for (const e of extraRows) {
+    const v = cleanExtras(parseJson(e.extras));
+    if (v) extrasByDay.set(e.day, [...(extrasByDay.get(e.day) ?? []), v]);
+  }
   return rows.map((r) => ({
     day: r.day,
     calories: Math.round(r.calories ?? 0),
@@ -303,6 +341,7 @@ export async function dailyTotals(
     sugar: r1(r.sugar),
     saturatedFat: r1(r.saturated_fat),
     sodium: Math.round(r.sodium ?? 0),
+    extras: sumExtras(extrasByDay.get(r.day) ?? []),
     count: r.n,
   }));
 }

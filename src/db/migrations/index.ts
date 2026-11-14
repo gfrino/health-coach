@@ -8,6 +8,7 @@ import { migration007 } from './007_food_log';
 import { migration008 } from './008_food_details';
 import { migration009 } from './009_program_schedule';
 import { migration010 } from './010_weight_goal';
+import { migration011 } from './011_food_extras';
 import type { Migration } from './types';
 
 /**
@@ -26,6 +27,7 @@ export const migrations: readonly Migration[] = [
   migration008,
   migration009,
   migration010,
+  migration011,
 ];
 
 export type { Migration } from './types';

@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText, TextField } from '@/components';
 import { parseNumber } from '@/records/labExtraction';
+import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
+
+import { useTrackerLabel } from './TrackerSettings';
 
 /** Valori del modulo come testo (si scrivono con la tastiera numerica, anche con la virgola). */
 export interface FoodDraft {
@@ -18,6 +21,8 @@ export interface FoodDraft {
   sugar: string;
   saturatedFat: string;
   sodium: string;
+  /** Valori in più tracciati, per id. */
+  extras: Record<string, string>;
 }
 
 export const emptyDraft = (): FoodDraft => ({
@@ -31,6 +36,7 @@ export const emptyDraft = (): FoodDraft => ({
   sugar: '',
   saturatedFat: '',
   sodium: '',
+  extras: {},
 });
 
 const str = (v: number | null | undefined) => (v == null ? '' : String(v));
@@ -46,6 +52,7 @@ export function toDraft(v: {
   sugar?: number | null;
   saturatedFat?: number | null;
   sodium?: number | null;
+  extras?: Record<string, number> | null;
 }): FoodDraft {
   return {
     name: v.name,
@@ -58,6 +65,7 @@ export function toDraft(v: {
     sugar: str(v.sugar),
     saturatedFat: str(v.saturatedFat),
     sodium: str(v.sodium),
+    extras: Object.fromEntries(Object.entries(v.extras ?? {}).map(([k, x]) => [k, str(x)])),
   };
 }
 
@@ -73,6 +81,11 @@ export function fromDraft(d: FoodDraft) {
     sugar: parseNumber(d.sugar),
     saturatedFat: parseNumber(d.saturatedFat),
     sodium: parseNumber(d.sodium),
+    extras: Object.fromEntries(
+      Object.entries(d.extras)
+        .map(([k, x]) => [k, parseNumber(x)] as const)
+        .filter((e): e is readonly [string, number] => e[1] !== null),
+    ),
   };
 }
 
@@ -89,6 +102,8 @@ export function FoodItemFields({
 }) {
   const { t } = useTranslation();
   const { colors, spacing } = useTheme();
+  const trackers = useSettingsStore((s) => s.settings.food.trackers ?? []);
+  const label = useTrackerLabel();
   const [details, setDetails] = useState(false);
   const set = (k: keyof FoodDraft) => (text: string) => onChange({ ...value, [k]: text });
   const numberField = (
@@ -141,6 +156,23 @@ export function FoodItemFields({
             {numberField('saturatedFat')}
             {numberField('sodium')}
           </View>
+          {trackers.length ? (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
+              {trackers.map((tr) => (
+                <View key={tr.id} style={{ flexBasis: '47%', flexGrow: 1 }}>
+                  <TextField
+                    label={`${label(tr)} (${tr.unit})`}
+                    value={value.extras[tr.id] ?? ''}
+                    onChangeText={(x) =>
+                      onChange({ ...value, extras: { ...value.extras, [tr.id]: x } })
+                    }
+                    keyboardType="decimal-pad"
+                    placeholder="0"
+                  />
+                </View>
+              ))}
+            </View>
+          ) : null}
         </View>
       ) : (
         <Pressable onPress={() => setDetails(true)} accessibilityRole="button" hitSlop={8}>

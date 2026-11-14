@@ -58,6 +58,7 @@ describe('diario alimentare', () => {
       saturatedFat: 0,
       sodium: 520,
       count: 2,
+      extras: {},
     });
 
     // Valore negativo scartato; pasto dall'ora (16:00 → spuntino).

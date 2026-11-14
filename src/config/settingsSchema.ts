@@ -79,6 +79,10 @@ export const foodSettingsSchema = z.object({
   healthAskedAt: z.number().int().nullable().optional(),
   /** Quanti tipi c'erano nell'ultima richiesta: se l'app ne scrive di nuovi, si richiede una volta. */
   healthAskedTypes: z.number().int().nullable().optional(),
+  /** Valori in più da tracciare (fruttosio, caffeina, voci dell'utente…): vedi src/food/trackers. */
+  trackers: z
+    .array(z.object({ id: z.string(), name: z.string().optional(), unit: z.string() }))
+    .optional(),
 });
 
 export const ONBOARDING_FLOW_VERSION = 2;

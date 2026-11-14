@@ -20,6 +20,7 @@ import { fileTypeOf } from '@/records/fileMeta';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS, localIsoDate } from '@/lib/dates';
 import { loadCalorieTarget } from '@/food/target';
+import { trackerPromptName } from '@/food/trackers';
 import { loadWeightGoal, weightGoalLines } from '@/goals/progress';
 import { loadProgramContext } from '@/programs/summary';
 import { getTodayTotalsAt } from '@/sources/freshness';
@@ -163,9 +164,11 @@ async function loadFoodContext(
     loadCalorieTarget(db, now).catch(() => null),
   ]);
   const past = week.filter((d) => d.day < today);
-  if (!entries.length && !past.length) return null;
+  const trackers = settings.food.trackers ?? [];
+  if (!entries.length && !past.length && !trackers.length) return null;
   const custom = settings.food.calorieTarget;
   return {
+    trackers: trackers.map((tr) => ({ id: tr.id, name: trackerPromptName(tr), unit: tr.unit })),
     today: entries.map((e) => ({
       id: e.id,
       meal: e.meal,
