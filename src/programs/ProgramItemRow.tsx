@@ -1,9 +1,19 @@
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Icon, type AppIconName } from '@/components';
 import type { ProgramCategory, ProgramItem } from '@/db/repositories/programRepository';
 import { useTheme } from '@/theme';
+
+import type { Weekday } from './schedule';
+
+/** Nomi brevi dei giorni nella lingua dell'app ("lun, mer, ven"). */
+export function weekdaysLabel(days: Weekday[], language: string): string {
+  // 1 gennaio 2024 era un lunedì.
+  return days
+    .map((d) => new Date(2024, 0, d).toLocaleDateString(language, { weekday: 'short' }))
+    .join(', ');
+}
 
 export const CATEGORY_ICONS: Record<ProgramCategory, AppIconName> = {
   sleep: 'sleep',
@@ -19,12 +29,19 @@ export function ProgramItemRow({
   item,
   done,
   onToggle,
+  auto = false,
+  scheduled = true,
 }: {
   item: ProgramItem;
   done: boolean;
   onToggle: (done: boolean) => void;
+  /** Spuntata dall'app (allenamento o passi). */
+  auto?: boolean;
+  /** Prevista oggi: le azioni di altri giorni si mostrano più chiare. */
+  scheduled?: boolean;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const source = Platform.OS === 'ios' ? 'Apple Health' : 'Health Connect';
   const { colors, spacing } = useTheme();
   return (
     <Pressable
@@ -39,7 +56,7 @@ export function ProgramItemRow({
         gap: spacing.sm,
         paddingVertical: spacing.xs,
         minHeight: 44,
-        opacity: pressed ? 0.6 : 1,
+        opacity: pressed ? 0.6 : scheduled || done ? 1 : 0.55,
       })}
     >
       <View style={{ paddingTop: 1 }}>
@@ -65,6 +82,19 @@ export function ProgramItemRow({
         {item.frequency === 'once' ? (
           <AppText variant="caption" tone="primary">
             {t('programs.once')}
+          </AppText>
+        ) : item.days ? (
+          <AppText variant="caption" tone="primary">
+            {weekdaysLabel(item.days, i18n.language)}
+          </AppText>
+        ) : null}
+        {done && auto ? (
+          <AppText variant="caption" tone="success">
+            {t('programs.autoDone', { source })}
+          </AppText>
+        ) : !done && item.auto && scheduled ? (
+          <AppText variant="caption" tone="textMuted">
+            {t('programs.autoHint', { source })}
           </AppText>
         ) : null}
       </View>

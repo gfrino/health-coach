@@ -153,7 +153,7 @@ async function scheduleCheckins(
   const programs = await loadProgramContext(db, now);
   const programsLeft = programs
     .flatMap((p) => p.items)
-    .filter((i) => i.frequency === 'daily' && !i.done).length;
+    .filter((i) => i.frequency === 'daily' && i.scheduledToday !== false && !i.done).length;
   for (const slot of slots) {
     const text = await checkinContent(db, slot, input, programsLeft);
     await Notifications.scheduleNotificationAsync({

@@ -73,6 +73,12 @@
       "dance": "Danza",
       "coreTraining": "Core",
       "mixedCardio": "Cardio misto",
+      "flexibility": "Stretching",
+      "mindAndBody": "Mente e corpo",
+      "preparationAndRecovery": "Recupero",
+      "crossTraining": "Cross training",
+      "taiChi": "Tai chi",
+      "cooldown": "Defaticamento",
       "other": "Altro"
     },
     "other": {
@@ -838,6 +844,10 @@
     "todayProgress": "{{done}} di {{total}} fatte oggi",
     "daily": "Ogni giorno",
     "once": "Una volta",
+    "otherDays": "Altri giorni",
+    "daysLabel": "Giorni (nessuno = tutti i giorni)",
+    "autoDone": "Spuntata da un allenamento in {{source}}",
+    "autoHint": "Si spunta da sola quando {{source}} registra l'allenamento",
     "categories": {
       "sleep": "Dormire meglio",
       "activity": "Più movimento",

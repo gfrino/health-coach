@@ -76,6 +76,7 @@ export function hcSleepStage(code: number): SleepStage | null {
 /** ExerciseSessionRecord.EXERCISE_TYPE_* più comuni. */
 const HC_EXERCISE: Record<number, string> = {
   8: 'cycling',
+  13: 'functionalStrength',
   9: 'cycling',
   16: 'dance',
   25: 'elliptical',
@@ -86,9 +87,11 @@ const HC_EXERCISE: Record<number, string> = {
   56: 'running',
   57: 'running',
   70: 'strength',
+  71: 'flexibility',
   73: 'swimming',
   74: 'swimming',
   79: 'walking',
+  81: 'strength',
   83: 'yoga',
 };
 

@@ -28,9 +28,11 @@ export function programInstruction(opts: {
     `Create a personal program for me. Focus: ${opts.focus}.`,
     opts.details.trim() ? `What I want: ${opts.details.trim()}` : null,
     opts.durationDays ? `Length: ${opts.durationDays} days.` : 'Length: open-ended.',
-    'Base it on my profile, data, conditions, diet and preferences. Give 3–6 concrete, doable actions: mostly daily habits, plus one-time steps if useful. Each action has a short title and one line on how to do it. Write in my language.',
+    'Base it on my profile, goals, data, conditions, diet and preferences. Give 3–6 concrete, doable actions: mostly recurring habits, plus one-time steps if useful. Each action has a short title and one line on how to do it. Write in my language.',
+    'A habit done only on some weekdays is ONE action with "days" (e.g. ["mon","wed","fri"]), never one action per weekday. Put the workout and its minutes in the title (e.g. "20 min brisk walk", "10 min stretching and core"): the app ticks it by itself when my health app records the workout.',
     'Reply ONLY with JSON, no other text, in this shape:',
-    '{"title":"…","goal":"one sentence","category":"sleep|activity|nutrition|stress|weight|general","items":[{"title":"…","details":"…","frequency":"daily|once"}]}',
+    '{"title":"…","goal":"one sentence","category":"sleep|activity|nutrition|stress|weight|general","items":[{"title":"…","details":"…","frequency":"daily|once","days":["mon","thu"]}]}',
+    'Omit "days" for an every-day habit.',
   ]
     .filter(Boolean)
     .join('\n');

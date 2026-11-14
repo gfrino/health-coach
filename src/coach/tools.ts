@@ -15,6 +15,7 @@ import { FOOD_MEALS } from '@/db/repositories/foodRepository';
 import { PROGRAM_CATEGORIES } from '@/db/repositories/programRepository';
 import { RECIPE_MEALS } from '@/db/repositories/recipeRepository';
 import { parseProgramItems } from '@/programs/parse';
+import { parseDays } from '@/programs/schedule';
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
 import { DAY_MS, localIsoDate } from '@/lib/dates';
 import { METRIC_UNITS, SleepStage } from '@/sources/model';
@@ -41,7 +42,18 @@ const PROGRAM_ITEM = {
     frequency: {
       type: 'string',
       enum: ['daily', 'once'],
-      description: 'daily = a habit to tick every day; once = a single step.',
+      description: 'daily = a recurring habit; once = a single step.',
+    },
+    days: {
+      type: 'array',
+      items: { type: 'string', enum: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] },
+      description:
+        'For a habit done only on some weekdays (e.g. ["mon","wed","fri"]). Omit for every day. Use ONE action with days, never one action per weekday.',
+    },
+    auto: {
+      type: 'boolean',
+      description:
+        'false = never tick it automatically. By default an action that names a workout or a step count (e.g. "20 min walk", "8000 steps") ticks itself when the health app records it.',
     },
   },
   required: ['title'],
@@ -503,6 +515,8 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
               details: typeof u.details === 'string' ? u.details.slice(0, 300) : undefined,
               frequency:
                 u.frequency === 'once' || u.frequency === 'daily' ? u.frequency : undefined,
+              days: Array.isArray(u.days) ? parseDays(u.days) : undefined,
+              auto: u.auto === false ? 'off' : u.auto === true ? null : undefined,
             });
           }
         for (const item of parseProgramItems(args.add_items))

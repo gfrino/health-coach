@@ -1,3 +1,12 @@
+import {
+  inferAutoRule,
+  inferDays,
+  isScheduled,
+  parseAutoRule,
+  type AutoRule,
+  type Weekday,
+} from '@/programs/schedule';
+
 import { newId } from '../ids';
 import type { Db } from '../types';
 
@@ -25,7 +34,16 @@ export interface ProgramItem {
   details: string | null;
   frequency: ItemFrequency;
   position: number;
+  /** Giorni previsti (1 = lunedì … 7 = domenica); `null` = tutti i giorni. */
+  days: Weekday[] | null;
+  /** Spunta automatica dai dati di salute (salvata o dedotta dal titolo); `null` = manuale. */
+  auto: AutoRule | null;
+  /** `true` se la spunta automatica è stata spenta dall'utente. */
+  autoOff: boolean;
 }
+
+/** Chi ha spuntato un'azione in un giorno. */
+export type CheckSource = 'user' | 'auto';
 
 export interface Program {
   id: string;
@@ -45,6 +63,10 @@ export interface ProgramItemInput {
   title: string;
   details?: string | null;
   frequency?: ItemFrequency;
+  /** `undefined` = dedotti dal titolo, `null` = tutti i giorni. */
+  days?: Weekday[] | null;
+  /** `undefined` = dedotta dal titolo, `'off'` = mai in automatico. */
+  auto?: AutoRule | 'off' | null;
 }
 
 export interface ProgramInput {
@@ -76,19 +98,58 @@ interface ItemRow {
   details: string | null;
   frequency: string;
   position: number;
+  days: string | null;
+  auto_rule: string | null;
 }
+
+const parseJson = (v: string | null): unknown => {
+  if (!v) return null;
+  try {
+    return JSON.parse(v) as unknown;
+  } catch {
+    return null;
+  }
+};
 
 export const asCategory = (v: unknown): ProgramCategory =>
   PROGRAM_CATEGORIES.includes(v as ProgramCategory) ? (v as ProgramCategory) : 'general';
 
-const toItem = (r: ItemRow): ProgramItem => ({
-  id: r.id,
-  programId: r.program_id,
-  title: r.title,
-  details: r.details,
-  frequency: r.frequency === 'once' ? 'once' : 'daily',
-  position: r.position,
-});
+const toItem = (r: ItemRow): ProgramItem => {
+  const frequency = r.frequency === 'once' ? 'once' : 'daily';
+  const storedDays = parseJson(r.days);
+  const days = Array.isArray(storedDays)
+    ? (storedDays.filter((d) => typeof d === 'number' && d >= 1 && d <= 7) as Weekday[])
+    : null;
+  const stored = parseAutoRule(parseJson(r.auto_rule));
+  return {
+    id: r.id,
+    programId: r.program_id,
+    title: r.title,
+    details: r.details,
+    frequency,
+    position: r.position,
+    // Colonna vuota (programmi creati prima): giorni e regola dedotti dal titolo.
+    days:
+      frequency === 'once'
+        ? null
+        : r.days === null
+          ? inferDays(r.title)
+          : days?.length
+            ? days
+            : null,
+    auto:
+      frequency === 'once' || stored === 'off'
+        ? null
+        : (stored ?? (r.auto_rule === null ? inferAutoRule(r.title, r.details) : null)),
+    autoOff: stored === 'off',
+  };
+};
+
+/** Valori per le colonne days / auto_rule: `undefined` = colonna vuota (si deduce dal titolo). */
+const daysValue = (d: Weekday[] | null | undefined) =>
+  d === undefined ? null : JSON.stringify(d ?? []);
+const autoValue = (a: AutoRule | 'off' | null | undefined) =>
+  a === undefined || a === null ? null : JSON.stringify(a);
 
 const toProgram = (r: ProgramRow, items: ProgramItem[]): Program => ({
   id: r.id,
@@ -108,7 +169,7 @@ async function itemsFor(db: Db, programIds: string[]): Promise<Map<string, Progr
   const map = new Map<string, ProgramItem[]>();
   if (!programIds.length) return map;
   const rows = await db.getAllAsync<ItemRow>(
-    `SELECT id, program_id, title, details, frequency, position FROM program_items
+    `SELECT id, program_id, title, details, frequency, position, days, auto_rule FROM program_items
      WHERE program_id IN (${programIds.map(() => '?').join(',')}) ORDER BY position, created_at`,
     programIds,
   );
@@ -186,8 +247,8 @@ async function insertItem(
 ): Promise<string> {
   const id = newId();
   await db.runAsync(
-    `INSERT INTO program_items (id, program_id, title, details, frequency, position, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO program_items (id, program_id, title, details, frequency, position, days, auto_rule, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       programId,
@@ -195,6 +256,8 @@ async function insertItem(
       item.details?.trim() || null,
       item.frequency === 'once' ? 'once' : 'daily',
       position,
+      daysValue(item.days),
+      autoValue(item.auto),
       now,
     ],
   );
@@ -248,7 +311,13 @@ export async function addItem(db: Db, programId: string, item: ProgramItemInput)
 export async function updateItem(
   db: Db,
   itemId: string,
-  patch: Partial<{ title: string; details: string | null; frequency: ItemFrequency }>,
+  patch: Partial<{
+    title: string;
+    details: string | null;
+    frequency: ItemFrequency;
+    days: Weekday[] | null;
+    auto: AutoRule | 'off' | null;
+  }>,
 ): Promise<boolean> {
   const item = await db.getFirstAsync<{ program_id: string }>(
     'SELECT program_id FROM program_items WHERE id = ?',
@@ -268,6 +337,14 @@ export async function updateItem(
   if (patch.frequency !== undefined) {
     sets.push('frequency = ?');
     args.push(patch.frequency === 'once' ? 'once' : 'daily');
+  }
+  if (patch.days !== undefined) {
+    sets.push('days = ?');
+    args.push(daysValue(patch.days));
+  }
+  if (patch.auto !== undefined) {
+    sets.push('auto_rule = ?');
+    args.push(autoValue(patch.auto));
   }
   if (sets.length)
     await db.runAsync(`UPDATE program_items SET ${sets.join(', ')} WHERE id = ?`, [
@@ -289,32 +366,60 @@ export async function removeItem(db: Db, itemId: string): Promise<void> {
 
 /**
  * Spunte: per le azioni quotidiane conta il giorno indicato; per quelle "una volta" basta
- * una spunta qualsiasi (restano fatte).
+ * una spunta qualsiasi (restano fatte). Togliere una spunta messa in automatico la segna come
+ * "skip", così non viene rimessa dal prossimo allenamento sincronizzato.
  */
 export async function setItemDone(db: Db, item: ProgramItem, day: string, done: boolean) {
   if (done) {
     await db.runAsync(
-      'INSERT OR REPLACE INTO program_checks (item_id, day, done_at) VALUES (?, ?, ?)',
+      "INSERT OR REPLACE INTO program_checks (item_id, day, done_at, source) VALUES (?, ?, ?, 'user')",
       [item.id, day, Date.now()],
     );
   } else if (item.frequency === 'once') {
     await db.runAsync('DELETE FROM program_checks WHERE item_id = ?', [item.id]);
+  } else if (item.auto) {
+    await db.runAsync(
+      "INSERT OR REPLACE INTO program_checks (item_id, day, done_at, source) VALUES (?, ?, ?, 'skip')",
+      [item.id, day, Date.now()],
+    );
   } else {
     await db.runAsync('DELETE FROM program_checks WHERE item_id = ? AND day = ?', [item.id, day]);
   }
 }
 
-/** Azioni fatte nel giorno indicato (le "una volta" contano se fatte in qualsiasi giorno). */
-export async function doneItemIds(db: Db, items: ProgramItem[], day: string): Promise<Set<string>> {
-  if (!items.length) return new Set();
-  const rows = await db.getAllAsync<{ item_id: string; day: string }>(
-    `SELECT item_id, day FROM program_checks WHERE item_id IN (${items.map(() => '?').join(',')})`,
+/** Spunta automatica (non sovrascrive mai una spunta o un "skip" dell'utente). */
+export async function setItemAutoDone(db: Db, itemId: string, day: string): Promise<boolean> {
+  const r = await db.runAsync(
+    "INSERT OR IGNORE INTO program_checks (item_id, day, done_at, source) VALUES (?, ?, ?, 'auto')",
+    [itemId, day, Date.now()],
+  );
+  return r.changes > 0;
+}
+
+/** Spunte del giorno indicato con chi le ha messe (le "una volta" contano in qualsiasi giorno). */
+export async function dayChecks(
+  db: Db,
+  items: ProgramItem[],
+  day: string,
+): Promise<Map<string, CheckSource>> {
+  const out = new Map<string, CheckSource>();
+  if (!items.length) return out;
+  const rows = await db.getAllAsync<{ item_id: string; day: string; source: string }>(
+    `SELECT item_id, day, source FROM program_checks
+     WHERE source <> 'skip' AND item_id IN (${items.map(() => '?').join(',')})`,
     items.map((i) => i.id),
   );
   const freq = new Map(items.map((i) => [i.id, i.frequency]));
-  return new Set(
-    rows.filter((r) => freq.get(r.item_id) === 'once' || r.day === day).map((r) => r.item_id),
-  );
+  for (const r of rows) {
+    if (freq.get(r.item_id) === 'once' || r.day === day)
+      out.set(r.item_id, r.source === 'auto' ? 'auto' : 'user');
+  }
+  return out;
+}
+
+/** Azioni fatte nel giorno indicato (le "una volta" contano se fatte in qualsiasi giorno). */
+export async function doneItemIds(db: Db, items: ProgramItem[], day: string): Promise<Set<string>> {
+  return new Set((await dayChecks(db, items, day)).keys());
 }
 
 /** Spunte per giorno nel periodo (per la costanza degli ultimi giorni). */
@@ -323,14 +428,23 @@ export async function checksBetween(
   items: ProgramItem[],
   fromDay: string,
   toDay: string,
-): Promise<{ itemId: string; day: string }[]> {
+): Promise<{ itemId: string; day: string; source: CheckSource }[]> {
   if (!items.length) return [];
-  const rows = await db.getAllAsync<{ item_id: string; day: string }>(
-    `SELECT item_id, day FROM program_checks
-     WHERE day >= ? AND day <= ? AND item_id IN (${items.map(() => '?').join(',')})`,
+  const rows = await db.getAllAsync<{ item_id: string; day: string; source: string }>(
+    `SELECT item_id, day, source FROM program_checks
+     WHERE source <> 'skip' AND day >= ? AND day <= ? AND item_id IN (${items.map(() => '?').join(',')})`,
     [fromDay, toDay, ...items.map((i) => i.id)],
   );
-  return rows.map((r) => ({ itemId: r.item_id, day: r.day }));
+  return rows.map((r) => ({
+    itemId: r.item_id,
+    day: r.day,
+    source: r.source === 'auto' ? 'auto' : 'user',
+  }));
+}
+
+/** L'azione è prevista nel giorno indicato? (Le "una volta" sono sempre previste finché non fatte.) */
+export function itemScheduled(item: ProgramItem, day: string): boolean {
+  return item.frequency === 'once' || isScheduled(item.days, day);
 }
 
 /** Giorno del programma (1 = primo giorno). */

@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText, Card, EmptyState, Icon, NavRow, ProgressBar, Screen } from '@/components';
 import { haptic } from '@/lib/haptics';
-import { CATEGORY_ICONS, ProgramItemRow } from '@/programs/ProgramItemRow';
+import { CATEGORY_ICONS } from '@/programs/ProgramItemRow';
+import { ProgramTodayList, todayProgress } from '@/programs/ProgramTodayList';
 import { usePrograms, type ProgramView } from '@/programs/usePrograms';
 import { useTheme } from '@/theme';
 
@@ -103,9 +104,8 @@ function ProgramCard({
 }) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
-  const { program, done, day } = view;
-  const total = program.items.length;
-  const doneCount = program.items.filter((i) => done.has(i.id)).length;
+  const { program, day } = view;
+  const { total, done: doneCount } = todayProgress(view);
   // Di default è aperto solo il primo programma.
   const [expanded, setExpanded] = useState(() => expandedState.get(program.id) ?? first);
   const toggleExpanded = () => {
@@ -173,16 +173,7 @@ function ProgramCard({
 
       {expanded ? (
         <>
-          <View>
-            {program.items.map((item) => (
-              <ProgramItemRow
-                key={item.id}
-                item={item}
-                done={done.has(item.id)}
-                onToggle={(d) => onToggle(item, d)}
-              />
-            ))}
-          </View>
+          <ProgramTodayList view={view} onToggle={onToggle} />
           <Pressable
             onPress={open}
             accessibilityRole="button"

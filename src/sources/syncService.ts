@@ -2,6 +2,7 @@ import { AppState, Platform } from 'react-native';
 import { create } from 'zustand';
 
 import { getDb, healthDataRepository } from '@/db';
+import { autoCheckPrograms } from '@/programs/autoCheck';
 import { runProactiveCheck } from '@/proactive/notifier';
 import { useSettingsStore } from '@/store/settingsStore';
 
@@ -119,6 +120,8 @@ export function syncHealthData(
       // Frequenza cardiaca: oltre 30 giorni basta un riassunto per giorno (il DB non cresce senza limite).
       // Resta qui dentro: scrive nel DB e non deve sovrapporsi a un'altra sincronizzazione.
       await compactOldHeartRate().catch(() => undefined);
+      // Allenamenti e passi appena arrivati: spunta le azioni dei programmi che corrispondono.
+      await autoCheckPrograms(await getDb()).catch(() => 0);
       if (__DEV__) {
         console.warn(
           `[sync] ${Date.now() - startedAt} ms · ${report.upserted} scritti · ${report.deleted} eliminati · ${report.errors.length} tipi non disponibili`,

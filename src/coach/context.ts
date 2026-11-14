@@ -74,7 +74,24 @@ export interface ProgramContext {
   durationDays: number | null;
   /** Percentuale di azioni quotidiane fatte negli ultimi 7 giorni (null se appena iniziato). */
   adherence7: number | null;
-  items: { id: string; title: string; frequency: 'daily' | 'once'; done: boolean }[];
+  items: {
+    id: string;
+    title: string;
+    frequency: 'daily' | 'once';
+    done: boolean;
+    /** Chi l'ha spuntata oggi: l'utente o l'app da un allenamento. */
+    doneBy?: 'user' | 'auto' | null;
+    /** Prevista oggi (le azioni con giorni fissi non lo sono tutti i giorni). */
+    scheduledToday?: boolean;
+    /** Giorni previsti ("mon, wed"), null = ogni giorno. */
+    days?: string | null;
+    /** Spunta automatica dai dati di salute, descritta. */
+    auto?: string | null;
+    /** Ultimi 7 giorni completi: giorni fatti su giorni previsti. */
+    recent?: { done: number; scheduled: number } | null;
+    /** Ultimo giorno in cui è stata fatta. */
+    lastDone?: string | null;
+  }[];
 }
 
 export interface CoachContextInput {
@@ -265,7 +282,7 @@ ${rule}`;
 }
 
 const PROGRAM_RULE = `PROGRAMS
-When the user asks for a plan, a routine or a program (or agrees to one you proposed), create it with create_program: a short title, the goal, 3–7 concrete, doable actions (daily habits or one-time steps), each with a one-line how-to. Adapt it to their data, conditions, diet and preferences. To change an existing program (add, edit or remove actions, rename, mark it completed) use update_program with ids from ACTIVE PROGRAMS. Tell the user the program is in the Programs tab, where they can tick actions and edit it. When relevant, encourage progress on their active programs.`;
+When the user asks for a plan, a routine or a program (or agrees to one you proposed), create it with create_program: a short title, the goal, 3–7 concrete, doable actions (recurring habits or one-time steps), each with a one-line how-to. A habit for some weekdays is ONE action with days, never one action per weekday; put the workout and its minutes in the title (e.g. "20 min walk") so it ticks itself when the health app records it. Adapt it to their data, conditions, diet and preferences. To change an existing program (add, edit or remove actions, rename, mark it completed) use update_program with ids from ACTIVE PROGRAMS. Tell the user the program is in the Programs tab, where they can tick actions and edit it. When relevant, encourage progress on their active programs: base it on the last 7 days and the last time each action was done (see ACTIVE PROGRAMS), never say they did nothing just because today is not ticked yet.`;
 
 export interface FoodContext {
   today: { id: string; meal: string; name: string; quantity: string | null; kcal: number | null }[];
@@ -334,14 +351,28 @@ export function recipesSection(
 export function programsSection(programs: ProgramContext[] | undefined, compact?: boolean) {
   if (!programs?.length) return null;
   const lines = programs.map((p) => {
-    const head = `- ${compact ? '' : `[${p.id}] `}"${p.title}"${p.goal ? ` — goal: ${p.goal}` : ''} · day ${p.day}${p.durationDays ? ` of ${p.durationDays}` : ''}${p.adherence7 != null ? ` · last 7 days ${p.adherence7}% done` : ''}`;
-    const items = p.items.map(
-      (i) =>
-        `  - ${compact ? '' : `[${i.id}] `}${i.title} (${i.frequency === 'once' ? 'once' : 'daily'}${i.done ? ', done' + (i.frequency === 'daily' ? ' today' : '') : ''})`,
-    );
+    const head = `- ${compact ? '' : `[${p.id}] `}"${p.title}"${p.goal ? ` — goal: ${p.goal}` : ''} · day ${p.day}${p.durationDays ? ` of ${p.durationDays}` : ''}${p.adherence7 != null ? ` · last 7 days ${p.adherence7}% of planned actions done` : ''}`;
+    const items = p.items.map((i) => {
+      const when = i.frequency === 'once' ? 'once' : i.days ? `on ${i.days}` : 'daily';
+      const today =
+        i.frequency === 'once'
+          ? i.done
+            ? 'done'
+            : 'not done yet'
+          : i.scheduledToday === false
+            ? 'not planned today'
+            : i.done
+              ? `done today${i.doneBy === 'auto' ? ' (from a workout)' : ''}`
+              : 'not done yet today';
+      const facts = [when, today];
+      if (i.recent) facts.push(`last 7 days ${i.recent.done}/${i.recent.scheduled} planned days`);
+      if (i.lastDone && !(i.done && i.frequency === 'daily')) facts.push(`last done ${i.lastDone}`);
+      if (i.auto && !compact) facts.push(i.auto);
+      return `  - ${compact ? '' : `[${i.id}] `}${i.title} (${facts.join('; ')})`;
+    });
     return [head, ...items].join('\n');
   });
-  return `ACTIVE PROGRAMS\n${lines.join('\n')}`;
+  return `ACTIVE PROGRAMS (ticks are saved day by day; judge progress on the last 7 days, not only today)\n${lines.join('\n')}`;
 }
 
 /** Totali di oggi parziali: il modello deve dire "finora" e l'ora dei dati. */

@@ -231,10 +231,13 @@ export interface HKWorkoutLike extends HKSampleLike {
 
 /** Nomi dei tipi di allenamento più comuni (HKWorkoutActivityType); gli altri restano "other". */
 const HK_ACTIVITY: Record<number, string> = {
+  11: 'crossTraining',
   13: 'cycling',
   16: 'elliptical',
   20: 'functionalStrength',
   24: 'hiking',
+  29: 'mindAndBody',
+  33: 'preparationAndRecovery',
   35: 'rowing',
   37: 'running',
   46: 'swimming',
@@ -243,13 +246,16 @@ const HK_ACTIVITY: Record<number, string> = {
   57: 'yoga',
   58: 'barre',
   59: 'coreTraining',
+  62: 'flexibility',
   63: 'hiit',
   64: 'jumpRope',
   66: 'pilates',
   71: 'wheelchairRun',
+  72: 'taiChi',
   73: 'mixedCardio',
   77: 'dance',
   79: 'cooldown',
+  80: 'cooldown',
 };
 
 export function normalizeWorkout(w: HKWorkoutLike): NormalizedWorkout {

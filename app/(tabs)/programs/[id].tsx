@@ -8,6 +8,7 @@ import {
   AppText,
   Button,
   Card,
+  ChipGroup,
   EmptyState,
   Icon,
   ProgressBar,
@@ -20,7 +21,9 @@ import { getDb, programRepository } from '@/db';
 import type { ItemFrequency, Program } from '@/db/repositories/programRepository';
 import { haptic } from '@/lib/haptics';
 import { refreshCheckins } from '@/proactive/notifier';
-import { CATEGORY_ICONS, ProgramItemRow } from '@/programs/ProgramItemRow';
+import { CATEGORY_ICONS, weekdaysLabel } from '@/programs/ProgramItemRow';
+import { WEEKDAYS, type Weekday } from '@/programs/schedule';
+import { ProgramTodayList, todayProgress } from '@/programs/ProgramTodayList';
 import { useProgram } from '@/programs/usePrograms';
 import { MAX_FONT_SCALE, useTheme } from '@/theme';
 
@@ -29,6 +32,8 @@ interface DraftItem {
   title: string;
   details: string;
   frequency: ItemFrequency;
+  /** Giorni scelti; vuoto = tutti i giorni. */
+  days: Weekday[];
 }
 
 interface Draft {
@@ -45,6 +50,7 @@ const toDraft = (p: Program): Draft => ({
     title: i.title,
     details: i.details ?? '',
     frequency: i.frequency,
+    days: i.days ?? [],
   })),
 });
 
@@ -59,7 +65,12 @@ async function saveDraft(p: Program, d: Draft) {
       if (it.id) await programRepository.removeItem(db, it.id);
       continue;
     }
-    const input = { title: it.title, details: it.details, frequency: it.frequency };
+    const input = {
+      title: it.title,
+      details: it.details,
+      frequency: it.frequency,
+      days: it.frequency === 'daily' && it.days.length && it.days.length < 7 ? it.days : null,
+    };
     if (it.id) await programRepository.updateItem(db, it.id, input);
     else await programRepository.addItem(db, p.id, input);
   }
@@ -67,7 +78,7 @@ async function saveDraft(p: Program, d: Draft) {
 
 /** Dettaglio di un programma: spunte di oggi, modifica, chiedi al coach, concludi o elimina. */
 export default function ProgramScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const params = useLocalSearchParams<{ id: string; edit?: string }>();
   const { view, reload, toggle } = useProgram(params.id);
@@ -90,10 +101,9 @@ export default function ProgramScreen() {
     );
   }
 
-  const { program, done, day } = view;
+  const { program, day } = view;
   const editing = draft !== null;
-  const total = program.items.length;
-  const doneCount = program.items.filter((i) => done.has(i.id)).length;
+  const { total, done: doneCount } = todayProgress(view);
 
   const finishEditing = async () => {
     if (!draft) return;
@@ -244,6 +254,24 @@ export default function ProgramScreen() {
                     { value: 'once', label: t('programs.once') },
                   ]}
                 />
+                {it.frequency === 'daily' ? (
+                  <ChipGroup
+                    label={t('programs.daysLabel')}
+                    value={it.days.map(String)}
+                    onChange={(v) => {
+                      const d = Number(v) as Weekday;
+                      setItem(index, {
+                        days: it.days.includes(d)
+                          ? it.days.filter((x) => x !== d)
+                          : [...it.days, d].sort((a, b) => a - b),
+                      });
+                    }}
+                    options={WEEKDAYS.map((d) => ({
+                      value: String(d),
+                      label: weekdaysLabel([d], i18n.language),
+                    }))}
+                  />
+                ) : null}
               </Card>
             ))}
             <Button
@@ -253,7 +281,10 @@ export default function ProgramScreen() {
                 haptic.tap();
                 setDraft({
                   ...draft,
-                  items: [...draft.items, { id: null, title: '', details: '', frequency: 'daily' }],
+                  items: [
+                    ...draft.items,
+                    { id: null, title: '', details: '', frequency: 'daily', days: [] },
+                  ],
                 });
               }}
             />
@@ -300,23 +331,16 @@ export default function ProgramScreen() {
             {program.goal ? <AppText variant="body">{program.goal}</AppText> : null}
 
             <Card>
-              {total ? (
+              {program.items.length ? (
                 <>
                   <AppText variant="headline">{t('programs.today')}</AppText>
-                  <ProgressBar
-                    value={doneCount / total}
-                    label={t('programs.todayProgress', { done: doneCount, total })}
-                  />
-                  <View>
-                    {program.items.map((item) => (
-                      <ProgramItemRow
-                        key={item.id}
-                        item={item}
-                        done={done.has(item.id)}
-                        onToggle={(d) => toggle(item, d)}
-                      />
-                    ))}
-                  </View>
+                  {total ? (
+                    <ProgressBar
+                      value={doneCount / total}
+                      label={t('programs.todayProgress', { done: doneCount, total })}
+                    />
+                  ) : null}
+                  <ProgramTodayList view={view} onToggle={toggle} />
                 </>
               ) : (
                 <AppText variant="callout" tone="textMuted">

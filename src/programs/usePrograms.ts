@@ -7,19 +7,28 @@ import { haptic } from '@/lib/haptics';
 import { localIsoDate } from '@/lib/dates';
 import { refreshCheckins } from '@/proactive/notifier';
 
+import { autoCheckPrograms } from './autoCheck';
+
 export interface ProgramView {
   program: Program;
   /** Azioni fatte oggi (le "una volta" se fatte in qualsiasi giorno). */
   done: Set<string>;
+  /** Tra quelle fatte, quelle spuntate dall'app da un allenamento o dai passi. */
+  auto: Set<string>;
+  /** Data di oggi (per sapere quali azioni sono previste oggi). */
+  today: string;
   /** Giorno del programma (1 = primo). */
   day: number;
 }
 
 async function view(p: Program, today: string): Promise<ProgramView> {
   const db = await getDb();
+  const checks = await programRepository.dayChecks(db, p.items, today);
   return {
     program: p,
-    done: await programRepository.doneItemIds(db, p.items, today),
+    done: new Set(checks.keys()),
+    auto: new Set([...checks].filter(([, s]) => s === 'auto').map(([id]) => id)),
+    today,
     day: programRepository.programDay(p, today),
   };
 }
@@ -36,9 +45,11 @@ async function toggleItem(item: ProgramItem, done: boolean) {
 const withToggled = (v: ProgramView, item: ProgramItem, done: boolean): ProgramView => {
   if (v.program.id !== item.programId) return v;
   const next = new Set(v.done);
+  const auto = new Set(v.auto);
+  auto.delete(item.id);
   if (done) next.add(item.id);
   else next.delete(item.id);
-  return { ...v, done: next };
+  return { ...v, done: next, auto };
 };
 
 /** Elenco dei programmi (attivi con le spunte di oggi, poi conclusi), ricaricato a ogni focus. */
@@ -49,6 +60,7 @@ export function usePrograms() {
   const reload = useCallback(async () => {
     const db = await getDb();
     const today = localIsoDate(new Date());
+    await autoCheckPrograms(db).catch(() => 0);
     const all = await programRepository.listPrograms(db);
     const views = await Promise.all(
       all.filter((p) => p.status === 'active').map((p) => view(p, today)),
@@ -77,6 +89,7 @@ export function useProgram(id: string) {
 
   const reload = useCallback(async () => {
     const db = await getDb();
+    await autoCheckPrograms(db).catch(() => 0);
     const p = await programRepository.getProgram(db, id);
     setState(p ? await view(p, localIsoDate(new Date())) : null);
   }, [id]);
