@@ -4,7 +4,13 @@ import { createTestDb } from '@/test/nodeSqliteDb';
 import { foodSection } from '@/coach/context';
 
 import { estimateInstruction, parseFoodEstimate } from '../estimate';
-import { catalogueTracker, cleanExtras, customTracker } from '../trackers';
+import {
+  catalogueTracker,
+  cleanExtras,
+  customTracker,
+  NO_TRACKERS,
+  type Tracker,
+} from '../trackers';
 
 let mockSeq = 0;
 jest.mock('@/db/ids', () => ({ newId: () => `id-${++mockSeq}` }));
@@ -65,5 +71,12 @@ describe('valori in più nel diario alimentare', () => {
   it('scarta valori non validi', () => {
     expect(cleanExtras({ fructose: -1, caffeine: '80', 'bad key': 3 })).toEqual({ caffeine: 80 });
     expect(customTracker('  ', 'g')).toBeNull();
+  });
+
+  it('il selettore delle voci restituisce sempre la stessa lista vuota (Zustand 5)', () => {
+    // Un array nuovo a ogni lettura fa ridisegnare la scheda Cibo all'infinito (crash in 1.23.0).
+    const state = { settings: { food: {} as { trackers?: Tracker[] } } };
+    const select = (s: typeof state) => s.settings.food.trackers ?? NO_TRACKERS;
+    expect(select(state)).toBe(select(state));
   });
 });

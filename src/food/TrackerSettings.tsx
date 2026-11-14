@@ -13,6 +13,7 @@ import {
   catalogueTracker,
   customTracker,
   isCatalogue,
+  NO_TRACKERS,
   TRACKER_CATALOGUE,
   type Tracker,
 } from './trackers';
@@ -29,7 +30,7 @@ export function useTrackerLabel() {
 /** Totali del giorno dei valori tracciati ("Fruttosio 18 g · Caffeina 160 mg"). */
 export function TrackedTotals({ extras }: { extras: Record<string, number> }) {
   const { i18n } = useTranslation();
-  const trackers = useSettingsStore((s) => s.settings.food.trackers ?? []);
+  const trackers = useSettingsStore((s) => s.settings.food.trackers ?? NO_TRACKERS);
   const label = useTrackerLabel();
   if (!trackers.length) return null;
   return (

@@ -4,6 +4,12 @@
  * "FODMAP"). Sono stimati dall'AI insieme al resto, sommati per giorno e passati al coach.
  */
 
+/**
+ * Lista vuota stabile per i selettori di Zustand: `?? []` crea un array nuovo a ogni lettura e
+ * Zustand 5 lo vede come un cambiamento, ridisegnando all'infinito (crash della scheda Cibo).
+ */
+export const NO_TRACKERS: readonly Tracker[] = Object.freeze([]);
+
 export interface Tracker {
   /** Chiave del catalogo (es. 'fructose') o 'c_…' per le voci scritte dall'utente. */
   id: string;

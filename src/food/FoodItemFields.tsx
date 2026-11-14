@@ -8,6 +8,7 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
 
 import { useTrackerLabel } from './TrackerSettings';
+import { NO_TRACKERS } from './trackers';
 
 /** Valori del modulo come testo (si scrivono con la tastiera numerica, anche con la virgola). */
 export interface FoodDraft {
@@ -102,7 +103,7 @@ export function FoodItemFields({
 }) {
   const { t } = useTranslation();
   const { colors, spacing } = useTheme();
-  const trackers = useSettingsStore((s) => s.settings.food.trackers ?? []);
+  const trackers = useSettingsStore((s) => s.settings.food.trackers ?? NO_TRACKERS);
   const label = useTrackerLabel();
   const [details, setDetails] = useState(false);
   const set = (k: keyof FoodDraft) => (text: string) => onChange({ ...value, [k]: text });
