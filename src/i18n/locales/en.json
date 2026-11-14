@@ -1005,6 +1005,9 @@
     "targetCustom": "{{kcal}} kcal a day, chosen by you.",
     "targetEstimated": "About {{kcal}} kcal a day, estimated from your profile and how much you move.",
     "trackers": {
+      "saved_one": "1 value chosen, already saved: it shows up when you add a food and in today's summary.",
+      "saved_other": "{{count}} values chosen, already saved: they show up when you add a food and in today's summary.",
+      "addedOne": "Added: {{name}}.",
       "title": "More values to track",
       "hint": "Choose what you want to keep an eye on besides calories and macros: it's estimated for each food and your coach takes it into account.",
       "customName": "Add your own",

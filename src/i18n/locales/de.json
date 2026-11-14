@@ -1005,6 +1005,9 @@
     "targetCustom": "{{kcal}} kcal pro Tag, von dir gewählt.",
     "targetEstimated": "Etwa {{kcal}} kcal pro Tag, geschätzt aus deinem Profil und wie viel du dich bewegst.",
     "trackers": {
+      "saved_one": "1 Wert gewählt, bereits gespeichert: er erscheint beim Hinzufügen eines Lebensmittels und in der heutigen Übersicht.",
+      "saved_other": "{{count}} Werte gewählt, bereits gespeichert: sie erscheinen beim Hinzufügen eines Lebensmittels und in der heutigen Übersicht.",
+      "addedOne": "Hinzugefügt: {{name}}.",
       "title": "Weitere Werte erfassen",
       "hint": "Wähle, was du neben Kalorien und Makros im Blick behalten willst: Es wird für jedes Lebensmittel geschätzt und dein Coach berücksichtigt es.",
       "customName": "Eigenen Wert hinzufügen",

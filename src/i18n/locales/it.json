@@ -1005,6 +1005,9 @@
     "targetCustom": "{{kcal}} kcal al giorno, scelto da te.",
     "targetEstimated": "Circa {{kcal}} kcal al giorno, stimate dal tuo profilo e da quanto ti muovi.",
     "trackers": {
+      "saved_one": "1 valore scelto, già salvato: compare quando aggiungi un alimento e nel riepilogo di oggi.",
+      "saved_other": "{{count}} valori scelti, già salvati: compaiono quando aggiungi un alimento e nel riepilogo di oggi.",
+      "addedOne": "Aggiunto: {{name}}.",
       "title": "Altri valori da tracciare",
       "hint": "Scegli cosa vuoi tenere d'occhio oltre a calorie e macro: verrà stimato per ogni alimento e il coach ne terrà conto.",
       "customName": "Aggiungi una voce tua",

@@ -142,6 +142,23 @@ export function FoodItemFields({
           />
         </View>
       </View>
+      {trackers.length ? (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
+          {trackers.map((tr) => (
+            <View key={tr.id} style={{ flexBasis: '47%', flexGrow: 1 }}>
+              <TextField
+                label={`${label(tr)} (${tr.unit})`}
+                value={value.extras[tr.id] ?? ''}
+                onChangeText={(x) =>
+                  onChange({ ...value, extras: { ...value.extras, [tr.id]: x } })
+                }
+                keyboardType="decimal-pad"
+                placeholder="0"
+              />
+            </View>
+          ))}
+        </View>
+      ) : null}
       {details ? (
         <View style={{ gap: spacing.md }}>
           <View style={{ flexDirection: 'row', gap: spacing.sm }}>
@@ -157,23 +174,6 @@ export function FoodItemFields({
             {numberField('saturatedFat')}
             {numberField('sodium')}
           </View>
-          {trackers.length ? (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-              {trackers.map((tr) => (
-                <View key={tr.id} style={{ flexBasis: '47%', flexGrow: 1 }}>
-                  <TextField
-                    label={`${label(tr)} (${tr.unit})`}
-                    value={value.extras[tr.id] ?? ''}
-                    onChangeText={(x) =>
-                      onChange({ ...value, extras: { ...value.extras, [tr.id]: x } })
-                    }
-                    keyboardType="decimal-pad"
-                    placeholder="0"
-                  />
-                </View>
-              ))}
-            </View>
-          ) : null}
         </View>
       ) : (
         <Pressable onPress={() => setDetails(true)} accessibilityRole="button" hitSlop={8}>

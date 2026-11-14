@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { View } from 'react-native';
+import { useRef, useState } from 'react';
+import { View, type TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Button, ChipGroup, TextField } from '@/components';
@@ -55,6 +55,8 @@ export function TrackerSettings() {
   const trackers = food.trackers ?? [];
   const [name, setName] = useState('');
   const [unit, setUnit] = useState('g');
+  const [added, setAdded] = useState<string | null>(null);
+  const nameRef = useRef<TextInput>(null);
 
   const save = (next: Tracker[]) => void update({ food: { ...food, trackers: next } });
   const toggle = (id: string) => {
@@ -64,9 +66,14 @@ export function TrackerSettings() {
   };
   const addCustom = () => {
     const tr = customTracker(name, unit);
-    if (!tr || trackers.some((x) => x.id === tr.id)) return;
+    // Nome vuoto: il pulsante porta al campo invece di restare spento (sembrava non salvare).
+    if (!tr) {
+      nameRef.current?.focus();
+      return;
+    }
+    if (!trackers.some((x) => x.id === tr.id)) save([...trackers, tr]);
     haptic.success();
-    save([...trackers, tr]);
+    setAdded(tr.name ?? tr.id);
     setName('');
   };
   const customs = trackers.filter((x) => !isCatalogue(x.id));
@@ -88,12 +95,23 @@ export function TrackerSettings() {
           ...customs.map((x) => ({ value: x.id, label: `${label(x)} (${x.unit})` })),
         ]}
       />
+      {trackers.length ? (
+        <AppText variant="caption" tone="success">
+          {t('food.trackers.saved', { count: trackers.length })}
+        </AppText>
+      ) : null}
       <View style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-end' }}>
         <View style={{ flex: 3 }}>
           <TextField
+            ref={nameRef}
             label={t('food.trackers.customName')}
             value={name}
-            onChangeText={setName}
+            onChangeText={(v) => {
+              setName(v);
+              setAdded(null);
+            }}
+            onSubmitEditing={addCustom}
+            returnKeyType="done"
             placeholder={t('food.trackers.customPlaceholder')}
           />
         </View>
@@ -101,12 +119,12 @@ export function TrackerSettings() {
           <TextField label={t('food.trackers.unit')} value={unit} onChangeText={setUnit} />
         </View>
       </View>
-      <Button
-        label={t('food.trackers.add')}
-        variant="secondary"
-        onPress={addCustom}
-        disabled={!name.trim()}
-      />
+      <Button label={t('food.trackers.add')} variant="secondary" onPress={addCustom} />
+      {added ? (
+        <AppText variant="caption" tone="success" accessibilityLiveRegion="polite">
+          {t('food.trackers.addedOne', { name: added })}
+        </AppText>
+      ) : null}
     </View>
   );
 }
