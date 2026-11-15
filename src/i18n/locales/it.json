@@ -1085,7 +1085,7 @@
     "photoNotSaved": "La foto serve solo per il calcolo: non viene salvata.",
     "photoNeedsOnlineAI": "Per riconoscere il cibo dalle foto serve un'AI online (Servizi → Provider AI). Intanto puoi scrivere cosa hai mangiato.",
     "cameraDenied": "Consenti l'accesso alla fotocamera nelle Impostazioni del telefono.",
-    "sugarOf": "di cui zuccheri {{value}} g",
+    "sugarOf": "zuccheri {{value}} g",
     "nutrients": {
       "title": "Altri valori ({{count}})",
       "show": "Mostra fibre, sodio e gli altri valori",
@@ -1099,7 +1099,11 @@
         "saturatedFat": "Grassi saturi",
         "sodium": "Sodio"
       }
-    }
+    },
+    "saturatedOf": "saturi {{value}} g",
+    "proteinLeft": "mancano {{value}} g",
+    "proteinDone": "raggiunte",
+    "proteinNoTarget": "aggiungi il peso"
   },
   "citations": {
     "title": "Fonti scientifiche",

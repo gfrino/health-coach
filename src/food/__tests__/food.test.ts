@@ -2,7 +2,7 @@ import { foodSection } from '@/coach/context';
 
 import { eatenAtFor, shiftDay } from '../days';
 import { estimateInstruction, parseFoodEstimate } from '../estimate';
-import { estimateTarget, MIN_TARGET } from '../target';
+import { estimateProtein, estimateTarget, MIN_TARGET } from '../target';
 
 jest.mock('@/db', () => ({}));
 
@@ -147,5 +147,33 @@ describe('stima da foto', () => {
     expect(photo).toContain('note, which wins over what you see: ne ho mangiato metà');
     expect(estimateInstruction('Italian', '', true)).not.toContain('note');
     expect(estimateInstruction('Italian', 'una mela')).toContain('What the user ate: una mela');
+  });
+});
+
+describe('estimateProtein', () => {
+  const base = { weightKg: 70, heightCm: 175, age: 40, activeKcal: null, goals: [] as string[] };
+
+  it('usa 0,83 g/kg EFSA per un adulto', () => {
+    expect(estimateProtein(base)).toEqual({ grams: 60, perKg: 0.83, basis: 'efsa' });
+  });
+
+  it('sale con età, attività, dimagrimento e muscoli', () => {
+    expect(estimateProtein({ ...base, age: 70 })!.perKg).toBe(1);
+    expect(estimateProtein({ ...base, activeKcal: 500 })!.basis).toBe('active');
+    expect(estimateProtein({ ...base, goals: ['loseWeight'] })).toEqual({
+      grams: 85,
+      perKg: 1.2,
+      basis: 'loseWeight',
+    });
+    expect(estimateProtein({ ...base, goals: ['gainMuscle'] })!.grams).toBe(110);
+  });
+
+  it('con BMI sopra 25 usa il peso a BMI 25', () => {
+    // 1,75² × 25 = 76,6 kg di riferimento invece di 100
+    expect(estimateProtein({ ...base, weightKg: 100 })!.grams).toBe(65);
+  });
+
+  it('senza peso non stima', () => {
+    expect(estimateProtein({ ...base, weightKg: null })).toBeNull();
   });
 });

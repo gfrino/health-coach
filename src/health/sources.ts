@@ -43,6 +43,30 @@ export const SOURCES: Record<SourceTopic, Citation[]> = {
       publisher: 'European Food Safety Authority',
       url: 'https://multimedia.efsa.europa.eu/drvs/index.htm',
     },
+    {
+      authors: 'EFSA Panel on Dietetic Products, Nutrition and Allergies',
+      title: 'Scientific Opinion on Dietary Reference Values for protein',
+      publisher: 'EFSA Journal, 2012',
+      url: 'https://doi.org/10.2903/j.efsa.2012.2557',
+    },
+    {
+      authors: 'Thomas DT, Erdman KA, Burke LM (ACSM, AND, DC)',
+      title: 'American College of Sports Medicine Joint Position Statement. Nutrition and Athletic Performance',
+      publisher: 'Med Sci Sports Exerc, 2016',
+      url: 'https://pubmed.ncbi.nlm.nih.gov/26891166/',
+    },
+    {
+      authors: 'Morton RW, et al.',
+      title: 'A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength in healthy adults',
+      publisher: 'Br J Sports Med, 2018',
+      url: 'https://pubmed.ncbi.nlm.nih.gov/28698222/',
+    },
+    {
+      authors: 'Bauer J, et al. (PROT-AGE Study Group)',
+      title: 'Evidence-based recommendations for optimal dietary protein intake in older people',
+      publisher: 'J Am Med Dir Assoc, 2013',
+      url: 'https://pubmed.ncbi.nlm.nih.gov/23867520/',
+    },
   ],
   nutrition: [
     {

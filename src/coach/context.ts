@@ -315,6 +315,8 @@ export interface FoodContext {
   /** Media sui giorni con voci negli ultimi 7 (oggi escluso). */
   avg7: { calories: number; days: number } | null;
   target: { kcal: number; custom: boolean; paceKgWeek?: number | null } | null;
+  /** Proteine al giorno stimate dall'app (g e g/kg). */
+  protein?: { grams: number; perKg: number } | null;
   /** Medie dei nutrienti rispetto ai valori di riferimento (ieri, 7, 30, 365 giorni). */
   nutrients?: NutrientReport | null;
 }
@@ -333,6 +335,9 @@ export function foodSection(
     `Today so far: ${t.calories} kcal (protein ${t.protein} g, carbs ${t.carbs} g, fat ${t.fat} g${t.saturatedFat ? ` of which saturated ${t.saturatedFat} g` : ''}${t.fiber ? `, fiber ${t.fiber} g` : ''}${t.sugar ? `, sugar ${t.sugar} g` : ''}${t.sodium ? `, sodium ${t.sodium} mg` : ''}; estimates) in ${food.today.length} foods`,
     food.target
       ? `daily target ${food.target.kcal} kcal (${food.target.custom ? 'set by the user' : `estimated by the app from profile and activity${food.target.paceKgWeek ? `, for about ${food.target.paceKgWeek} kg/week toward their weight goal` : ''}`})`
+      : null,
+    food.protein
+      ? `daily protein target about ${food.protein.grams} g (${food.protein.perKg} g/kg, app estimate from weight, age, activity and goals)`
       : null,
     food.avg7
       ? `average of the last ${food.avg7.days} logged days: ${food.avg7.calories} kcal`

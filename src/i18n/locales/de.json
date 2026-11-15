@@ -1085,7 +1085,7 @@
     "photoNotSaved": "Das Foto dient nur der Schätzung: Es wird nicht gespeichert.",
     "photoNeedsOnlineAI": "Um Essen auf Fotos zu erkennen, brauchst du eine Online-KI (Dienste → KI-Anbieter). Bis dahin kannst du aufschreiben, was du gegessen hast.",
     "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen deines Telefons.",
-    "sugarOf": "davon Zucker {{value}} g",
+    "sugarOf": "Zucker {{value}} g",
     "nutrients": {
       "title": "Weitere Werte ({{count}})",
       "show": "Zeigt Ballaststoffe, Natrium und die weiteren Werte",
@@ -1099,7 +1099,11 @@
         "saturatedFat": "Gesättigte Fette",
         "sodium": "Natrium"
       }
-    }
+    },
+    "saturatedOf": "gesättigt {{value}} g",
+    "proteinLeft": "noch {{value}} g",
+    "proteinDone": "erreicht",
+    "proteinNoTarget": "Gewicht angeben"
   },
   "citations": {
     "title": "Wissenschaftliche Quellen",

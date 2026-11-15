@@ -19,7 +19,7 @@ import { loadAttachmentContent } from '@/records/attachmentContent';
 import { fileTypeOf } from '@/records/fileMeta';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS, localIsoDate } from '@/lib/dates';
-import { loadCalorieTarget } from '@/food/target';
+import { loadFoodTargets } from '@/food/target';
 import { addDays, buildNutrientReport } from '@/food/nutrientReport';
 import { ageFrom } from '@/food/references';
 import { trackerPromptName } from '@/food/trackers';
@@ -160,16 +160,17 @@ async function loadFoodContext(
   now: Date,
 ): Promise<FoodContext | null> {
   const today = localIsoDate(now);
-  const [entries, year, estimated, profile] = await Promise.all([
+  const [entries, year, targets, profile] = await Promise.all([
     foodRepository.listDay(db, today),
     foodRepository.dailyTotals(db, addDays(today, -365), today),
-    loadCalorieTarget(db, now).catch(() => null),
+    loadFoodTargets(db, now).catch(() => ({ calories: null, protein: null })),
     profileRepository.getProfile(db),
   ]);
   const weekAgo = addDays(today, -7);
   const past = year.filter((d) => d.day < today && d.day >= weekAgo);
   const trackers = settings.food.trackers ?? [];
   if (!entries.length && !past.length && !trackers.length) return null;
+  const estimated = targets.calories;
   const custom = settings.food.calorieTarget;
   const kcal = custom ?? estimated?.kcal ?? null;
   const nutrients = buildNutrientReport(
@@ -200,6 +201,7 @@ async function loadFoodContext(
       : estimated
         ? { kcal: estimated.kcal, custom: false, paceKgWeek: estimated.paceKgWeek }
         : null,
+    protein: targets.protein ? { grams: targets.protein.grams, perKg: targets.protein.perKg } : null,
   };
 }
 

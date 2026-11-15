@@ -1085,7 +1085,7 @@
     "photoNotSaved": "The photo is only used for the estimate: it isn't saved.",
     "photoNeedsOnlineAI": "Recognising food from photos needs an online AI (Services → AI provider). For now you can write what you ate.",
     "cameraDenied": "Allow camera access in your phone's Settings.",
-    "sugarOf": "of which sugars {{value}} g",
+    "sugarOf": "sugars {{value}} g",
     "nutrients": {
       "title": "More values ({{count}})",
       "show": "Shows fibre, sodium and the other values",
@@ -1099,7 +1099,11 @@
         "saturatedFat": "Saturated fat",
         "sodium": "Sodium"
       }
-    }
+    },
+    "saturatedOf": "saturated {{value}} g",
+    "proteinLeft": "{{value}} g to go",
+    "proteinDone": "target met",
+    "proteinNoTarget": "add your weight"
   },
   "citations": {
     "title": "Scientific sources",

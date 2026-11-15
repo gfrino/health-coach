@@ -85,8 +85,62 @@ function ageOn(birthDate: string | null, now: Date): number | null {
   return age;
 }
 
-/** Obiettivo dal profilo e dai dati di salute (peso più recente, calorie attive degli ultimi 7 giorni). */
-export async function loadCalorieTarget(db: Db, now = new Date()): Promise<CalorieTarget | null> {
+export interface ProteinTarget {
+  /** Grammi al giorno (arrotondati a 5). */
+  grams: number;
+  /** Grammi per kg di peso di riferimento. */
+  perKg: number;
+  /** Perché questo valore: fabbisogno EFSA, attività, dimagrimento, muscoli o età. */
+  basis: 'efsa' | 'active' | 'loseWeight' | 'muscle' | 'older';
+}
+
+/**
+ * Proteine al giorno stimate dall'app:
+ * - EFSA (2012): 0,83 g per kg di peso per gli adulti;
+ * - dai 65 anni almeno 1,0 g/kg (PROT-AGE, 2013);
+ * - persone attive o che vogliono dimagrire 1,2 g/kg (ACSM/AND/DC 2016: 1,2–2,0; a dieta aiuta a
+ *   conservare la massa muscolare);
+ * - per aumentare i muscoli 1,6 g/kg (Morton et al. 2018: oltre i benefici non crescono).
+ * Con un BMI sopra 25 si usa il peso che corrisponde a BMI 25, per non gonfiare l'obiettivo.
+ */
+export function estimateProtein(i: {
+  weightKg: number | null;
+  heightCm: number | null;
+  age: number | null;
+  activeKcal: number | null;
+  goals: string[];
+}): ProteinTarget | null {
+  if (!i.weightKg || i.weightKg < 30) return null;
+  const h = i.heightCm && i.heightCm > 100 ? i.heightCm / 100 : null;
+  const refWeight = h ? Math.min(i.weightKg, 25 * h * h) : i.weightKg;
+  const active = (i.activeKcal ?? 0) >= 400 || i.goals.includes('fitness');
+  let basis: ProteinTarget['basis'] = 'efsa';
+  let perKg = 0.83;
+  if (i.age != null && i.age >= 65) {
+    basis = 'older';
+    perKg = 1.0;
+  }
+  if (i.goals.includes('loseWeight') && perKg < 1.2) {
+    basis = 'loseWeight';
+    perKg = 1.2;
+  } else if (active && perKg < 1.2) {
+    basis = 'active';
+    perKg = 1.2;
+  }
+  if (i.goals.includes('gainMuscle')) {
+    basis = 'muscle';
+    perKg = 1.6;
+  }
+  return { grams: Math.round((refWeight * perKg) / 5) * 5, perKg, basis };
+}
+
+export interface FoodTargets {
+  calories: CalorieTarget | null;
+  protein: ProteinTarget | null;
+}
+
+/** Obiettivi dal profilo e dai dati di salute (peso più recente, calorie attive degli ultimi 7 giorni). */
+export async function loadFoodTargets(db: Db, now = new Date()): Promise<FoodTargets> {
   const profile = await profileRepository.getProfile(db);
   const to = now.getTime() + 1;
   const [weight, active] = await Promise.all([
@@ -99,13 +153,23 @@ export async function loadCalorieTarget(db: Db, now = new Date()): Promise<Calor
   const activeKcal = fullDays.length
     ? fullDays.reduce((a, d) => a + d.value, 0) / fullDays.length
     : null;
-  return estimateTarget({
+  const input = {
     sex: profile.sex,
     age: ageOn(profile.birthDate, now),
     weightKg: weight.days.at(-1)?.value ?? profile.weightKg,
     heightCm: profile.heightCm,
     activeKcal,
     goals: profile.goals,
-    weightGoal: weightGoalProgress(profile, weight.days, today),
-  });
+  };
+  return {
+    calories: estimateTarget({
+      ...input,
+      weightGoal: weightGoalProgress(profile, weight.days, today),
+    }),
+    protein: estimateProtein(input),
+  };
+}
+
+export async function loadCalorieTarget(db: Db, now = new Date()): Promise<CalorieTarget | null> {
+  return (await loadFoodTargets(db, now)).calories;
 }

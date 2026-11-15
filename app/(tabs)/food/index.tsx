@@ -19,7 +19,7 @@ import {
 import { foodRepository, getDb, profileRepository } from '@/db';
 import { FOOD_MEALS, type FoodEntry, type FoodMeal } from '@/db/repositories/foodRepository';
 import { shiftDay } from '@/food/days';
-import { loadCalorieTarget, type CalorieTarget } from '@/food/target';
+import { loadFoodTargets, type CalorieTarget, type ProteinTarget } from '@/food/target';
 import { NutrientList } from '@/food/NutrientList';
 import { ageFrom, type RefProfile } from '@/food/references';
 import { TrackerSettings } from '@/food/TrackerSettings';
@@ -48,19 +48,21 @@ export default function FoodScreen() {
   const [day, setDay] = useState(today);
   const [entries, setEntries] = useState<FoodEntry[] | null>(null);
   const [estimated, setEstimated] = useState<CalorieTarget | null>(null);
+  const [protein, setProtein] = useState<ProteinTarget | null>(null);
   const [person, setPerson] = useState<Pick<RefProfile, 'sex' | 'age'>>({ sex: null, age: null });
   const [editingTarget, setEditingTarget] = useState(false);
   const [targetInput, setTargetInput] = useState('');
 
   const load = useCallback(async () => {
     const db = await getDb();
-    const [list, target, profile] = await Promise.all([
+    const [list, targets, profile] = await Promise.all([
       foodRepository.listDay(db, day),
-      loadCalorieTarget(db).catch(() => null),
+      loadFoodTargets(db).catch(() => ({ calories: null, protein: null })),
       profileRepository.getProfile(db),
     ]);
     setEntries(list);
-    setEstimated(target);
+    setEstimated(targets.calories);
+    setProtein(targets.protein);
     setPerson({ sex: profile.sex, age: ageFrom(profile.birthDate, localIsoDate(new Date())) });
   }, [day]);
   useFocusEffect(
@@ -127,31 +129,82 @@ export default function FoodScreen() {
     </Pressable>
   );
 
-  const macro = (icon: AppIconName, label: string, grams: number, sub?: string) => (
-    <View style={{ flex: 1, alignItems: 'center', gap: 4 }}>
+  /** Riquadro di un macronutriente: icona, valore, barra e una riga di dettaglio. */
+  const macro = (o: {
+    icon: AppIconName;
+    label: string;
+    grams: number;
+    /** Obiettivo in grammi (solo proteine). */
+    of?: number | null;
+    /** Riempimento della barra (0–1), null = nessuna barra. */
+    bar: number | null;
+    barColor?: string;
+    detail: string;
+    detailColor?: string;
+  }) => (
+    <View
+      accessible
+      accessibilityLabel={`${o.label}: ${t('food.grams', { value: num(o.grams, locale, 0) })}${o.of ? ` / ${t('food.grams', { value: num(o.of, locale, 0) })}` : ''}, ${o.detail}`}
+      style={{
+        flex: 1,
+        gap: 6,
+        padding: spacing.sm,
+        borderRadius: radius.lg,
+        backgroundColor: colors.surfaceAlt,
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <View
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: 12,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: colors.primarySoft,
+          }}
+        >
+          <Icon name={o.icon} size={13} color={colors.primary} />
+        </View>
+        <AppText variant="caption" tone="textMuted" numberOfLines={1} style={{ flex: 1 }}>
+          {o.label}
+        </AppText>
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+        <AppText variant="headline">{num(o.grams, locale, 0)}</AppText>
+        <AppText variant="caption" tone="textMuted" numberOfLines={1}>
+          {o.of ? ` / ${num(o.of, locale, 0)} g` : ' g'}
+        </AppText>
+      </View>
       <View
         style={{
-          width: 36,
-          height: 36,
-          borderRadius: 18,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: colors.primarySoft,
+          height: 4,
+          borderRadius: radius.pill,
+          backgroundColor: o.bar !== null ? colors.border : 'transparent',
+          overflow: 'hidden',
         }}
       >
-        <Icon name={icon} size={17} color={colors.primary} />
+        {o.bar !== null ? (
+          <View
+            style={{
+              width: `${Math.max(0, Math.min(1, o.bar)) * 100}%`,
+              height: '100%',
+              backgroundColor: o.barColor ?? colors.primary,
+            }}
+          />
+        ) : null}
       </View>
-      <AppText variant="headline">{t('food.grams', { value: num(grams, locale, 0) })}</AppText>
-      <AppText variant="caption" tone="textMuted">
-        {label}
+      <AppText
+        variant="caption"
+        numberOfLines={1}
+        style={{ fontSize: 11, color: o.detailColor ?? colors.textMuted }}
+      >
+        {o.detail}
       </AppText>
-      {sub ? (
-        <AppText variant="caption" tone="textMuted" align="center" style={{ fontSize: 11 }}>
-          {sub}
-        </AppText>
-      ) : null}
     </View>
   );
+
+  const proteinLeft = protein ? protein.grams - totals.protein : null;
 
   return (
     <>
@@ -193,13 +246,31 @@ export default function FoodScreen() {
 
         {/* Riepilogo */}
         <Card>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
-            <AppText variant="largeTitle">{num(totals.calories, locale, 0)}</AppText>
-            <AppText variant="callout" tone="textMuted">
-              {target != null
-                ? t('food.ofTarget', { kcal: num(target, locale, 0) })
-                : t('food.kcalEaten')}
-            </AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: left != null && left < 0 ? colors.warningSoft : colors.primarySoft,
+              }}
+            >
+              <Icon
+                name="flame"
+                size={20}
+                color={left != null && left < 0 ? colors.warning : colors.primary}
+              />
+            </View>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
+              <AppText variant="largeTitle">{num(totals.calories, locale, 0)}</AppText>
+              <AppText variant="callout" tone="textMuted" numberOfLines={1} style={{ flexShrink: 1 }}>
+                {target != null
+                  ? t('food.ofTarget', { kcal: num(target, locale, 0) })
+                  : t('food.kcalEaten')}
+              </AppText>
+            </View>
           </View>
           {target != null ? (
             <>
@@ -221,22 +292,38 @@ export default function FoodScreen() {
               {t('food.noTarget')}
             </AppText>
           )}
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingTop: spacing.sm,
-              borderTopWidth: 1,
-              borderTopColor: colors.border,
-            }}
-          >
-            {macro('protein', t('food.protein'), totals.protein)}
-            {macro(
-              'carbs',
-              t('food.carbs'),
-              totals.carbs,
-              t('food.sugarOf', { value: num(totals.sugar, locale, 0) }),
-            )}
-            {macro('fat', t('food.fat'), totals.fat)}
+          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+            {macro({
+              icon: 'protein',
+              label: t('food.protein'),
+              grams: totals.protein,
+              of: protein?.grams,
+              bar: protein ? totals.protein / protein.grams : null,
+              barColor: proteinLeft != null && proteinLeft <= 0 ? colors.success : colors.primary,
+              detail:
+                proteinLeft == null
+                  ? t('food.proteinNoTarget')
+                  : proteinLeft > 0
+                    ? t('food.proteinLeft', { value: num(proteinLeft, locale, 0) })
+                    : t('food.proteinDone'),
+              detailColor: proteinLeft != null && proteinLeft <= 0 ? colors.success : undefined,
+            })}
+            {macro({
+              icon: 'carbs',
+              label: t('food.carbs'),
+              grams: totals.carbs,
+              bar: totals.carbs > 0 ? totals.sugar / totals.carbs : null,
+              barColor: colors.textMuted,
+              detail: t('food.sugarOf', { value: num(totals.sugar, locale, 0) }),
+            })}
+            {macro({
+              icon: 'fat',
+              label: t('food.fat'),
+              grams: totals.fat,
+              bar: totals.fat > 0 ? totals.saturatedFat / totals.fat : null,
+              barColor: colors.textMuted,
+              detail: t('food.saturatedOf', { value: num(totals.saturatedFat, locale, 0) }),
+            })}
           </View>
           <NutrientList totals={totals} profile={{ ...person, kcal: target }} />
           <SourcesLink topic="energy" />
