@@ -8,7 +8,8 @@ import { AppText, Card, EmptyState, Icon, NavRow, ProgressBar, Screen } from '@/
 import { GoalCard } from '@/goals/GoalCard';
 import { haptic } from '@/lib/haptics';
 import { CATEGORY_ICONS } from '@/programs/ProgramItemRow';
-import { ProgramTodayList, todayProgress } from '@/programs/ProgramTodayList';
+import { ProgramTodayList, progressLabel, todayProgress } from '@/programs/ProgramTodayList';
+import { ProgramWeekNav } from '@/programs/ProgramWeekNav';
 import { usePrograms, type ProgramView } from '@/programs/usePrograms';
 import { useTheme } from '@/theme';
 
@@ -16,7 +17,7 @@ import { useTheme } from '@/theme';
 export default function ProgramsScreen() {
   const { t } = useTranslation();
   const { colors, spacing } = useTheme();
-  const { active, finished, toggle } = usePrograms();
+  const { active, finished, toggle, selectDay } = usePrograms();
 
   const create = () => {
     haptic.tap();
@@ -64,7 +65,13 @@ export default function ProgramsScreen() {
               </Card>
             ) : (
               active.map((v, i) => (
-                <ProgramCard key={v.program.id} view={v} onToggle={toggle} first={i === 0} />
+                <ProgramCard
+                  key={v.program.id}
+                  view={v}
+                  onToggle={toggle}
+                  onSelectDay={(day) => void selectDay(v.program, day)}
+                  first={i === 0}
+                />
               ))
             )}
             {finished.length ? (
@@ -98,16 +105,19 @@ const expandedState = new Map<string, boolean>();
 function ProgramCard({
   view,
   onToggle,
+  onSelectDay,
   first,
 }: {
   view: ProgramView;
   onToggle: ReturnType<typeof usePrograms>['toggle'];
+  onSelectDay: (day: string) => void;
   first: boolean;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const { program, day } = view;
   const { total, done: doneCount } = todayProgress(view);
+  const label = progressLabel(view, t, i18n.language);
   // Di default è aperto solo il primo programma.
   const [expanded, setExpanded] = useState(() => expandedState.get(program.id) ?? first);
   const toggleExpanded = () => {
@@ -163,18 +173,16 @@ function ProgramCard({
 
       {total ? (
         <View style={{ gap: spacing.xs }}>
-          <ProgressBar
-            value={doneCount / total}
-            label={t('programs.todayProgress', { done: doneCount, total })}
-          />
+          <ProgressBar value={doneCount / total} label={label} />
           <AppText variant="caption" tone="textMuted">
-            {t('programs.todayProgress', { done: doneCount, total })}
+            {label}
           </AppText>
         </View>
       ) : null}
 
       {expanded ? (
         <>
+          <ProgramWeekNav view={view} onSelect={onSelectDay} />
           <ProgramTodayList view={view} onToggle={onToggle} />
           <Pressable
             onPress={open}

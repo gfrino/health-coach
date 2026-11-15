@@ -892,7 +892,13 @@
     "deleteBody": "Das Programm und dein Fortschritt werden von diesem Telefon gelöscht.",
     "showDetails": "Details und bearbeiten",
     "expand": "Zeigt die Aktionen",
-    "collapse": "Blendet die Aktionen aus"
+    "collapse": "Blendet die Aktionen aus",
+    "dayProgress": "{{done}} von {{total}} erledigt am {{date}}",
+    "prevWeek": "Vorherige Woche",
+    "nextWeek": "Nächste Woche",
+    "backToToday": "Zurück zu heute",
+    "dayStatus": "{{done}} von {{total}} erledigt",
+    "dayNothing": "nichts geplant"
   },
   "memory": {
     "title": "Was dein Coach sich merkt",
@@ -1118,13 +1124,14 @@
     "setTitle": "Lege dein Zielgewicht fest",
     "setBody": "Sag uns, wohin du willst (und bis wann, wenn du magst): dein Coach begleitet dich Schritt für Schritt und die Kalorien passen sich an.",
     "editHint": "Öffnet dein Profil, um das Ziel zu ändern",
-    "progress": "Von {{start}} auf {{now}}: noch {{left}}",
+    "progress": "Jetzt {{now}} (Start bei {{start}}): noch {{left}}",
     "reached": "Ziel erreicht: du wiegst {{now}}. Dein Coach hilft dir, es zu halten.",
     "noTrend": "Wiege dich 2–3 Mal pro Woche, um den Verlauf zu sehen.",
     "trendEta": "Verlauf {{trend}} pro Woche: du erreichst es etwa am {{eta}}.",
     "trendWrong": "Verlauf {{trend}} pro Woche: noch keine Annäherung ans Ziel.",
     "needed": "Um es bis {{date}} zu schaffen, brauchst du etwa {{needed}} pro Woche.",
     "behind": "Etwas im Rückstand: für den {{date}} brauchst du etwa {{needed}} pro Woche.",
-    "tooFast": "Das nötige Tempo ist zu schnell, um sicher zu sein: wähle ein späteres Datum."
+    "tooFast": "Das nötige Tempo ist zu schnell, um sicher zu sein: wähle ein späteres Datum.",
+    "progressNow": "Jetzt {{now}}: noch {{left}}"
   }
 }

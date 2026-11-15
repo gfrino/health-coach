@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import { AppText } from '@/components';
 import { itemScheduled, type ProgramItem } from '@/db/repositories/programRepository';
@@ -14,7 +15,19 @@ export function todayProgress(view: ProgramView) {
   return { total: planned.length, done: planned.filter((i) => view.done.has(i.id)).length };
 }
 
-/** Elenco delle azioni: prima quelle di oggi, poi (più chiare) quelle previste in altri giorni. */
+/** "1 di 1 fatte oggi" o, per un giorno passato, "1 di 1 fatte dom 8 nov". */
+export function progressLabel(view: ProgramView, t: TFunction, language: string) {
+  const { total, done } = todayProgress(view);
+  if (view.isToday) return t('programs.todayProgress', { done, total });
+  const date = new Date(`${view.today}T12:00:00`).toLocaleDateString(language, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  });
+  return t('programs.dayProgress', { done, total, date });
+}
+
+/** Elenco delle azioni: prima quelle del giorno mostrato, poi (più chiare) quelle previste in altri giorni. */
 export function ProgramTodayList({
   view,
   onToggle,

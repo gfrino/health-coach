@@ -116,12 +116,13 @@ export function syncHealthData(
     .then(async (report) => {
       // Arrivati i dati veri, i dati di esempio (sviluppo) non devono mescolarsi con loro.
       if (report.upserted > 0) await clearDemoData().catch(() => undefined);
+      // Allenamenti e passi appena arrivati: spunta subito le azioni dei programmi che corrispondono.
+      await autoCheckPrograms(await getDb()).catch(() => 0);
+      // Dopo le spunte: le schermate che ascoltano lastSyncAt (Programmi) si ricaricano.
       useSyncStore.setState({ lastSyncAt: Date.now(), lastReport: report });
       // Frequenza cardiaca: oltre 30 giorni basta un riassunto per giorno (il DB non cresce senza limite).
       // Resta qui dentro: scrive nel DB e non deve sovrapporsi a un'altra sincronizzazione.
       await compactOldHeartRate().catch(() => undefined);
-      // Allenamenti e passi appena arrivati: spunta le azioni dei programmi che corrispondono.
-      await autoCheckPrograms(await getDb()).catch(() => 0);
       if (__DEV__) {
         console.warn(
           `[sync] ${Date.now() - startedAt} ms · ${report.upserted} scritti · ${report.deleted} eliminati · ${report.errors.length} tipi non disponibili`,

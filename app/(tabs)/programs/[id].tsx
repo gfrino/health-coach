@@ -23,7 +23,8 @@ import { haptic } from '@/lib/haptics';
 import { refreshCheckins } from '@/proactive/notifier';
 import { CATEGORY_ICONS, weekdaysLabel } from '@/programs/ProgramItemRow';
 import { WEEKDAYS, type Weekday } from '@/programs/schedule';
-import { ProgramTodayList, todayProgress } from '@/programs/ProgramTodayList';
+import { ProgramTodayList, progressLabel, todayProgress } from '@/programs/ProgramTodayList';
+import { ProgramWeekNav } from '@/programs/ProgramWeekNav';
 import { useProgram } from '@/programs/usePrograms';
 import { MAX_FONT_SCALE, useTheme } from '@/theme';
 
@@ -81,7 +82,7 @@ export default function ProgramScreen() {
   const { t, i18n } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const params = useLocalSearchParams<{ id: string; edit?: string }>();
-  const { view, reload, toggle } = useProgram(params.id);
+  const { view, reload, toggle, selectDay } = useProgram(params.id);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -333,12 +334,21 @@ export default function ProgramScreen() {
             <Card>
               {program.items.length ? (
                 <>
-                  <AppText variant="headline">{t('programs.today')}</AppText>
+                  {program.status === 'active' ? (
+                    <ProgramWeekNav view={view} onSelect={(d) => void selectDay(program, d)} />
+                  ) : (
+                    <AppText variant="headline">{t('programs.today')}</AppText>
+                  )}
                   {total ? (
-                    <ProgressBar
-                      value={doneCount / total}
-                      label={t('programs.todayProgress', { done: doneCount, total })}
-                    />
+                    <View style={{ gap: spacing.xs }}>
+                      <ProgressBar
+                        value={doneCount / total}
+                        label={progressLabel(view, t, i18n.language)}
+                      />
+                      <AppText variant="caption" tone="textMuted">
+                        {progressLabel(view, t, i18n.language)}
+                      </AppText>
+                    </View>
                   ) : null}
                   <ProgramTodayList view={view} onToggle={toggle} />
                 </>

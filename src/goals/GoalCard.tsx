@@ -63,6 +63,12 @@ export function GoalCard() {
       year: 'numeric',
     });
   const g = state.goal;
+  // Finché il peso non è cambiato "da 77,5 a 77,5" non dice niente: solo peso attuale e quanto manca.
+  const progressText = g
+    ? Math.abs(g.startKg - g.currentKg) >= 0.1
+      ? t('goal.progress', { start: w(g.startKg), now: w(g.currentKg), left: w(g.remainingKg) })
+      : t('goal.progressNow', { now: w(g.currentKg), left: w(g.remainingKg) })
+    : '';
 
   return (
     <Pressable
@@ -89,18 +95,10 @@ export function GoalCard() {
             <>
               <ProgressBar
                 value={g.done}
-                label={t('goal.progress', {
-                  start: w(g.startKg),
-                  now: w(g.currentKg),
-                  left: w(g.remainingKg),
-                })}
+                label={progressText}
               />
               <AppText variant="callout">
-                {t('goal.progress', {
-                  start: w(g.startKg),
-                  now: w(g.currentKg),
-                  left: w(g.remainingKg),
-                })}
+                {progressText}
               </AppText>
               <AppText variant="caption" tone="textMuted">
                 {g.trendKgWeek === null

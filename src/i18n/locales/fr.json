@@ -892,7 +892,13 @@
     "deleteBody": "Le programme et ta progression seront supprimés de ce téléphone.",
     "showDetails": "Détails et modification",
     "expand": "Affiche les actions",
-    "collapse": "Masque les actions"
+    "collapse": "Masque les actions",
+    "dayProgress": "{{done}} sur {{total}} faites le {{date}}",
+    "prevWeek": "Semaine précédente",
+    "nextWeek": "Semaine suivante",
+    "backToToday": "Revenir à aujourd’hui",
+    "dayStatus": "{{done}} sur {{total}} faites",
+    "dayNothing": "rien de prévu"
   },
   "memory": {
     "title": "Ce dont ton coach se souvient",
@@ -1118,13 +1124,14 @@
     "setTitle": "Fixe ton poids cible",
     "setBody": "Dis-nous où tu veux arriver (et pour quand, si tu veux) : ton coach te guide pas à pas et les calories s'adaptent.",
     "editHint": "Ouvre ton profil pour changer l'objectif",
-    "progress": "De {{start}} à {{now}} : encore {{left}}",
+    "progress": "Maintenant {{now}} (départ à {{start}}) : encore {{left}}",
     "reached": "Objectif atteint : tu pèses {{now}}. Ton coach t'aide à le garder.",
     "noTrend": "Pèse-toi 2 à 3 fois par semaine pour voir la tendance.",
     "trendEta": "Tendance {{trend}} par semaine : tu y arrives vers le {{eta}}.",
     "trendWrong": "Tendance {{trend}} par semaine : tu ne t'en rapproches pas encore.",
     "needed": "Pour y arriver d'ici le {{date}}, il faut environ {{needed}} par semaine.",
     "behind": "Un peu en retard : pour le {{date}}, il faut environ {{needed}} par semaine.",
-    "tooFast": "Le rythme nécessaire est trop rapide pour être sûr : envisage une date plus lointaine."
+    "tooFast": "Le rythme nécessaire est trop rapide pour être sûr : envisage une date plus lointaine.",
+    "progressNow": "Maintenant {{now}} : encore {{left}}"
   }
 }

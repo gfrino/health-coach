@@ -892,7 +892,13 @@
     "deleteBody": "The program and its progress will be deleted from this phone.",
     "showDetails": "Details and edit",
     "expand": "Opens the actions",
-    "collapse": "Closes the actions"
+    "collapse": "Closes the actions",
+    "dayProgress": "{{done}} of {{total}} done on {{date}}",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "backToToday": "Back to today",
+    "dayStatus": "{{done}} of {{total}} done",
+    "dayNothing": "nothing planned"
   },
   "memory": {
     "title": "What your coach remembers",
@@ -1118,13 +1124,14 @@
     "setTitle": "Set your target weight",
     "setBody": "Tell us where you want to get (and by when, if you like): your coach guides you step by step and calories adapt.",
     "editHint": "Opens your profile to change the goal",
-    "progress": "From {{start}} to {{now}}: {{left}} to go",
+    "progress": "Now {{now}} (started at {{start}}): {{left}} to go",
     "reached": "Goal reached: you weigh {{now}}. Your coach helps you keep it.",
     "noTrend": "Weigh yourself 2–3 times a week to see your trend.",
     "trendEta": "Trend {{trend}} a week: you get there around {{eta}}.",
     "trendWrong": "Trend {{trend}} a week: not moving toward the goal yet.",
     "needed": "To get there by {{date}} you need about {{needed}} a week.",
     "behind": "A bit behind: for {{date}} you need about {{needed}} a week.",
-    "tooFast": "The pace needed is too fast to be safe: consider a later date."
+    "tooFast": "The pace needed is too fast to be safe: consider a later date.",
+    "progressNow": "Now {{now}}: {{left}} to go"
   }
 }

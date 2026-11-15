@@ -1,6 +1,6 @@
 {
   "name": "health-coach",
-  "version": "1.23.2",
+  "version": "1.24.0",
   "main": "index.ts",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.129.0",
