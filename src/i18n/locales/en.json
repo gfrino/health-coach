@@ -1084,7 +1084,22 @@
     "photoReading": "{{name}} is looking at your plate…",
     "photoNotSaved": "The photo is only used for the estimate: it isn't saved.",
     "photoNeedsOnlineAI": "Recognising food from photos needs an online AI (Services → AI provider). For now you can write what you ate.",
-    "cameraDenied": "Allow camera access in your phone's Settings."
+    "cameraDenied": "Allow camera access in your phone's Settings.",
+    "sugarOf": "of which sugars {{value}} g",
+    "nutrients": {
+      "title": "More values ({{count}})",
+      "show": "Shows fibre, sodium and the other values",
+      "hide": "Hides the other values",
+      "min": "goal {{value}}",
+      "max": "max {{value}}",
+      "avoid": "less is better",
+      "hint": "Recommended daily values for adults (EFSA, WHO), adapted to the sex and age in your profile. Amounts are estimates.",
+      "names": {
+        "fiber": "Fibre",
+        "saturatedFat": "Saturated fat",
+        "sodium": "Sodium"
+      }
+    }
   },
   "citations": {
     "title": "Scientific sources",

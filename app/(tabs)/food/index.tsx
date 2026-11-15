@@ -9,17 +9,20 @@ import {
   Button,
   Card,
   Icon,
+  type AppIconName,
   ProgressBar,
   Screen,
   SourcesLink,
   SwitchRow,
   TextField,
 } from '@/components';
-import { foodRepository, getDb } from '@/db';
+import { foodRepository, getDb, profileRepository } from '@/db';
 import { FOOD_MEALS, type FoodEntry, type FoodMeal } from '@/db/repositories/foodRepository';
 import { shiftDay } from '@/food/days';
 import { loadCalorieTarget, type CalorieTarget } from '@/food/target';
-import { TrackedTotals, TrackerSettings } from '@/food/TrackerSettings';
+import { NutrientList } from '@/food/NutrientList';
+import { ageFrom, type RefProfile } from '@/food/references';
+import { TrackerSettings } from '@/food/TrackerSettings';
 import { haptic } from '@/lib/haptics';
 import { localIsoDate } from '@/lib/dates';
 import { num } from '@/lib/units';
@@ -27,11 +30,11 @@ import { parseNumber } from '@/records/labExtraction';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
 
-const MEAL_EMOJI: Record<FoodMeal, string> = {
-  breakfast: '☀️',
-  lunch: '🥗',
-  dinner: '🌙',
-  snack: '🍎',
+const MEAL_ICONS: Record<FoodMeal, AppIconName> = {
+  breakfast: 'breakfast',
+  lunch: 'lunch',
+  dinner: 'dinner',
+  snack: 'snack',
 };
 
 /** Tab "Cibo": il diario alimentare del giorno, semplice come un quaderno. */
@@ -45,17 +48,20 @@ export default function FoodScreen() {
   const [day, setDay] = useState(today);
   const [entries, setEntries] = useState<FoodEntry[] | null>(null);
   const [estimated, setEstimated] = useState<CalorieTarget | null>(null);
+  const [person, setPerson] = useState<Pick<RefProfile, 'sex' | 'age'>>({ sex: null, age: null });
   const [editingTarget, setEditingTarget] = useState(false);
   const [targetInput, setTargetInput] = useState('');
 
   const load = useCallback(async () => {
     const db = await getDb();
-    const [list, target] = await Promise.all([
+    const [list, target, profile] = await Promise.all([
       foodRepository.listDay(db, day),
       loadCalorieTarget(db).catch(() => null),
+      profileRepository.getProfile(db),
     ]);
     setEntries(list);
     setEstimated(target);
+    setPerson({ sex: profile.sex, age: ageFrom(profile.birthDate, localIsoDate(new Date())) });
   }, [day]);
   useFocusEffect(
     useCallback(() => {
@@ -121,12 +127,29 @@ export default function FoodScreen() {
     </Pressable>
   );
 
-  const macro = (label: string, grams: number) => (
-    <View style={{ flex: 1, alignItems: 'center', gap: 2 }}>
+  const macro = (icon: AppIconName, label: string, grams: number, sub?: string) => (
+    <View style={{ flex: 1, alignItems: 'center', gap: 4 }}>
+      <View
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.primarySoft,
+        }}
+      >
+        <Icon name={icon} size={17} color={colors.primary} />
+      </View>
       <AppText variant="headline">{t('food.grams', { value: num(grams, locale, 0) })}</AppText>
       <AppText variant="caption" tone="textMuted">
         {label}
       </AppText>
+      {sub ? (
+        <AppText variant="caption" tone="textMuted" align="center" style={{ fontSize: 11 }}>
+          {sub}
+        </AppText>
+      ) : null}
     </View>
   );
 
@@ -206,11 +229,16 @@ export default function FoodScreen() {
               borderTopColor: colors.border,
             }}
           >
-            {macro(t('food.protein'), totals.protein)}
-            {macro(t('food.carbs'), totals.carbs)}
-            {macro(t('food.fat'), totals.fat)}
+            {macro('protein', t('food.protein'), totals.protein)}
+            {macro(
+              'carbs',
+              t('food.carbs'),
+              totals.carbs,
+              t('food.sugarOf', { value: num(totals.sugar, locale, 0) }),
+            )}
+            {macro('fat', t('food.fat'), totals.fat)}
           </View>
-          <TrackedTotals extras={totals.extras} />
+          <NutrientList totals={totals} profile={{ ...person, kcal: target }} />
           <SourcesLink topic="energy" />
         </Card>
 
@@ -221,8 +249,20 @@ export default function FoodScreen() {
           return (
             <Card key={meal}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                <View
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: radius.md,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: colors.primarySoft,
+                  }}
+                >
+                  <Icon name={MEAL_ICONS[meal]} size={16} color={colors.primary} />
+                </View>
                 <AppText variant="headline" style={{ flex: 1 }}>
-                  {`${MEAL_EMOJI[meal]}  ${t(`food.meals.${meal}`)}`}
+                  {t(`food.meals.${meal}`)}
                 </AppText>
                 {items.length ? (
                   <AppText variant="callout" tone="textMuted">

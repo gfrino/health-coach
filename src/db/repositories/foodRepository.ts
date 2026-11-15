@@ -296,12 +296,14 @@ export function totals(entries: Partial<Pick<FoodEntry, NutrientKey | 'extras'>>
   };
 }
 
+export type DailyFoodTotals = { day: string } & FoodTotals;
+
 /** Totali per giorno tra due date (incluse), solo i giorni con almeno una voce. */
 export async function dailyTotals(
   db: Db,
   fromDay: string,
   toDay: string,
-): Promise<({ day: string } & FoodTotals)[]> {
+): Promise<DailyFoodTotals[]> {
   const rows = await db.getAllAsync<{
     day: string;
     calories: number | null;

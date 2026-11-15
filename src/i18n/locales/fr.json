@@ -1084,7 +1084,22 @@
     "photoReading": "{{name}} regarde ton assiette…",
     "photoNotSaved": "La photo sert seulement au calcul : elle n'est pas enregistrée.",
     "photoNeedsOnlineAI": "Pour reconnaître les aliments sur une photo, il faut une IA en ligne (Services → Fournisseur IA). En attendant, tu peux écrire ce que tu as mangé.",
-    "cameraDenied": "Autorise l'accès à l'appareil photo dans les Réglages du téléphone."
+    "cameraDenied": "Autorise l'accès à l'appareil photo dans les Réglages du téléphone.",
+    "sugarOf": "dont sucres {{value}} g",
+    "nutrients": {
+      "title": "Autres valeurs ({{count}})",
+      "show": "Affiche les fibres, le sodium et les autres valeurs",
+      "hide": "Masque les autres valeurs",
+      "min": "objectif {{value}}",
+      "max": "max {{value}}",
+      "avoid": "moins c’est mieux",
+      "hint": "Valeurs quotidiennes recommandées pour les adultes (EFSA, OMS), adaptées au sexe et à l’âge de ton profil. Les quantités sont des estimations.",
+      "names": {
+        "fiber": "Fibres",
+        "saturatedFat": "Graisses saturées",
+        "sodium": "Sodium"
+      }
+    }
   },
   "citations": {
     "title": "Sources scientifiques",

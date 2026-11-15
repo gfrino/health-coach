@@ -1,5 +1,6 @@
 import type { ChatMessage } from '@/ai/types';
 import type { CoachConfig, SupportedLanguage } from '@/config/settingsSchema';
+import { nutrientLines, type NutrientReport } from '@/food/nutrientReport';
 import { goalsForPrompt } from '@/goals/goals';
 import { localIsoDate } from '@/lib/dates';
 import { extraMeasuresSection, type CycleInfo, type ExtraMeasure } from './extraMeasuresText';
@@ -314,10 +315,13 @@ export interface FoodContext {
   /** Media sui giorni con voci negli ultimi 7 (oggi escluso). */
   avg7: { calories: number; days: number } | null;
   target: { kcal: number; custom: boolean; paceKgWeek?: number | null } | null;
+  /** Medie dei nutrienti rispetto ai valori di riferimento (ieri, 7, 30, 365 giorni). */
+  nutrients?: NutrientReport | null;
 }
 
 const FOOD_RULE = `FOOD DIARY
-When the user tells you what they ate or drank (now or earlier today), log it with log_food in the same turn: split it into foods, estimate calories and macros for the portion they said (typical portions if not said), and pick the meal from what they say or the time. Never log something already in FOOD TODAY. Then confirm in one short phrase with the estimated total (e.g. "Logged: about 450 kcal"); they can correct it in the Food tab. Calories are estimates: say "about". Never judge or moralize about food; respect their diet and approach. Relate meals to their goals, labs and calorie target only when useful. If FOOD TODAY lists values the user tracks (e.g. fructose, caffeine), also estimate them in log_food extras and mention them when they matter.`;
+When the user tells you what they ate or drank (now or earlier today), log it with log_food in the same turn: split it into foods, estimate calories and macros for the portion they said (typical portions if not said), and pick the meal from what they say or the time. Never log something already in FOOD TODAY. Then confirm in one short phrase with the estimated total (e.g. "Logged: about 450 kcal"); they can correct it in the Food tab. Calories are estimates: say "about". Never judge or moralize about food; respect their diet and approach. Relate meals to their goals, labs and calorie target only when useful. If FOOD TODAY lists values the user tracks (e.g. fructose, caffeine), also estimate them in log_food extras and mention them when they matter.
+NUTRIENT CHECK (when present) compares their diary with adult daily reference values over yesterday, 7, 30 and 365 days. Use it to spot possible shortfalls (low) or excesses (high): a pattern over weeks or months matters far more than one day. When it is relevant, or when they ask about nutrition, energy or tiredness, mention it with the numbers, suggest foods that fit their diet and tastes, and say it is an estimate from the logged days. For a shortfall that lasts a month or more, suggest asking their doctor about a blood test (lab results, if any, weigh more than diary estimates). Never diagnose a deficiency and never prescribe supplements or doses.`;
 
 export function foodSection(
   food: FoodContext | null | undefined,
@@ -344,12 +348,14 @@ export function foodSection(
         )
         .join(', ')}.`
     : null;
-  if (compact) return `FOOD DIARY\n${head}.${tracked ? `\n${tracked}` : ''}`;
+  const check = food.nutrients ? nutrientLines(food.nutrients, compact) : null;
+  if (compact)
+    return `FOOD DIARY\n${head}.${tracked ? `\n${tracked}` : ''}${check ? `\n${check}` : ''}`;
   const lines = food.today.map(
     (f) =>
       `- [${f.id}] ${f.meal}: ${f.name}${f.quantity ? ` (${f.quantity})` : ''}${f.kcal != null ? ` · ${f.kcal} kcal` : ''}`,
   );
-  return `FOOD TODAY (food diary, Food tab)\n${head}.${tracked ? `\n${tracked}` : ''}${lines.length ? `\n${lines.join('\n')}` : '\nNothing logged yet today.'}`;
+  return `FOOD TODAY (food diary, Food tab)\n${head}.${tracked ? `\n${tracked}` : ''}${lines.length ? `\n${lines.join('\n')}` : '\nNothing logged yet today.'}${check ? `\n${check}` : ''}`;
 }
 
 const RECIPE_RULE = `RECIPES

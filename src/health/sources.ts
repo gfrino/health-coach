@@ -69,6 +69,24 @@ export const SOURCES: Record<SourceTopic, Citation[]> = {
       publisher: 'European Food Safety Authority',
       url: 'https://multimedia.efsa.europa.eu/drvs/index.htm',
     },
+    {
+      authors: 'World Health Organization',
+      title: 'Saturated fatty acid and trans-fatty acid intake for adults and children: WHO guideline',
+      publisher: 'WHO, 2023',
+      url: 'https://www.who.int/publications/i/item/9789240073630',
+    },
+    {
+      authors: 'EFSA Panel on Dietetic Products, Nutrition and Allergies',
+      title: 'Scientific Opinion on the safety of caffeine',
+      publisher: 'EFSA Journal, 2015',
+      url: 'https://doi.org/10.2903/j.efsa.2015.4102',
+    },
+    {
+      authors: 'WHO Regional Office for Europe',
+      title: 'No level of alcohol consumption is safe for our health',
+      publisher: 'WHO, 2023',
+      url: 'https://www.who.int/europe/news/item/04-01-2023-no-level-of-alcohol-consumption-is-safe-for-our-health',
+    },
   ],
   hydration: [
     {

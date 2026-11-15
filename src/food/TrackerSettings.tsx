@@ -3,7 +3,6 @@ import { View, type TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Button, ChipGroup, TextField } from '@/components';
-import { num } from '@/lib/units';
 import { haptic } from '@/lib/haptics';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
@@ -13,7 +12,6 @@ import {
   catalogueTracker,
   customTracker,
   isCatalogue,
-  NO_TRACKERS,
   TRACKER_CATALOGUE,
   type Tracker,
 } from './trackers';
@@ -25,21 +23,6 @@ export function useTrackerLabel() {
     isCatalogue(tr.id)
       ? t(`food.trackers.names.${tr.id}` as 'food.trackers.names.fructose')
       : (tr.name ?? tr.id);
-}
-
-/** Totali del giorno dei valori tracciati ("Fruttosio 18 g · Caffeina 160 mg"). */
-export function TrackedTotals({ extras }: { extras: Record<string, number> }) {
-  const { i18n } = useTranslation();
-  const trackers = useSettingsStore((s) => s.settings.food.trackers ?? NO_TRACKERS);
-  const label = useTrackerLabel();
-  if (!trackers.length) return null;
-  return (
-    <AppText variant="caption" tone="textMuted">
-      {trackers
-        .map((tr) => `${label(tr)} ${num(extras[tr.id] ?? 0, i18n.language, 1)} ${tr.unit}`)
-        .join(' · ')}
-    </AppText>
-  );
 }
 
 /**

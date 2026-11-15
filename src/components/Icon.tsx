@@ -69,6 +69,33 @@ export const icons = {
   clock: { ios: 'clock', android: 'schedule' },
   people: { ios: 'person.2', android: 'group' },
   sources: { ios: 'books.vertical', android: 'menu_book' },
+  // Pasti
+  breakfast: { ios: 'sunrise.fill', android: 'wb_twilight' },
+  lunch: { ios: 'sun.max.fill', android: 'light_mode' },
+  dinner: { ios: 'moon.stars.fill', android: 'dark_mode' },
+  snack: { ios: 'takeoutbag.and.cup.and.straw.fill', android: 'bakery_dining' },
+  // Macronutrienti e valori del diario
+  protein: { ios: 'figure.strengthtraining.traditional', android: 'fitness_center' },
+  carbs: { ios: 'laurel.leading', android: 'grass' },
+  fat: { ios: 'drop.fill', android: 'water_drop' },
+  fiber: { ios: 'leaf.fill', android: 'eco' },
+  saturatedFat: { ios: 'drop.halffull', android: 'opacity' },
+  sodium: { ios: 'circle.grid.3x3.fill', android: 'grain' },
+  fructose: { ios: 'tree.fill', android: 'nutrition' },
+  addedSugar: { ios: 'cube.fill', android: 'cookie' },
+  caffeine: { ios: 'cup.and.saucer.fill', android: 'coffee' },
+  alcohol: { ios: 'wineglass.fill', android: 'wine_bar' },
+  cholesterol: { ios: 'heart.circle.fill', android: 'ecg_heart' },
+  potassium: { ios: 'bolt.fill', android: 'bolt' },
+  magnesium: { ios: 'atom', android: 'science' },
+  calcium: { ios: 'figure.stand', android: 'skeleton' },
+  iron: { ios: 'drop.triangle.fill', android: 'bloodtype' },
+  vitaminC: { ios: 'sparkles', android: 'auto_awesome' },
+  vitaminD: { ios: 'sun.min.fill', android: 'sunny' },
+  omega3: { ios: 'fish.fill', android: 'set_meal' },
+  lactose: { ios: 'waterbottle.fill', android: 'local_drink' },
+  purines: { ios: 'hexagon.fill', android: 'hexagon' },
+  customTracker: { ios: 'tag.fill', android: 'label' },
 } satisfies Record<string, IconName>;
 
 export type AppIconName = keyof typeof icons;
