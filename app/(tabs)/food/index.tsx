@@ -38,6 +38,9 @@ const MEAL_ICONS: Record<FoodMeal, AppIconName> = {
   snack: 'snack',
 };
 
+/** Valore che apre una chat nuova nel coach (cambia a ogni tocco). */
+const newChatId = () => String(Date.now());
+
 type MacroKey = 'protein' | 'carbs' | 'sugar' | 'fat';
 
 /** Tab "Cibo": il diario alimentare del giorno, semplice come un quaderno. */
@@ -219,6 +222,20 @@ export default function FoodScreen() {
       </AppText>
     </Pressable>
   );
+
+  const askCoach = () => {
+    haptic.tap();
+    router.navigate({
+      pathname: '/coach',
+      params: {
+        new: newChatId(),
+        ask:
+          day === today
+            ? t('food.askCoachPrompt')
+            : t('food.askCoachPromptDay', { day: dayLabel.toLowerCase(), date: day }),
+      },
+    });
+  };
 
   const proteinLeft = protein ? protein.grams - totals.protein : null;
   const refProfile: RefProfile = { ...person, kcal: target };
@@ -441,6 +458,7 @@ export default function FoodScreen() {
             </View>
           ) : null}
           <NutrientList totals={totals} profile={refProfile} />
+          <Button label={t('food.askCoach')} icon="coach" variant="secondary" onPress={askCoach} />
           <SourcesLink topic="energy" />
         </Card>
 

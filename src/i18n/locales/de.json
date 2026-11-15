@@ -843,7 +843,7 @@
       "archived": "Archiviert"
     },
     "day": "Tag {{day}}",
-    "dayOf": "Tag {{day}} von {{total}}",
+    "dayOf": "Tag {{day}} ({{date}}) von {{total}}",
     "todayProgress": "{{done}} von {{total}} heute erledigt",
     "daily": "Jeden Tag",
     "once": "Einmal",
@@ -1137,7 +1137,10 @@
       },
       "saturatedLowCarb": "Mit {{diet}} überschreitet man sie leicht: Bevorzuge natives Olivenöl, Avocado, Oliven, fetten Fisch und Nüsse und achte in den Laborwerten auf das LDL-Cholesterin."
     },
-    "netCarbs": "Netto-Kohlenhydrate"
+    "netCarbs": "Netto-Kohlenhydrate",
+    "askCoach": "Sprich mit deinem Coach darüber",
+    "askCoachPrompt": "Schauen wir uns mein heutiges Ernährungstagebuch an: Wie stehe ich bei Eiweiß, Kohlenhydraten, Zucker und Fett für meine Ernährungsweise, und was fehlt mir?",
+    "askCoachPromptDay": "Schauen wir uns mein Ernährungstagebuch von {{day}} ({{date}}) an: Wie lief es bei Eiweiß, Kohlenhydraten, Zucker und Fett für meine Ernährungsweise, und was hat gefehlt?"
   },
   "citations": {
     "title": "Wissenschaftliche Quellen",

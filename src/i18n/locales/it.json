@@ -843,7 +843,7 @@
       "archived": "Archiviato"
     },
     "day": "Giorno {{day}}",
-    "dayOf": "Giorno {{day}} di {{total}}",
+    "dayOf": "Giorno {{day}} ({{date}}) di {{total}}",
     "todayProgress": "{{done}} di {{total}} fatte oggi",
     "daily": "Ogni giorno",
     "once": "Una volta",
@@ -1137,7 +1137,10 @@
       },
       "saturatedLowCarb": "Con {{diet}} è facile superarli: preferisci olio extravergine, avocado, olive, pesce grasso e frutta secca, e tieni d'occhio il colesterolo LDL negli esami."
     },
-    "netCarbs": "Carboidrati netti"
+    "netCarbs": "Carboidrati netti",
+    "askCoach": "Parlane con il tuo coach",
+    "askCoachPrompt": "Guardiamo insieme il mio diario alimentare di oggi: come sto andando con proteine, carboidrati, zuccheri e grassi rispetto alla mia dieta, e cosa mi manca?",
+    "askCoachPromptDay": "Guardiamo insieme il mio diario alimentare di {{day}} ({{date}}): com’è andata con proteine, carboidrati, zuccheri e grassi rispetto alla mia dieta, e cosa è mancato?"
   },
   "citations": {
     "title": "Fonti scientifiche",

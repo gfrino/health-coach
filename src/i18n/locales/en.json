@@ -843,7 +843,7 @@
       "archived": "Archived"
     },
     "day": "Day {{day}}",
-    "dayOf": "Day {{day}} of {{total}}",
+    "dayOf": "Day {{day}} ({{date}}) of {{total}}",
     "todayProgress": "{{done}} of {{total}} done today",
     "daily": "Every day",
     "once": "Once",
@@ -1137,7 +1137,10 @@
       },
       "saturatedLowCarb": "With {{diet}} it is easy to go over: prefer extra-virgin olive oil, avocado, olives, fatty fish and nuts, and keep an eye on LDL cholesterol in your labs."
     },
-    "netCarbs": "Net carbs"
+    "netCarbs": "Net carbs",
+    "askCoach": "Talk to your coach about it",
+    "askCoachPrompt": "Let's look at my food diary for today: how am I doing with protein, carbs, sugars and fat for my diet, and what am I missing?",
+    "askCoachPromptDay": "Let's look at my food diary for {{day}} ({{date}}): how did I do with protein, carbs, sugars and fat for my diet, and what was missing?"
   },
   "citations": {
     "title": "Scientific sources",

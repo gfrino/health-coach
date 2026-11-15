@@ -843,7 +843,7 @@
       "archived": "Archivé"
     },
     "day": "Jour {{day}}",
-    "dayOf": "Jour {{day}} sur {{total}}",
+    "dayOf": "Jour {{day}} ({{date}}) sur {{total}}",
     "todayProgress": "{{done}} sur {{total}} faites aujourd'hui",
     "daily": "Chaque jour",
     "once": "Une fois",
@@ -1137,7 +1137,10 @@
       },
       "saturatedLowCarb": "Avec {{diet}}, on les dépasse facilement : privilégiez l'huile d'olive vierge extra, l'avocat, les olives, les poissons gras et les fruits à coque, et surveillez le cholestérol LDL dans vos analyses."
     },
-    "netCarbs": "Glucides nets"
+    "netCarbs": "Glucides nets",
+    "askCoach": "En parler avec votre coach",
+    "askCoachPrompt": "Regardons mon journal alimentaire d'aujourd'hui : où en suis-je pour les protéines, glucides, sucres et lipides par rapport à mon régime, et que me manque-t-il ?",
+    "askCoachPromptDay": "Regardons mon journal alimentaire de {{day}} ({{date}}) : comment cela s'est-il passé pour les protéines, glucides, sucres et lipides par rapport à mon régime, et qu'est-ce qui a manqué ?"
   },
   "citations": {
     "title": "Sources scientifiques",
