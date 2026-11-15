@@ -1085,7 +1085,6 @@
     "photoNotSaved": "Das Foto dient nur der Schätzung: Es wird nicht gespeichert.",
     "photoNeedsOnlineAI": "Um Essen auf Fotos zu erkennen, brauchst du eine Online-KI (Dienste → KI-Anbieter). Bis dahin kannst du aufschreiben, was du gegessen hast.",
     "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen deines Telefons.",
-    "sugarOf": "Zucker {{value}} g",
     "nutrients": {
       "title": "Weitere Werte ({{count}})",
       "show": "Zeigt Ballaststoffe, Natrium und die weiteren Werte",
@@ -1103,7 +1102,28 @@
     "saturatedOf": "gesättigt {{value}} g",
     "proteinLeft": "noch {{value}} g",
     "proteinDone": "erreicht",
-    "proteinNoTarget": "Gewicht angeben"
+    "proteinNoTarget": "Gewicht angeben",
+    "sugars": "Zucker",
+    "energyShare": "{{pct}}% der kcal",
+    "overLimit": "{{value}} g über Limit",
+    "limitLeft": "noch {{value}} g",
+    "macroInfo": {
+      "hint": "Zeigt die Erklärung",
+      "protein": "Eiweiß: {{grams}} g von einem Ziel von {{target}} g, also {{perKg}} g pro kg Körpergewicht. Der Balken füllt sich bis zum Ziel und wird grün, wenn du es erreichst.",
+      "proteinNoTarget": "Eiweiß: {{grams}} g. Gib im Profil dein Gewicht an, um ein Tagesziel zu erhalten.",
+      "proteinBasis": {
+        "efsa": "Das ist der Bedarf laut EFSA für Erwachsene.",
+        "older": "Ab 65 hilft etwas mehr, Muskeln und Kraft zu erhalten.",
+        "active": "Du bewegst dich viel: Für Aktive werden 1,2 bis 2 g pro kg empfohlen.",
+        "loseWeight": "Beim Abnehmen brauchst du mehr, um keine Muskeln zu verlieren.",
+        "muscle": "Für Muskelaufbau: Über 1,6 g pro kg steigt der Nutzen nicht weiter."
+      },
+      "carbs": "Kohlenhydrate: {{grams}} g, etwa {{pct}}% der heutigen Kalorien. Die EFSA empfiehlt 45–60% der Kalorien: Der Balken füllt sich bis zum oberen Wert, {{max}} g bei deinem Ziel.",
+      "sugar": "Zucker (natürlich und zugesetzt, bereits in den Kohlenhydraten enthalten): {{sugar}} g von einem Richtwert von höchstens {{max}} g pro Tag, der EU-Referenzmenge. Über dem Limit wird der Balken rot.",
+      "freeSugar": "Für zugesetzten Zucker (Süßes, Limonaden, Honig, Säfte) empfiehlt die WHO weniger als {{free}} g pro Tag.",
+      "fat": "Fett: {{grams}} g, etwa {{pct}}% der heutigen Kalorien. Die EFSA empfiehlt 20–35% der Kalorien: Der Balken füllt sich bis zum oberen Wert, {{max}} g bei deinem Ziel.",
+      "saturated": "Davon sind {{sat}} g gesättigte Fette (Butter, Käse, fettes Fleisch): Die WHO empfiehlt weniger als {{max}} g, also unter 10% der Kalorien. Darüber wird der Text rot."
+    }
   },
   "citations": {
     "title": "Wissenschaftliche Quellen",

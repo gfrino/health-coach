@@ -120,3 +120,12 @@ describe('controllo dei nutrienti per il coach', () => {
     expect(text).toContain('iron (EFSA need 16 mg/day): yesterday 7 mg (44%, low)');
   });
 });
+
+describe('zuccheri totali', () => {
+  it('usa i 90 g di riferimento UE e segna il superamento', () => {
+    const ref = nutrientReference('sugar', { sex: null, age: null, kcal: 2050 })!;
+    expect(ref).toEqual({ kind: 'max', value: 90, unit: 'g', source: 'EU' });
+    expect(refStatus(95, ref)).toBe('high');
+    expect(refStatus(31, ref)).toBe('ok');
+  });
+});

@@ -1,7 +1,7 @@
 import { router, useFocusEffect } from 'expo-router';
 import { Stack } from 'expo-router/stack';
 import { useCallback, useState } from 'react';
-import { Platform, Pressable, View } from 'react-native';
+import { LayoutAnimation, Platform, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -21,7 +21,7 @@ import { FOOD_MEALS, type FoodEntry, type FoodMeal } from '@/db/repositories/foo
 import { shiftDay } from '@/food/days';
 import { loadFoodTargets, type CalorieTarget, type ProteinTarget } from '@/food/target';
 import { NutrientList } from '@/food/NutrientList';
-import { ageFrom, type RefProfile } from '@/food/references';
+import { ageFrom, nutrientReference, type RefProfile } from '@/food/references';
 import { TrackerSettings } from '@/food/TrackerSettings';
 import { haptic } from '@/lib/haptics';
 import { localIsoDate } from '@/lib/dates';
@@ -37,6 +37,8 @@ const MEAL_ICONS: Record<FoodMeal, AppIconName> = {
   snack: 'snack',
 };
 
+type MacroKey = 'protein' | 'carbs' | 'sugar' | 'fat';
+
 /** Tab "Cibo": il diario alimentare del giorno, semplice come un quaderno. */
 export default function FoodScreen() {
   const { t, i18n } = useTranslation();
@@ -51,6 +53,7 @@ export default function FoodScreen() {
   const [protein, setProtein] = useState<ProteinTarget | null>(null);
   const [person, setPerson] = useState<Pick<RefProfile, 'sex' | 'age'>>({ sex: null, age: null });
   const [editingTarget, setEditingTarget] = useState(false);
+  const [explain, setExplain] = useState<MacroKey | null>(null);
   const [targetInput, setTargetInput] = useState('');
 
   const load = useCallback(async () => {
@@ -131,6 +134,7 @@ export default function FoodScreen() {
 
   /** Riquadro di un macronutriente: icona, valore, barra e una riga di dettaglio. */
   const macro = (o: {
+    key: MacroKey;
     icon: AppIconName;
     label: string;
     grams: number;
@@ -142,16 +146,26 @@ export default function FoodScreen() {
     detail: string;
     detailColor?: string;
   }) => (
-    <View
-      accessible
+    <Pressable
+      onPress={() => {
+        haptic.select();
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setExplain(explain === o.key ? null : o.key);
+      }}
+      accessibilityRole="button"
+      accessibilityState={{ expanded: explain === o.key }}
+      accessibilityHint={t('food.macroInfo.hint')}
       accessibilityLabel={`${o.label}: ${t('food.grams', { value: num(o.grams, locale, 0) })}${o.of ? ` / ${t('food.grams', { value: num(o.of, locale, 0) })}` : ''}, ${o.detail}`}
-      style={{
+      style={({ pressed }) => ({
         flex: 1,
         gap: 6,
         padding: spacing.sm,
         borderRadius: radius.lg,
+        borderWidth: 1,
+        borderColor: explain === o.key ? colors.primary : 'transparent',
         backgroundColor: colors.surfaceAlt,
-      }}
+        opacity: pressed ? 0.7 : 1,
+      })}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         <View
@@ -169,6 +183,7 @@ export default function FoodScreen() {
         <AppText variant="caption" tone="textMuted" numberOfLines={1} style={{ flex: 1 }}>
           {o.label}
         </AppText>
+        <Icon name="info" size={12} color={colors.textMuted} />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
         <AppText variant="headline">{num(o.grams, locale, 0)}</AppText>
@@ -201,10 +216,50 @@ export default function FoodScreen() {
       >
         {o.detail}
       </AppText>
-    </View>
+    </Pressable>
   );
 
   const proteinLeft = protein ? protein.grams - totals.protein : null;
+  const refProfile: RefProfile = { ...person, kcal: target };
+  const sugarMax = nutrientReference('sugar', refProfile)!.value;
+  const freeSugarMax = nutrientReference('addedSugar', refProfile)!.value;
+  const satMax = nutrientReference('saturatedFat', refProfile)!.value;
+  const sugarOver = totals.sugar > sugarMax;
+  const satOver = totals.saturatedFat > satMax;
+  // Fascia consigliata EFSA: carboidrati 45–60% e grassi 20–35% dell'energia; la barra va verso il massimo.
+  const kcalRef = target ?? 2000;
+  const carbsMax = Math.round((kcalRef * 0.6) / 4);
+  const fatMax = Math.round((kcalRef * 0.35) / 9);
+  const energyPct = (grams: number, kcalPerGram: number) =>
+    totals.calories > 0 ? Math.round(((grams * kcalPerGram) / totals.calories) * 100) : 0;
+  const g = (v: number) => num(v, locale, 0);
+  const explanation: Record<MacroKey, string[]> = {
+    protein: protein
+      ? [
+          t('food.macroInfo.protein', {
+            grams: g(totals.protein),
+            target: g(protein.grams),
+            perKg: num(protein.perKg, locale, 2),
+          }),
+          t(`food.macroInfo.proteinBasis.${protein.basis}`),
+        ]
+      : [t('food.macroInfo.proteinNoTarget', { grams: g(totals.protein) })],
+    carbs: [
+      t('food.macroInfo.carbs', {
+        grams: g(totals.carbs),
+        pct: energyPct(totals.carbs, 4),
+        max: g(carbsMax),
+      }),
+    ],
+    sugar: [
+      t('food.macroInfo.sugar', { sugar: g(totals.sugar), max: g(sugarMax) }),
+      t('food.macroInfo.freeSugar', { free: g(freeSugarMax) }),
+    ],
+    fat: [
+      t('food.macroInfo.fat', { grams: g(totals.fat), pct: energyPct(totals.fat, 9), max: g(fatMax) }),
+      t('food.macroInfo.saturated', { sat: g(totals.saturatedFat), max: g(satMax) }),
+    ],
+  };
 
   return (
     <>
@@ -292,40 +347,76 @@ export default function FoodScreen() {
               {t('food.noTarget')}
             </AppText>
           )}
-          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-            {macro({
-              icon: 'protein',
-              label: t('food.protein'),
-              grams: totals.protein,
-              of: protein?.grams,
-              bar: protein ? totals.protein / protein.grams : null,
-              barColor: proteinLeft != null && proteinLeft <= 0 ? colors.success : colors.primary,
-              detail:
-                proteinLeft == null
-                  ? t('food.proteinNoTarget')
-                  : proteinLeft > 0
-                    ? t('food.proteinLeft', { value: num(proteinLeft, locale, 0) })
-                    : t('food.proteinDone'),
-              detailColor: proteinLeft != null && proteinLeft <= 0 ? colors.success : undefined,
-            })}
-            {macro({
-              icon: 'carbs',
-              label: t('food.carbs'),
-              grams: totals.carbs,
-              bar: totals.carbs > 0 ? totals.sugar / totals.carbs : null,
-              barColor: colors.textMuted,
-              detail: t('food.sugarOf', { value: num(totals.sugar, locale, 0) }),
-            })}
-            {macro({
-              icon: 'fat',
-              label: t('food.fat'),
-              grams: totals.fat,
-              bar: totals.fat > 0 ? totals.saturatedFat / totals.fat : null,
-              barColor: colors.textMuted,
-              detail: t('food.saturatedOf', { value: num(totals.saturatedFat, locale, 0) }),
-            })}
+          <View style={{ gap: spacing.sm }}>
+            <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+              {macro({
+                key: 'protein',
+                icon: 'protein',
+                label: t('food.protein'),
+                grams: totals.protein,
+                of: protein?.grams,
+                bar: protein ? totals.protein / protein.grams : null,
+                barColor: proteinLeft != null && proteinLeft <= 0 ? colors.success : colors.primary,
+                detail:
+                  proteinLeft == null
+                    ? t('food.proteinNoTarget')
+                    : proteinLeft > 0
+                      ? t('food.proteinLeft', { value: g(proteinLeft) })
+                      : t('food.proteinDone'),
+                detailColor: proteinLeft != null && proteinLeft <= 0 ? colors.success : undefined,
+              })}
+              {macro({
+                key: 'carbs',
+                icon: 'carbs',
+                label: t('food.carbs'),
+                grams: totals.carbs,
+                bar: totals.carbs / carbsMax,
+                detail: t('food.energyShare', { pct: energyPct(totals.carbs, 4) }),
+              })}
+            </View>
+            <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+              {macro({
+                key: 'sugar',
+                icon: 'addedSugar',
+                label: t('food.sugars'),
+                grams: totals.sugar,
+                of: sugarMax,
+                bar: totals.sugar / sugarMax,
+                barColor: sugarOver ? colors.danger : colors.primary,
+                detail: sugarOver
+                  ? t('food.overLimit', { value: g(totals.sugar - sugarMax) })
+                  : t('food.limitLeft', { value: g(sugarMax - totals.sugar) }),
+                detailColor: sugarOver ? colors.danger : undefined,
+              })}
+              {macro({
+                key: 'fat',
+                icon: 'fat',
+                label: t('food.fat'),
+                grams: totals.fat,
+                bar: totals.fat / fatMax,
+                barColor: totals.fat > fatMax ? colors.warning : colors.primary,
+                detail: t('food.saturatedOf', { value: g(totals.saturatedFat) }),
+                detailColor: satOver ? colors.danger : undefined,
+              })}
+            </View>
           </View>
-          <NutrientList totals={totals} profile={{ ...person, kcal: target }} />
+          {explain ? (
+            <View
+              style={{
+                gap: spacing.xs,
+                padding: spacing.md,
+                borderRadius: radius.lg,
+                backgroundColor: colors.primarySoft,
+              }}
+            >
+              {explanation[explain].map((line) => (
+                <AppText key={line} variant="callout">
+                  {line}
+                </AppText>
+              ))}
+            </View>
+          ) : null}
+          <NutrientList totals={totals} profile={refProfile} />
           <SourcesLink topic="energy" />
         </Card>
 

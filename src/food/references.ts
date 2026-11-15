@@ -5,7 +5,8 @@
  *   ferro, vitamina C, vitamina D, omega-3 (ALA 0,5% dell'energia + 250 mg EPA+DHA);
  * - EFSA, sicurezza della caffeina (2015): fino a 400 mg al giorno per gli adulti;
  * - OMS: sodio sotto i 2 g, zuccheri liberi sotto il 10% dell'energia, grassi saturi sotto il 10%;
- * - OMS (2023): per l'alcol non esiste una quantità sicura.
+ * - OMS (2023): per l'alcol non esiste una quantità sicura;
+ * - UE, Regolamento 1169/2011 (allegato XIII): assunzione di riferimento di 90 g di zuccheri totali.
  * Fruttosio, lattosio, purine, colesterolo e voci dell'utente non hanno un riferimento ufficiale.
  */
 
@@ -22,7 +23,7 @@ export interface NutrientRef {
   /** Valore al giorno nell'unità del nutriente (0 per 'avoid'). */
   value: number;
   unit: string;
-  source: 'EFSA' | 'WHO';
+  source: 'EFSA' | 'WHO' | 'EU';
 }
 
 export interface RefProfile {
@@ -88,6 +89,9 @@ export function nutrientReference(id: string, p: RefProfile): NutrientRef | null
       return { kind: 'max', value: 2000, unit: 'mg', source: 'WHO' };
     case 'saturatedFat':
       return { kind: 'max', value: Math.round((kcal * 0.1) / 9), unit: 'g', source: 'WHO' };
+    case 'sugar':
+      // Zuccheri totali (naturali e aggiunti), quelli stimati nel diario.
+      return { kind: 'max', value: 90, unit: 'g', source: 'EU' };
     case 'addedSugar':
       return { kind: 'max', value: Math.round((kcal * 0.1) / 4), unit: 'g', source: 'WHO' };
     case 'caffeine':

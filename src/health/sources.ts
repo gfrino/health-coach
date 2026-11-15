@@ -111,6 +111,12 @@ export const SOURCES: Record<SourceTopic, Citation[]> = {
       publisher: 'WHO, 2023',
       url: 'https://www.who.int/europe/news/item/04-01-2023-no-level-of-alcohol-consumption-is-safe-for-our-health',
     },
+    {
+      authors: 'European Parliament and Council of the European Union',
+      title: 'Regulation (EU) No 1169/2011 on the provision of food information to consumers (Annex XIII: reference intakes)',
+      publisher: 'Official Journal of the EU, 2011',
+      url: 'https://eur-lex.europa.eu/eli/reg/2011/1169/oj',
+    },
   ],
   hydration: [
     {

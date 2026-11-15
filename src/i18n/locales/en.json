@@ -1085,7 +1085,6 @@
     "photoNotSaved": "The photo is only used for the estimate: it isn't saved.",
     "photoNeedsOnlineAI": "Recognising food from photos needs an online AI (Services → AI provider). For now you can write what you ate.",
     "cameraDenied": "Allow camera access in your phone's Settings.",
-    "sugarOf": "sugars {{value}} g",
     "nutrients": {
       "title": "More values ({{count}})",
       "show": "Shows fibre, sodium and the other values",
@@ -1103,7 +1102,28 @@
     "saturatedOf": "saturated {{value}} g",
     "proteinLeft": "{{value}} g to go",
     "proteinDone": "target met",
-    "proteinNoTarget": "add your weight"
+    "proteinNoTarget": "add your weight",
+    "sugars": "Sugars",
+    "energyShare": "{{pct}}% of kcal",
+    "overLimit": "{{value}} g over limit",
+    "limitLeft": "{{value}} g left",
+    "macroInfo": {
+      "hint": "Shows the explanation",
+      "protein": "Protein: {{grams}} g of a {{target}} g target, that is {{perKg}} g per kg of body weight. The bar fills toward the target and turns green when you reach it.",
+      "proteinNoTarget": "Protein: {{grams}} g. Add your weight to your profile to get a daily target.",
+      "proteinBasis": {
+        "efsa": "This is the EFSA requirement for an adult.",
+        "older": "From 65, a little more helps keep muscle and strength.",
+        "active": "You move a lot: for active people 1.2 to 2 g per kg is recommended.",
+        "loseWeight": "While losing weight you need more to keep your muscle.",
+        "muscle": "To build muscle: above 1.6 g per kg the benefits stop growing."
+      },
+      "carbs": "Carbs: {{grams}} g, about {{pct}}% of today's calories. EFSA recommends 45–60% of calories: the bar fills toward the top of that range, {{max}} g with your target.",
+      "sugar": "Sugars (natural and added, already included in carbs): {{sugar}} g of an indicative maximum of {{max}} g a day, the EU reference intake. The bar turns red above the limit.",
+      "freeSugar": "For added sugars (sweets, soft drinks, honey, juices) the WHO recommends staying below {{free}} g a day.",
+      "fat": "Fat: {{grams}} g, about {{pct}}% of today's calories. EFSA recommends 20–35% of calories: the bar fills toward the top of that range, {{max}} g with your target.",
+      "saturated": "Of this, saturated fat (butter, cheese, fatty meat) is {{sat}} g: the WHO recommends staying below {{max}} g, less than 10% of calories. Above it the text turns red."
+    }
   },
   "citations": {
     "title": "Scientific sources",

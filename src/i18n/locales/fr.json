@@ -1085,7 +1085,6 @@
     "photoNotSaved": "La photo sert seulement au calcul : elle n'est pas enregistrée.",
     "photoNeedsOnlineAI": "Pour reconnaître les aliments sur une photo, il faut une IA en ligne (Services → Fournisseur IA). En attendant, tu peux écrire ce que tu as mangé.",
     "cameraDenied": "Autorise l'accès à l'appareil photo dans les Réglages du téléphone.",
-    "sugarOf": "sucres {{value}} g",
     "nutrients": {
       "title": "Autres valeurs ({{count}})",
       "show": "Affiche les fibres, le sodium et les autres valeurs",
@@ -1103,7 +1102,28 @@
     "saturatedOf": "saturés {{value}} g",
     "proteinLeft": "encore {{value}} g",
     "proteinDone": "atteint",
-    "proteinNoTarget": "poids manquant"
+    "proteinNoTarget": "poids manquant",
+    "sugars": "Sucres",
+    "energyShare": "{{pct}}% des kcal",
+    "overLimit": "{{value}} g au-delà",
+    "limitLeft": "reste {{value}} g",
+    "macroInfo": {
+      "hint": "Affiche l'explication",
+      "protein": "Protéines : {{grams}} g sur un objectif de {{target}} g, soit {{perKg}} g par kg de poids. La barre se remplit vers l'objectif et devient verte quand il est atteint.",
+      "proteinNoTarget": "Protéines : {{grams}} g. Indiquez votre poids dans le profil pour obtenir un objectif quotidien.",
+      "proteinBasis": {
+        "efsa": "C'est le besoin indiqué par l'EFSA pour un adulte.",
+        "older": "Dès 65 ans, un peu plus aide à garder muscles et force.",
+        "active": "Vous bougez beaucoup : pour les personnes actives, on recommande 1,2 à 2 g par kg.",
+        "loseWeight": "Pendant une perte de poids, il en faut plus pour ne pas perdre de muscle.",
+        "muscle": "Pour gagner du muscle : au-delà de 1,6 g par kg, les bénéfices n'augmentent plus."
+      },
+      "carbs": "Glucides : {{grams}} g, environ {{pct}} % des calories du jour. L'EFSA recommande 45–60 % des calories : la barre va vers le haut de cette plage, {{max}} g avec votre objectif.",
+      "sugar": "Sucres (naturels et ajoutés, déjà compris dans les glucides) : {{sugar}} g sur un maximum indicatif de {{max}} g par jour, l'apport de référence de l'UE. Au-delà, la barre devient rouge.",
+      "freeSugar": "Pour les sucres ajoutés (douceurs, sodas, miel, jus), l'OMS recommande de rester sous {{free}} g par jour.",
+      "fat": "Lipides : {{grams}} g, environ {{pct}} % des calories du jour. L'EFSA recommande 20–35 % des calories : la barre va vers le haut de cette plage, {{max}} g avec votre objectif.",
+      "saturated": "Dont {{sat}} g de graisses saturées (beurre, fromage, viandes grasses) : l'OMS recommande de rester sous {{max}} g, soit moins de 10 % des calories. Au-delà, le texte devient rouge."
+    }
   },
   "citations": {
     "title": "Sources scientifiques",

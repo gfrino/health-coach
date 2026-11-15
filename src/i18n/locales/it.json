@@ -1085,7 +1085,6 @@
     "photoNotSaved": "La foto serve solo per il calcolo: non viene salvata.",
     "photoNeedsOnlineAI": "Per riconoscere il cibo dalle foto serve un'AI online (Servizi → Provider AI). Intanto puoi scrivere cosa hai mangiato.",
     "cameraDenied": "Consenti l'accesso alla fotocamera nelle Impostazioni del telefono.",
-    "sugarOf": "zuccheri {{value}} g",
     "nutrients": {
       "title": "Altri valori ({{count}})",
       "show": "Mostra fibre, sodio e gli altri valori",
@@ -1103,7 +1102,28 @@
     "saturatedOf": "saturi {{value}} g",
     "proteinLeft": "mancano {{value}} g",
     "proteinDone": "raggiunte",
-    "proteinNoTarget": "aggiungi il peso"
+    "proteinNoTarget": "aggiungi il peso",
+    "sugars": "Zuccheri",
+    "energyShare": "{{pct}}% delle kcal",
+    "overLimit": "{{value}} g oltre il limite",
+    "limitLeft": "margine {{value}} g",
+    "macroInfo": {
+      "hint": "Mostra la spiegazione",
+      "protein": "Proteine: {{grams}} g su un obiettivo di {{target}} g, cioè {{perKg}} g per kg di peso. La barra si riempie verso l'obiettivo e diventa verde quando lo raggiungi.",
+      "proteinNoTarget": "Proteine: {{grams}} g. Aggiungi il peso nel profilo per avere un obiettivo giornaliero.",
+      "proteinBasis": {
+        "efsa": "È il fabbisogno indicato dall'EFSA per un adulto.",
+        "older": "Dai 65 anni ne servono un po' di più per conservare muscoli e forza.",
+        "active": "Ti muovi molto: per chi è attivo si consigliano da 1,2 a 2 g per kg.",
+        "loseWeight": "Mentre dimagrisci ne servono di più per non perdere muscoli.",
+        "muscle": "Per aumentare i muscoli: oltre 1,6 g per kg i benefici non crescono."
+      },
+      "carbs": "Carboidrati: {{grams}} g, circa il {{pct}}% delle calorie di oggi. L'EFSA consiglia il 45–60% delle calorie: la barra va verso il massimo della fascia, {{max}} g con il tuo obiettivo.",
+      "sugar": "Zuccheri (naturali e aggiunti, sono già compresi nei carboidrati): {{sugar}} g su un massimo indicativo di {{max}} g al giorno, il valore di riferimento UE. La barra diventa rossa oltre il limite.",
+      "freeSugar": "Per gli zuccheri aggiunti (dolci, bibite, miele, succhi) l'OMS consiglia di restare sotto i {{free}} g al giorno.",
+      "fat": "Grassi: {{grams}} g, circa il {{pct}}% delle calorie di oggi. L'EFSA consiglia il 20–35% delle calorie: la barra va verso il massimo della fascia, {{max}} g con il tuo obiettivo.",
+      "saturated": "Di questi, i grassi saturi (burro, formaggi, carni grasse) sono {{sat}} g: l'OMS consiglia di restare sotto i {{max}} g, cioè meno del 10% delle calorie. Se li superi la scritta diventa rossa."
+    }
   },
   "citations": {
     "title": "Fonti scientifiche",
