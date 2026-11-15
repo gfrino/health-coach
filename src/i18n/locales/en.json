@@ -1118,12 +1118,26 @@
         "loseWeight": "While losing weight you need more to keep your muscle.",
         "muscle": "To build muscle: above 1.6 g per kg the benefits stop growing."
       },
-      "carbs": "Carbs: {{grams}} g, about {{pct}}% of today's calories. EFSA recommends 45–60% of calories: the bar fills toward the top of that range, {{max}} g with your target.",
-      "sugar": "Sugars (natural and added, already included in carbs): {{sugar}} g of an indicative maximum of {{max}} g a day, the EU reference intake. The bar turns red above the limit.",
       "freeSugar": "For added sugars (sweets, soft drinks, honey, juices) the WHO recommends staying below {{free}} g a day.",
-      "fat": "Fat: {{grams}} g, about {{pct}}% of today's calories. EFSA recommends 20–35% of calories: the bar fills toward the top of that range, {{max}} g with your target.",
-      "saturated": "Of this, saturated fat (butter, cheese, fatty meat) is {{sat}} g: the WHO recommends staying below {{max}} g, less than 10% of calories. Above it the text turns red."
-    }
+      "saturated": "Of this, saturated fat (butter, cheese, fatty meat) is {{sat}} g: the WHO recommends staying below {{max}} g, less than 10% of calories. Above it the text turns red.",
+      "carbsBasis": {
+        "efsa": "Carbs: {{grams}} g, about {{pct}}% of today's calories. Without a specific diet the EFSA range applies, 45–60% of calories ({{min}}–{{max}} g with your target): the bar fills toward the top.",
+        "lowCarb": "Carbs: {{grams}} g. With the diet you chose ({{diet}}) you usually stay between {{min}} and {{max}} g a day, from vegetables, some fruit and legumes: the bar fills toward {{max}} g.",
+        "keto": "Net carbs (carbs minus fiber): {{grams}} g. With {{diet}} you stay between 20 and {{max}} g a day to reach and keep ketosis: the bar fills toward {{max}} g and turns red above it. Leafy greens count little because they are rich in fiber.",
+        "carnivore": "Net carbs: {{grams}} g. With {{diet}} carbs are almost absent: the bar fills toward {{max}} g and turns red above it."
+      },
+      "sugarBasis": {
+        "eu": "Sugars (natural and added, already included in carbs): {{sugar}} g of an indicative maximum of {{max}} g a day, the EU reference intake. The bar turns red above the limit.",
+        "who5": "Sugars: {{sugar}} g. With {{diet}} sugar should be kept to a minimum, so I use the WHO's stricter limit, 5% of calories: {{max}} g a day. The bar turns red above it."
+      },
+      "fatBasis": {
+        "efsa": "Fat: {{grams}} g, about {{pct}}% of today's calories. Without a specific diet EFSA recommends 20–35% of calories: the bar fills toward the top, {{max}} g with your target.",
+        "mediterranean": "Fat: {{grams}} g, about {{pct}}% of today's calories. The Mediterranean diet includes more, mostly extra-virgin olive oil and nuts: up to about 40% of calories, {{max}} g with your target.",
+        "fuel": "Fat: {{grams}} g, about {{pct}}% of today's calories. With {{diet}} fat is the main source of energy and is eaten to satiety, not as a goal: there is no cap. The bar shows about {{max}} g, the energy left after protein and carbs."
+      },
+      "saturatedLowCarb": "With {{diet}} it is easy to go over: prefer extra-virgin olive oil, avocado, olives, fatty fish and nuts, and keep an eye on LDL cholesterol in your labs."
+    },
+    "netCarbs": "Net carbs"
   },
   "citations": {
     "title": "Scientific sources",

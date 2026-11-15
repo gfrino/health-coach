@@ -1118,12 +1118,26 @@
         "loseWeight": "Pendant une perte de poids, il en faut plus pour ne pas perdre de muscle.",
         "muscle": "Pour gagner du muscle : au-delà de 1,6 g par kg, les bénéfices n'augmentent plus."
       },
-      "carbs": "Glucides : {{grams}} g, environ {{pct}} % des calories du jour. L'EFSA recommande 45–60 % des calories : la barre va vers le haut de cette plage, {{max}} g avec votre objectif.",
-      "sugar": "Sucres (naturels et ajoutés, déjà compris dans les glucides) : {{sugar}} g sur un maximum indicatif de {{max}} g par jour, l'apport de référence de l'UE. Au-delà, la barre devient rouge.",
       "freeSugar": "Pour les sucres ajoutés (douceurs, sodas, miel, jus), l'OMS recommande de rester sous {{free}} g par jour.",
-      "fat": "Lipides : {{grams}} g, environ {{pct}} % des calories du jour. L'EFSA recommande 20–35 % des calories : la barre va vers le haut de cette plage, {{max}} g avec votre objectif.",
-      "saturated": "Dont {{sat}} g de graisses saturées (beurre, fromage, viandes grasses) : l'OMS recommande de rester sous {{max}} g, soit moins de 10 % des calories. Au-delà, le texte devient rouge."
-    }
+      "saturated": "Dont {{sat}} g de graisses saturées (beurre, fromage, viandes grasses) : l'OMS recommande de rester sous {{max}} g, soit moins de 10 % des calories. Au-delà, le texte devient rouge.",
+      "carbsBasis": {
+        "efsa": "Glucides : {{grams}} g, environ {{pct}} % des calories du jour. Sans régime particulier, la plage EFSA s'applique, 45–60 % des calories ({{min}}–{{max}} g avec votre objectif) : la barre va vers le haut de la plage.",
+        "lowCarb": "Glucides : {{grams}} g. Avec le régime choisi ({{diet}}), on reste en général entre {{min}} et {{max}} g par jour, issus de légumes, d'un peu de fruits et de légumineuses : la barre va vers {{max}} g.",
+        "keto": "Glucides nets (glucides moins fibres) : {{grams}} g. Avec {{diet}}, on reste entre 20 et {{max}} g par jour pour entrer et rester en cétose : la barre va vers {{max}} g et devient rouge au-delà. Les légumes verts comptent peu car ils sont riches en fibres.",
+        "carnivore": "Glucides nets : {{grams}} g. Avec {{diet}}, les glucides sont presque absents : la barre va vers {{max}} g et devient rouge au-delà."
+      },
+      "sugarBasis": {
+        "eu": "Sucres (naturels et ajoutés, déjà compris dans les glucides) : {{sugar}} g sur un maximum indicatif de {{max}} g par jour, l'apport de référence de l'UE. Au-delà, la barre devient rouge.",
+        "who5": "Sucres : {{sugar}} g. Avec {{diet}}, le sucre doit rester minimal, j'utilise donc la limite plus stricte de l'OMS, 5 % des calories : {{max}} g par jour. Au-delà, la barre devient rouge."
+      },
+      "fatBasis": {
+        "efsa": "Lipides : {{grams}} g, environ {{pct}} % des calories du jour. Sans régime particulier, l'EFSA recommande 20–35 % des calories : la barre va vers le haut, {{max}} g avec votre objectif.",
+        "mediterranean": "Lipides : {{grams}} g, environ {{pct}} % des calories du jour. Le régime méditerranéen en prévoit davantage, surtout de l'huile d'olive vierge extra et des fruits à coque : jusqu'à environ 40 % des calories, {{max}} g avec votre objectif.",
+        "fuel": "Lipides : {{grams}} g, environ {{pct}} % des calories du jour. Avec {{diet}}, les graisses sont la principale source d'énergie et se mangent jusqu'à satiété, pas comme un objectif : il n'y a pas de plafond. La barre indique environ {{max}} g, l'énergie restante après protéines et glucides."
+      },
+      "saturatedLowCarb": "Avec {{diet}}, on les dépasse facilement : privilégiez l'huile d'olive vierge extra, l'avocat, les olives, les poissons gras et les fruits à coque, et surveillez le cholestérol LDL dans vos analyses."
+    },
+    "netCarbs": "Glucides nets"
   },
   "citations": {
     "title": "Sources scientifiques",

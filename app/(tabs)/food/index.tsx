@@ -19,6 +19,7 @@ import {
 import { foodRepository, getDb, profileRepository } from '@/db';
 import { FOOD_MEALS, type FoodEntry, type FoodMeal } from '@/db/repositories/foodRepository';
 import { shiftDay } from '@/food/days';
+import { macroGuide } from '@/food/macroGuide';
 import { loadFoodTargets, type CalorieTarget, type ProteinTarget } from '@/food/target';
 import { NutrientList } from '@/food/NutrientList';
 import { ageFrom, nutrientReference, type RefProfile } from '@/food/references';
@@ -221,15 +222,19 @@ export default function FoodScreen() {
 
   const proteinLeft = protein ? protein.grams - totals.protein : null;
   const refProfile: RefProfile = { ...person, kcal: target };
-  const sugarMax = nutrientReference('sugar', refProfile)!.value;
+  // Riferimenti secondo la dieta scelta per il coach (keto: carboidrati netti, grassi come energia…).
+  const diet = settings.coach.nutritionApproach;
+  const dietName = t(`coachSetup.nutritionOptions.${diet}`);
+  const guide = macroGuide(diet, target, protein?.grams ?? null);
+  const carbsShown = guide.carbs.net ? Math.max(0, totals.carbs - totals.fiber) : totals.carbs;
+  const carbsOver = carbsShown > guide.carbs.max;
+  const sugarMax = guide.sugar.max;
   const freeSugarMax = nutrientReference('addedSugar', refProfile)!.value;
   const satMax = nutrientReference('saturatedFat', refProfile)!.value;
   const sugarOver = totals.sugar > sugarMax;
   const satOver = totals.saturatedFat > satMax;
-  // Fascia consigliata EFSA: carboidrati 45–60% e grassi 20–35% dell'energia; la barra va verso il massimo.
-  const kcalRef = target ?? 2000;
-  const carbsMax = Math.round((kcalRef * 0.6) / 4);
-  const fatMax = Math.round((kcalRef * 0.35) / 9);
+  const fatRef = guide.fat.max ?? guide.fat.target ?? 0;
+  const fatOver = guide.fat.max != null && totals.fat > guide.fat.max;
   const energyPct = (grams: number, kcalPerGram: number) =>
     totals.calories > 0 ? Math.round(((grams * kcalPerGram) / totals.calories) * 100) : 0;
   const g = (v: number) => num(v, locale, 0);
@@ -245,19 +250,31 @@ export default function FoodScreen() {
         ]
       : [t('food.macroInfo.proteinNoTarget', { grams: g(totals.protein) })],
     carbs: [
-      t('food.macroInfo.carbs', {
-        grams: g(totals.carbs),
+      t(`food.macroInfo.carbsBasis.${guide.carbs.basis}`, {
+        grams: g(carbsShown),
         pct: energyPct(totals.carbs, 4),
-        max: g(carbsMax),
+        min: g(guide.carbs.min ?? 0),
+        max: g(guide.carbs.max),
+        diet: dietName,
       }),
     ],
     sugar: [
-      t('food.macroInfo.sugar', { sugar: g(totals.sugar), max: g(sugarMax) }),
-      t('food.macroInfo.freeSugar', { free: g(freeSugarMax) }),
+      t(`food.macroInfo.sugarBasis.${guide.sugar.basis}`, {
+        sugar: g(totals.sugar),
+        max: g(sugarMax),
+        diet: dietName,
+      }),
+      ...(guide.sugar.basis === 'eu' ? [t('food.macroInfo.freeSugar', { free: g(freeSugarMax) })] : []),
     ],
     fat: [
-      t('food.macroInfo.fat', { grams: g(totals.fat), pct: energyPct(totals.fat, 9), max: g(fatMax) }),
+      t(`food.macroInfo.fatBasis.${guide.fat.basis}`, {
+        grams: g(totals.fat),
+        pct: energyPct(totals.fat, 9),
+        max: g(fatRef),
+        diet: dietName,
+      }),
       t('food.macroInfo.saturated', { sat: g(totals.saturatedFat), max: g(satMax) }),
+      ...(guide.fat.basis === 'fuel' ? [t('food.macroInfo.saturatedLowCarb', { diet: dietName })] : []),
     ],
   };
 
@@ -368,10 +385,17 @@ export default function FoodScreen() {
               {macro({
                 key: 'carbs',
                 icon: 'carbs',
-                label: t('food.carbs'),
-                grams: totals.carbs,
-                bar: totals.carbs / carbsMax,
-                detail: t('food.energyShare', { pct: energyPct(totals.carbs, 4) }),
+                label: t(guide.carbs.net ? 'food.netCarbs' : 'food.carbs'),
+                grams: carbsShown,
+                of: guide.carbs.strict ? guide.carbs.max : null,
+                bar: carbsShown / guide.carbs.max,
+                barColor: carbsOver ? (guide.carbs.strict ? colors.danger : colors.warning) : undefined,
+                detail: guide.carbs.strict
+                  ? carbsOver
+                    ? t('food.overLimit', { value: g(carbsShown - guide.carbs.max) })
+                    : t('food.limitLeft', { value: g(guide.carbs.max - carbsShown) })
+                  : t('food.energyShare', { pct: energyPct(totals.carbs, 4) }),
+                detailColor: carbsOver && guide.carbs.strict ? colors.danger : undefined,
               })}
             </View>
             <View style={{ flexDirection: 'row', gap: spacing.sm }}>
@@ -393,8 +417,8 @@ export default function FoodScreen() {
                 icon: 'fat',
                 label: t('food.fat'),
                 grams: totals.fat,
-                bar: totals.fat / fatMax,
-                barColor: totals.fat > fatMax ? colors.warning : colors.primary,
+                bar: fatRef > 0 ? totals.fat / fatRef : null,
+                barColor: fatOver ? colors.warning : colors.primary,
                 detail: t('food.saturatedOf', { value: g(totals.saturatedFat) }),
                 detailColor: satOver ? colors.danger : undefined,
               })}

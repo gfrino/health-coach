@@ -1118,12 +1118,26 @@
         "loseWeight": "Mentre dimagrisci ne servono di più per non perdere muscoli.",
         "muscle": "Per aumentare i muscoli: oltre 1,6 g per kg i benefici non crescono."
       },
-      "carbs": "Carboidrati: {{grams}} g, circa il {{pct}}% delle calorie di oggi. L'EFSA consiglia il 45–60% delle calorie: la barra va verso il massimo della fascia, {{max}} g con il tuo obiettivo.",
-      "sugar": "Zuccheri (naturali e aggiunti, sono già compresi nei carboidrati): {{sugar}} g su un massimo indicativo di {{max}} g al giorno, il valore di riferimento UE. La barra diventa rossa oltre il limite.",
       "freeSugar": "Per gli zuccheri aggiunti (dolci, bibite, miele, succhi) l'OMS consiglia di restare sotto i {{free}} g al giorno.",
-      "fat": "Grassi: {{grams}} g, circa il {{pct}}% delle calorie di oggi. L'EFSA consiglia il 20–35% delle calorie: la barra va verso il massimo della fascia, {{max}} g con il tuo obiettivo.",
-      "saturated": "Di questi, i grassi saturi (burro, formaggi, carni grasse) sono {{sat}} g: l'OMS consiglia di restare sotto i {{max}} g, cioè meno del 10% delle calorie. Se li superi la scritta diventa rossa."
-    }
+      "saturated": "Di questi, i grassi saturi (burro, formaggi, carni grasse) sono {{sat}} g: l'OMS consiglia di restare sotto i {{max}} g, cioè meno del 10% delle calorie. Se li superi la scritta diventa rossa.",
+      "carbsBasis": {
+        "efsa": "Carboidrati: {{grams}} g, circa il {{pct}}% delle calorie di oggi. Senza una dieta particolare vale la fascia EFSA, 45–60% delle calorie ({{min}}–{{max}} g con il tuo obiettivo): la barra va verso il massimo.",
+        "lowCarb": "Carboidrati: {{grams}} g. Con la dieta che hai scelto ({{diet}}) si sta di solito tra {{min}} e {{max}} g al giorno, da verdure, un po' di frutta e legumi: la barra va verso i {{max}} g.",
+        "keto": "Carboidrati netti (carboidrati meno fibre): {{grams}} g. Con {{diet}} si resta tra 20 e {{max}} g al giorno per entrare e restare in chetosi: la barra va verso i {{max}} g e diventa rossa oltre. Le verdure a foglia contano poco perché sono ricche di fibre.",
+        "carnivore": "Carboidrati netti: {{grams}} g. Con {{diet}} i carboidrati sono quasi assenti: la barra va verso i {{max}} g e diventa rossa oltre."
+      },
+      "sugarBasis": {
+        "eu": "Zuccheri (naturali e aggiunti, sono già compresi nei carboidrati): {{sugar}} g su un massimo indicativo di {{max}} g al giorno, il valore di riferimento UE. La barra diventa rossa oltre il limite.",
+        "who5": "Zuccheri: {{sugar}} g. Con {{diet}} gli zuccheri vanno ridotti al minimo, quindi uso il limite più severo dell'OMS, il 5% delle calorie: {{max}} g al giorno. La barra diventa rossa oltre."
+      },
+      "fatBasis": {
+        "efsa": "Grassi: {{grams}} g, circa il {{pct}}% delle calorie di oggi. Senza una dieta particolare l'EFSA consiglia il 20–35% delle calorie: la barra va verso il massimo, {{max}} g con il tuo obiettivo.",
+        "mediterranean": "Grassi: {{grams}} g, circa il {{pct}}% delle calorie di oggi. La dieta mediterranea ne prevede di più, soprattutto olio extravergine e frutta secca: fino a circa il 40% delle calorie, {{max}} g con il tuo obiettivo.",
+        "fuel": "Grassi: {{grams}} g, circa il {{pct}}% delle calorie di oggi. Con {{diet}} i grassi sono la fonte principale di energia e si mangiano fino a sazietà, non come obiettivo: non c'è un tetto. La barra indica circa {{max}} g, l'energia che resta tolte proteine e carboidrati."
+      },
+      "saturatedLowCarb": "Con {{diet}} è facile superarli: preferisci olio extravergine, avocado, olive, pesce grasso e frutta secca, e tieni d'occhio il colesterolo LDL negli esami."
+    },
+    "netCarbs": "Carboidrati netti"
   },
   "citations": {
     "title": "Fonti scientifiche",

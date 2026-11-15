@@ -1118,12 +1118,26 @@
         "loseWeight": "Beim Abnehmen brauchst du mehr, um keine Muskeln zu verlieren.",
         "muscle": "Für Muskelaufbau: Über 1,6 g pro kg steigt der Nutzen nicht weiter."
       },
-      "carbs": "Kohlenhydrate: {{grams}} g, etwa {{pct}}% der heutigen Kalorien. Die EFSA empfiehlt 45–60% der Kalorien: Der Balken füllt sich bis zum oberen Wert, {{max}} g bei deinem Ziel.",
-      "sugar": "Zucker (natürlich und zugesetzt, bereits in den Kohlenhydraten enthalten): {{sugar}} g von einem Richtwert von höchstens {{max}} g pro Tag, der EU-Referenzmenge. Über dem Limit wird der Balken rot.",
       "freeSugar": "Für zugesetzten Zucker (Süßes, Limonaden, Honig, Säfte) empfiehlt die WHO weniger als {{free}} g pro Tag.",
-      "fat": "Fett: {{grams}} g, etwa {{pct}}% der heutigen Kalorien. Die EFSA empfiehlt 20–35% der Kalorien: Der Balken füllt sich bis zum oberen Wert, {{max}} g bei deinem Ziel.",
-      "saturated": "Davon sind {{sat}} g gesättigte Fette (Butter, Käse, fettes Fleisch): Die WHO empfiehlt weniger als {{max}} g, also unter 10% der Kalorien. Darüber wird der Text rot."
-    }
+      "saturated": "Davon sind {{sat}} g gesättigte Fette (Butter, Käse, fettes Fleisch): Die WHO empfiehlt weniger als {{max}} g, also unter 10% der Kalorien. Darüber wird der Text rot.",
+      "carbsBasis": {
+        "efsa": "Kohlenhydrate: {{grams}} g, etwa {{pct}}% der heutigen Kalorien. Ohne bestimmte Ernährungsweise gilt der EFSA-Bereich, 45–60% der Kalorien ({{min}}–{{max}} g bei deinem Ziel): Der Balken füllt sich bis zum oberen Wert.",
+        "lowCarb": "Kohlenhydrate: {{grams}} g. Mit der gewählten Ernährung ({{diet}}) liegt man meist zwischen {{min}} und {{max}} g pro Tag, aus Gemüse, etwas Obst und Hülsenfrüchten: Der Balken füllt sich bis {{max}} g.",
+        "keto": "Netto-Kohlenhydrate (Kohlenhydrate minus Ballaststoffe): {{grams}} g. Mit {{diet}} bleibt man zwischen 20 und {{max}} g pro Tag, um in die Ketose zu kommen und darin zu bleiben: Der Balken füllt sich bis {{max}} g und wird darüber rot. Blattgemüse zählt wenig, weil es reich an Ballaststoffen ist.",
+        "carnivore": "Netto-Kohlenhydrate: {{grams}} g. Mit {{diet}} fehlen Kohlenhydrate fast ganz: Der Balken füllt sich bis {{max}} g und wird darüber rot."
+      },
+      "sugarBasis": {
+        "eu": "Zucker (natürlich und zugesetzt, bereits in den Kohlenhydraten enthalten): {{sugar}} g von einem Richtwert von höchstens {{max}} g pro Tag, der EU-Referenzmenge. Über dem Limit wird der Balken rot.",
+        "who5": "Zucker: {{sugar}} g. Mit {{diet}} sollte Zucker möglichst wegfallen, daher gilt das strengere WHO-Limit von 5% der Kalorien: {{max}} g pro Tag. Darüber wird der Balken rot."
+      },
+      "fatBasis": {
+        "efsa": "Fett: {{grams}} g, etwa {{pct}}% der heutigen Kalorien. Ohne bestimmte Ernährungsweise empfiehlt die EFSA 20–35% der Kalorien: Der Balken füllt sich bis zum oberen Wert, {{max}} g bei deinem Ziel.",
+        "mediterranean": "Fett: {{grams}} g, etwa {{pct}}% der heutigen Kalorien. Die Mittelmeerkost sieht mehr vor, vor allem natives Olivenöl und Nüsse: bis etwa 40% der Kalorien, {{max}} g bei deinem Ziel.",
+        "fuel": "Fett: {{grams}} g, etwa {{pct}}% der heutigen Kalorien. Mit {{diet}} ist Fett die Hauptenergiequelle und wird bis zur Sättigung gegessen, nicht als Ziel: Es gibt keine Obergrenze. Der Balken zeigt etwa {{max}} g, die Energie, die nach Eiweiß und Kohlenhydraten bleibt."
+      },
+      "saturatedLowCarb": "Mit {{diet}} überschreitet man sie leicht: Bevorzuge natives Olivenöl, Avocado, Oliven, fetten Fisch und Nüsse und achte in den Laborwerten auf das LDL-Cholesterin."
+    },
+    "netCarbs": "Netto-Kohlenhydrate"
   },
   "citations": {
     "title": "Wissenschaftliche Quellen",
