@@ -26,12 +26,23 @@ export interface WeightGoalProgress {
   trendKgWeek: number | null;
   /** Kg/settimana necessari per arrivare alla data scelta. */
   neededKgWeek: number | null;
-  /** Data prevista con l'andamento attuale (se va nella direzione giusta). */
+  /** Data prevista con l'andamento attuale (se va nella direzione giusta ed entro un anno). */
   etaDate: string | null;
+  /**
+   * Andamento che non dice niente di utile: 'flat' = peso praticamente fermo (meno di 0,1 kg a
+   * settimana, dentro le oscillazioni normali); 'slow' = nella direzione giusta ma ci vorrebbe più di
+   * un anno. In questi casi niente data prevista (prima diceva "ci arrivi verso febbraio 2029").
+   */
+  trendNote: 'flat' | 'slow' | null;
   /** Ritmo richiesto oltre l'1% del peso a settimana: troppo rapido. */
   tooFast: boolean;
   onTrack: boolean | null;
 }
+
+/** Sotto 0,1 kg a settimana il peso è di fatto stabile: le pesate oscillano di più. */
+const FLAT_KG_WEEK = 0.1;
+/** Oltre un anno una data prevista non ha senso. */
+const MAX_ETA_WEEKS = 52;
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -85,14 +96,13 @@ export function weightGoalProgress(
   const weeksLeft = profile.targetDate ? weeksBetween(today, profile.targetDate) : null;
   const needed =
     weeksLeft !== null && !reached ? (weeksLeft > 0 ? round2(remaining / weeksLeft) : null) : null;
-  const goodTrend = trend !== null && sign * trend > 0.02;
+  const flat = trend !== null && Math.abs(trend) < FLAT_KG_WEEK;
+  const goodTrend = trend !== null && !flat && sign * trend > 0;
+  const etaWeeks = goodTrend && !reached ? remaining / Math.abs(trend) : null;
+  const slow = etaWeeks !== null && etaWeeks > MAX_ETA_WEEKS;
   const etaDate =
-    goodTrend && !reached
-      ? localIsoDate(
-          new Date(
-            new Date(`${today}T12:00:00`).getTime() + (remaining / Math.abs(trend)) * 7 * DAY_MS,
-          ),
-        )
+    etaWeeks !== null && !slow
+      ? localIsoDate(new Date(new Date(`${today}T12:00:00`).getTime() + etaWeeks * 7 * DAY_MS))
       : null;
   return {
     direction,
@@ -108,6 +118,7 @@ export function weightGoalProgress(
     trendKgWeek: trend,
     neededKgWeek: needed,
     etaDate,
+    trendNote: reached ? null : flat ? 'flat' : slow ? 'slow' : null,
     tooFast: needed !== null && needed > currentKg * 0.01,
     onTrack:
       reached || needed === null || trend === null
@@ -138,7 +149,7 @@ export function weightGoalLines(g: WeightGoalProgress): string[] {
   ];
   if (g.trendKgWeek !== null)
     lines.push(
-      `Trend over the last weeks: ${g.trendKgWeek > 0 ? '+' : ''}${g.trendKgWeek} kg/week${g.etaDate ? `; at this pace they reach the target around ${g.etaDate}` : ' (not moving toward the target)'}.`,
+      `Trend over the last weeks: ${g.trendKgWeek > 0 ? '+' : ''}${g.trendKgWeek} kg/week${g.etaDate ? `; at this pace they reach the target around ${g.etaDate}` : g.trendNote === 'flat' ? ' (weight essentially stable, no real progress yet)' : g.trendNote === 'slow' ? ' (right direction but too slow: more than a year at this pace)' : ' (not moving toward the target)'}.`,
     );
   else lines.push('Not enough recent weigh-ins for a trend: encourage weighing 2–3 times a week.');
   if (g.neededKgWeek !== null)

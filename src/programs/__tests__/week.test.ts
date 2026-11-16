@@ -4,7 +4,15 @@ import * as programRepository from '@/db/repositories/programRepository';
 import { createTestDb } from '@/test/nodeSqliteDb';
 
 import { autoCheckPrograms } from '../autoCheck';
-import { addDays, buildWeek, dayInProgram, shiftWeek, weekStart } from '../week';
+import {
+  addDays,
+  buildWeek,
+  dayInProgram,
+  defaultProgramDay,
+  lastProgramDay,
+  shiftWeek,
+  weekStart,
+} from '../week';
 
 let mockSeq = 0;
 jest.mock('@/db/ids', () => ({ newId: () => `w-${++mockSeq}` }));
@@ -35,6 +43,19 @@ describe('settimana dei programmi', () => {
     expect(shiftWeek(prog, '2026-11-15', '2026-11-15', 1)).toBeNull();
     expect(shiftWeek(prog, '2026-11-12', '2026-11-17', 1)).toBe('2026-11-17');
     expect(shiftWeek(prog, '2026-11-15', '2026-11-17', 1)).toBe('2026-11-17');
+  });
+
+  it("programma finito: si mostra l'ultimo giorno e le frecce saltano le settimane vuote", () => {
+    const ended = { startDay: '2026-10-27', durationDays: 7 }; // 27 ott – 2 nov
+    expect(lastProgramDay(ended, '2026-11-16')).toBe('2026-11-02');
+    expect(defaultProgramDay(ended, '2026-11-16')).toBe('2026-11-02');
+    // Da oggi (settimana 16–22 nov, vuota): indietro salta la settimana 9–15 e arriva a domenica 2.
+    expect(shiftWeek(ended, '2026-11-16', '2026-11-16', -1)).toBe('2026-11-02');
+    expect(shiftWeek(ended, '2026-11-02', '2026-11-16', -1)).toBe('2026-10-27');
+    expect(shiftWeek(ended, '2026-10-27', '2026-11-16', -1)).toBeNull();
+    expect(shiftWeek(ended, '2026-11-02', '2026-11-16', 1)).toBeNull();
+    // In corso: di default oggi.
+    expect(defaultProgramDay(prog, '2026-11-15')).toBe('2026-11-15');
   });
 
   it('conta previste e fatte per ogni giorno della settimana', () => {
@@ -101,7 +122,12 @@ describe('settimana dei programmi', () => {
     ]);
     // Lunedì 9 fatto ma dimenticato: lo si spunta tornando alla settimana prima.
     await programRepository.setItemDone(db, mon, '2026-11-09', true);
-    const checks = await programRepository.checksBetween(db, [sun, mon], '2026-11-09', '2026-11-15');
+    const checks = await programRepository.checksBetween(
+      db,
+      [sun, mon],
+      '2026-11-09',
+      '2026-11-15',
+    );
     expect(checks.map((c) => c.day).sort()).toEqual(['2026-11-09', '2026-11-15']);
   });
 });

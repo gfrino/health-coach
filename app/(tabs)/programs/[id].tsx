@@ -23,7 +23,12 @@ import { haptic } from '@/lib/haptics';
 import { refreshCheckins } from '@/proactive/notifier';
 import { CATEGORY_ICONS, weekdaysLabel } from '@/programs/ProgramItemRow';
 import { WEEKDAYS, type Weekday } from '@/programs/schedule';
-import { ProgramTodayList, progressLabel, todayProgress } from '@/programs/ProgramTodayList';
+import {
+  ProgramTodayList,
+  programDayLabel,
+  progressLabel,
+  todayProgress,
+} from '@/programs/ProgramTodayList';
 import { ProgramWeekNav } from '@/programs/ProgramWeekNav';
 import { useProgram } from '@/programs/usePrograms';
 import { MAX_FONT_SCALE, useTheme } from '@/theme';
@@ -315,12 +320,7 @@ export default function ProgramScreen() {
                 <AppText variant="caption" tone="textMuted">
                   {[
                     program.status === 'active'
-                      ? program.durationDays
-                        ? t('programs.dayOf', {
-                            day: Math.min(day, program.durationDays),
-                            total: program.durationDays,
-                          })
-                        : t('programs.day', { day })
+                      ? programDayLabel(program, day, t, i18n.language)
                       : t(`programs.status.${program.status}`),
                     program.source === 'coach' ? t('programs.byCoach') : null,
                   ]

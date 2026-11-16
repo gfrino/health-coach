@@ -37,23 +37,54 @@ export function dayInProgram(
   return !p.durationDays || day <= addDays(p.startDay, p.durationDays - 1);
 }
 
-/** Giorno da mostrare spostandosi di una settimana: lo stesso giorno, ma dentro il programma. */
+/** Ultimo giorno del programma (la fine, o oggi se non è ancora finito). */
+export function lastProgramDay(
+  p: { startDay: string; durationDays: number | null },
+  today: string,
+): string {
+  const end = p.durationDays ? addDays(p.startDay, p.durationDays - 1) : today;
+  return end < today ? end : today;
+}
+
+/** Giorno da mostrare di default: oggi, o l'ultimo giorno se il programma è già finito. */
+export function defaultProgramDay(
+  p: { startDay: string; durationDays: number | null },
+  today: string,
+): string {
+  const last = lastProgramDay(p, today);
+  return last < p.startDay ? today : last;
+}
+
+/**
+ * Giorno da mostrare spostandosi di una settimana: lo stesso giorno, ma dentro il programma. Le
+ * settimane senza giorni del programma (es. dopo la fine) si saltano, così si arriva sempre allo
+ * storico.
+ */
 export function shiftWeek(
   p: { startDay: string; durationDays: number | null },
   day: string,
   today: string,
   dir: -1 | 1,
 ): string | null {
-  const target = addDays(day, 7 * dir);
-  const start = weekStart(target);
-  if (dayInProgram(p, target, today)) return target;
-  // Lo stesso giorno non c'è (prima dell'inizio o nel futuro): il giorno più vicino di quella settimana.
-  const days = Array.from({ length: 7 }, (_, i) => addDays(start, i)).filter((d) =>
-    dayInProgram(p, d, today),
-  );
-  if (!days.length) return null;
-  const dist = (d: string) => Math.abs(new Date(d).getTime() - new Date(target).getTime());
-  return days.reduce((best, d) => (dist(d) < dist(best) ? d : best));
+  const first = p.startDay;
+  const last = lastProgramDay(p, today);
+  if (last < first) return null;
+  for (let step = 1; step <= 600; step++) {
+    const target = addDays(day, 7 * step * dir);
+    const start = weekStart(target);
+    const end = addDays(start, 6);
+    if (dir < 0 && end < first) return null;
+    if (dir > 0 && start > last) return null;
+    if (dayInProgram(p, target, today)) return target;
+    // Lo stesso giorno non c'è (prima dell'inizio o dopo la fine): il giorno più vicino di quella settimana.
+    const days = Array.from({ length: 7 }, (_, i) => addDays(start, i)).filter((d) =>
+      dayInProgram(p, d, today),
+    );
+    if (!days.length) continue;
+    const dist = (d: string) => Math.abs(new Date(d).getTime() - new Date(target).getTime());
+    return days.reduce((best, d) => (dist(d) < dist(best) ? d : best));
+  }
+  return null;
 }
 
 export function buildWeek(

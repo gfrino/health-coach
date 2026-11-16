@@ -9,7 +9,14 @@ import { refreshCheckins } from '@/proactive/notifier';
 import { useSyncStore } from '@/sources/syncService';
 
 import { autoCheckPrograms } from './autoCheck';
-import { addDays, buildWeek, dayInProgram, weekStart, type WeekDay } from './week';
+import {
+  addDays,
+  buildWeek,
+  dayInProgram,
+  defaultProgramDay,
+  weekStart,
+  type WeekDay,
+} from './week';
 
 export interface ProgramView {
   program: Program;
@@ -70,12 +77,12 @@ const withToggled = (v: ProgramView, item: ProgramItem, done: boolean): ProgramV
   return { ...v, done: next, auto, week };
 };
 
-/** Giorno scelto per ogni programma (resta finché l'app è aperta); di default oggi. */
+/** Giorno scelto per ogni programma (resta finché l'app è aperta); di default oggi (o l'ultimo giorno). */
 const selectedDays = new Map<string, string>();
 
 function shownDay(p: Program, today: string): string {
   const d = selectedDays.get(p.id);
-  return d && dayInProgram(p, d, today) ? d : today;
+  return d && dayInProgram(p, d, today) ? d : defaultProgramDay(p, today);
 }
 
 /** Ricarica quando una sincronizzazione finisce: nuovi allenamenti possono aver spuntato azioni. */

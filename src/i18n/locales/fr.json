@@ -843,7 +843,7 @@
       "archived": "Archivé"
     },
     "day": "Jour {{day}}",
-    "dayOf": "Jour {{day}} ({{date}}) sur {{total}}",
+    "dayOf": "Jour {{day}} sur {{total}}",
     "todayProgress": "{{done}} sur {{total}} faites aujourd'hui",
     "daily": "Chaque jour",
     "once": "Une fois",
@@ -898,7 +898,9 @@
     "nextWeek": "Semaine suivante",
     "backToToday": "Revenir à aujourd’hui",
     "dayStatus": "{{done}} sur {{total}} faites",
-    "dayNothing": "rien de prévu"
+    "dayNothing": "rien de prévu",
+    "endedOn": "Terminé le {{date}} · {{total}} jours",
+    "backToLast": "Revenir au dernier jour"
   },
   "memory": {
     "title": "Ce dont ton coach se souvient",
@@ -1199,6 +1201,8 @@
     "needed": "Pour y arriver d'ici le {{date}}, il faut environ {{needed}} par semaine.",
     "behind": "Un peu en retard : pour le {{date}}, il faut environ {{needed}} par semaine.",
     "tooFast": "Le rythme nécessaire est trop rapide pour être sûr : envisage une date plus lointaine.",
-    "progressNow": "Maintenant {{now}} : encore {{left}}"
+    "progressNow": "Maintenant {{now}} : encore {{left}}",
+    "trendFlat": "Poids presque stable ({{trend}} par semaine) : pas encore de vrai progrès.",
+    "trendSlow": "Tendance {{trend}} par semaine : la direction est bonne, mais à ce rythme il faudrait plus d’un an."
   }
 }

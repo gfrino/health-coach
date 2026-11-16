@@ -81,6 +81,48 @@ describe('obiettivi', () => {
     expect(g.onTrack).toBe(true);
     expect(g.etaDate! < '2027-03-01').toBe(true);
     expect(weightGoalLines(g).join(' ')).toContain('5.5 kg to go');
+    expect(g.trendNote).toBeNull();
+  });
+
+  it('niente data prevista se il peso è quasi fermo o ci vorrebbe più di un anno', () => {
+    const profile = {
+      goals: ['loseWeight'],
+      weightKg: 77,
+      targetWeightKg: 70,
+      targetDate: null,
+      goalStartWeightKg: 77,
+      goalStartDate: '2026-10-20',
+    };
+    // -0,06 kg a settimana: 7 kg richiederebbero più di due anni (prima: "verso febbraio 2029").
+    const flat = weightGoalProgress(
+      profile,
+      [
+        { day: '2026-10-20', value: 77.3 },
+        { day: '2026-10-27', value: 77.0 },
+        { day: '2026-11-03', value: 77.4 },
+        { day: '2026-11-10', value: 77.1 },
+        { day: '2026-11-15', value: 77.0 },
+      ],
+      '2026-11-16',
+    )!;
+    expect(Math.abs(flat.trendKgWeek!)).toBeLessThan(0.1);
+    expect(flat.etaDate).toBeNull();
+    expect(flat.trendNote).toBe('flat');
+    expect(weightGoalLines(flat).join(' ')).toContain('essentially stable');
+    // -0,12 kg a settimana: direzione giusta ma oltre un anno.
+    const slow = weightGoalProgress(
+      profile,
+      [
+        { day: '2026-10-19', value: 77.5 },
+        { day: '2026-10-26', value: 77.38 },
+        { day: '2026-11-02', value: 77.26 },
+        { day: '2026-11-09', value: 77.14 },
+        { day: '2026-11-16', value: 77.02 },
+      ],
+      '2026-11-16',
+    )!;
+    expect(slow.etaDate).toBeNull();
+    expect(slow.trendNote).toBe('slow');
   });
 
   it('le calorie seguono il ritmo, entro limiti sicuri', () => {

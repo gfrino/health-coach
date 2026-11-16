@@ -8,7 +8,12 @@ import { AppText, Card, EmptyState, Icon, NavRow, ProgressBar, Screen } from '@/
 import { GoalCard } from '@/goals/GoalCard';
 import { haptic } from '@/lib/haptics';
 import { CATEGORY_ICONS } from '@/programs/ProgramItemRow';
-import { ProgramTodayList, progressLabel, todayProgress } from '@/programs/ProgramTodayList';
+import {
+  ProgramTodayList,
+  programDayLabel,
+  progressLabel,
+  todayProgress,
+} from '@/programs/ProgramTodayList';
 import { ProgramWeekNav } from '@/programs/ProgramWeekNav';
 import { usePrograms, type ProgramView } from '@/programs/usePrograms';
 import { useTheme } from '@/theme';
@@ -160,12 +165,7 @@ function ProgramCard({
         <View style={{ flex: 1 }}>
           <AppText variant="headline">{program.title}</AppText>
           <AppText variant="caption" tone="textMuted">
-            {program.durationDays
-              ? t('programs.dayOf', {
-                  day: Math.min(day, program.durationDays),
-                  total: program.durationDays,
-                })
-              : t('programs.day', { day })}
+            {programDayLabel(program, day, t, i18n.language)}
           </AppText>
         </View>
         <Icon name={expanded ? 'chevronUp' : 'chevronDown'} size={14} color={colors.textMuted} />

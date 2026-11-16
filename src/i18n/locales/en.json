@@ -843,7 +843,7 @@
       "archived": "Archived"
     },
     "day": "Day {{day}}",
-    "dayOf": "Day {{day}} ({{date}}) of {{total}}",
+    "dayOf": "Day {{day}} of {{total}}",
     "todayProgress": "{{done}} of {{total}} done today",
     "daily": "Every day",
     "once": "Once",
@@ -898,7 +898,9 @@
     "nextWeek": "Next week",
     "backToToday": "Back to today",
     "dayStatus": "{{done}} of {{total}} done",
-    "dayNothing": "nothing planned"
+    "dayNothing": "nothing planned",
+    "endedOn": "Ended {{date}} · {{total}} days",
+    "backToLast": "Back to the last day"
   },
   "memory": {
     "title": "What your coach remembers",
@@ -1199,6 +1201,8 @@
     "needed": "To get there by {{date}} you need about {{needed}} a week.",
     "behind": "A bit behind: for {{date}} you need about {{needed}} a week.",
     "tooFast": "The pace needed is too fast to be safe: consider a later date.",
-    "progressNow": "Now {{now}}: {{left}} to go"
+    "progressNow": "Now {{now}}: {{left}} to go",
+    "trendFlat": "Weight about stable ({{trend}} a week): no real progress yet.",
+    "trendSlow": "Trend {{trend}} a week: right direction, but at this pace it would take more than a year."
   }
 }

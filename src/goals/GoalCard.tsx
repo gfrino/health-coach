@@ -93,13 +93,8 @@ export function GoalCard() {
             <AppText variant="callout">{t('goal.reached', { now: w(g.currentKg) })}</AppText>
           ) : (
             <>
-              <ProgressBar
-                value={g.done}
-                label={progressText}
-              />
-              <AppText variant="callout">
-                {progressText}
-              </AppText>
+              <ProgressBar value={g.done} label={progressText} />
+              <AppText variant="callout">{progressText}</AppText>
               <AppText variant="caption" tone="textMuted">
                 {g.trendKgWeek === null
                   ? t('goal.noTrend')
@@ -108,9 +103,14 @@ export function GoalCard() {
                         trend: `${g.trendKgWeek > 0 ? '+' : ''}${w(g.trendKgWeek, 2)}`,
                         eta: date(g.etaDate),
                       })
-                    : t('goal.trendWrong', {
-                        trend: `${g.trendKgWeek > 0 ? '+' : ''}${w(g.trendKgWeek, 2)}`,
-                      })}
+                    : t(
+                        g.trendNote === 'flat'
+                          ? 'goal.trendFlat'
+                          : g.trendNote === 'slow'
+                            ? 'goal.trendSlow'
+                            : 'goal.trendWrong',
+                        { trend: `${g.trendKgWeek > 0 ? '+' : ''}${w(g.trendKgWeek, 2)}` },
+                      )}
                 {g.targetDate && g.neededKgWeek !== null
                   ? ` ${t(g.onTrack === false ? 'goal.behind' : 'goal.needed', {
                       needed: w(g.neededKgWeek, 2),

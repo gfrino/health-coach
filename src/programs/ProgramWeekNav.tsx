@@ -7,7 +7,7 @@ import { localIsoDate } from '@/lib/dates';
 import { useTheme } from '@/theme';
 
 import type { ProgramView } from './usePrograms';
-import { shiftWeek } from './week';
+import { defaultProgramDay, shiftWeek } from './week';
 
 const date = (day: string) => new Date(`${day}T12:00:00`);
 
@@ -27,6 +27,8 @@ export function ProgramWeekNav({
   const today = localIsoDate(new Date());
   const prev = shiftWeek(view.program, view.today, today, -1);
   const next = shiftWeek(view.program, view.today, today, 1);
+  // Programma finito: il "ritorno" porta all'ultimo giorno invece che a oggi.
+  const home = defaultProgramDay(view.program, today);
   const first = view.week[0]!.day;
   const last = view.week[6]!.day;
   const fmt = (d: string, o: Intl.DateTimeFormatOptions) =>
@@ -139,15 +141,15 @@ export function ProgramWeekNav({
           );
         })}
       </View>
-      {!view.isToday ? (
+      {view.today !== home ? (
         <Pressable
-          onPress={() => go(today)}
+          onPress={() => go(home)}
           accessibilityRole="button"
           hitSlop={6}
           style={({ pressed }) => ({ alignSelf: 'center', opacity: pressed ? 0.5 : 1 })}
         >
           <AppText variant="caption" tone="primary" style={{ fontWeight: '600' }}>
-            {t('programs.backToToday')}
+            {t(home === today ? 'programs.backToToday' : 'programs.backToLast')}
           </AppText>
         </Pressable>
       ) : null}
