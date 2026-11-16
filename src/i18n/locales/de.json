@@ -1088,7 +1088,7 @@
     "photoNeedsOnlineAI": "Um Essen auf Fotos zu erkennen, brauchst du eine Online-KI (Dienste → KI-Anbieter). Bis dahin kannst du aufschreiben, was du gegessen hast.",
     "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen deines Telefons.",
     "nutrients": {
-      "title": "Weitere Werte ({{count}})",
+      "title": "Nährstoffe & Ziele ({{count}})",
       "show": "Zeigt Ballaststoffe, Natrium und die weiteren Werte",
       "hide": "Blendet die weiteren Werte aus",
       "min": "Ziel {{value}}",
@@ -1110,7 +1110,11 @@
       "officialHint": "Empfohlen: {{value}}",
       "noOfficial": "Es gibt keinen offiziellen Wert: du entscheidest.",
       "reset": "Zurück zur Empfehlung",
-      "remove": "Entfernen"
+      "remove": "Entfernen",
+      "sort": "Sortieren",
+      "sortHint": "Verschiebe die Werte mit den Pfeilen: die Reihenfolge bleibt gespeichert.",
+      "moveUp": "{{name}} nach oben",
+      "moveDown": "{{name}} nach unten"
     },
     "saturatedOf": "gesättigt {{value}} g",
     "proteinLeft": "noch {{value}} g",

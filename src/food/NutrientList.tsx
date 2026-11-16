@@ -19,6 +19,7 @@ import {
   type NutrientRef,
   type RefProfile,
 } from './references';
+import { moveId, orderRows } from './nutrientOrder';
 import { useTrackerLabel } from './TrackerSettings';
 import { isCatalogue, NO_TRACKERS } from './trackers';
 
@@ -46,9 +47,10 @@ export function NutrientList({ totals, profile }: { totals: FoodTotals; profile:
   const trackerLabel = useTrackerLabel();
   const [open, setOpen] = useState(openState);
   const [editing, setEditing] = useState<string | null>(null);
+  const [sorting, setSorting] = useState(false);
   const locale = i18n.language;
 
-  const rows = [
+  const allRows = [
     ...BASE_NUTRIENTS.map((id) => ({
       id,
       label: t(`food.nutrients.names.${id}`),
@@ -62,6 +64,28 @@ export function NutrientList({ totals, profile }: { totals: FoodTotals; profile:
       value: totals.extras[tr.id] ?? 0,
     })),
   ];
+
+  const rows = orderRows(allRows, food.order);
+  const move = (id: string, dir: -1 | 1) => {
+    haptic.select();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    void update({
+      food: {
+        ...food,
+        order: moveId(
+          rows.map((r) => r.id),
+          id,
+          dir,
+        ),
+      },
+    });
+  };
+  const toggleSorting = () => {
+    haptic.select();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setEditing(null);
+    setSorting(!sorting);
+  };
 
   const toggle = () => {
     haptic.select();
@@ -121,7 +145,65 @@ export function NutrientList({ totals, profile }: { totals: FoodTotals; profile:
       </Pressable>
       {open ? (
         <View style={{ gap: spacing.sm, paddingBottom: spacing.xs }}>
-          {rows.map((r) => {
+          {rows.map((r, index) => {
+            if (sorting) {
+              const arrow = (dir: -1 | 1) => {
+                const off = dir < 0 ? index === 0 : index === rows.length - 1;
+                return (
+                  <Pressable
+                    onPress={() => move(r.id, dir)}
+                    disabled={off}
+                    accessibilityRole="button"
+                    accessibilityLabel={t(
+                      dir < 0 ? 'food.nutrients.moveUp' : 'food.nutrients.moveDown',
+                      {
+                        name: r.label,
+                      },
+                    )}
+                    hitSlop={4}
+                    style={({ pressed }) => ({
+                      width: 44,
+                      height: 44,
+                      borderRadius: radius.md,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.surfaceAlt,
+                      opacity: off ? 0.3 : pressed ? 0.6 : 1,
+                    })}
+                  >
+                    <Icon
+                      name={dir < 0 ? 'chevronUp' : 'chevronDown'}
+                      size={14}
+                      color={colors.primary}
+                    />
+                  </Pressable>
+                );
+              };
+              return (
+                <View
+                  key={r.id}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}
+                >
+                  <View
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: radius.md,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.primarySoft,
+                    }}
+                  >
+                    <Icon name={nutrientIcon(r.id)} size={15} color={colors.primary} />
+                  </View>
+                  <AppText variant="callout" style={{ flex: 1 }} numberOfLines={1}>
+                    {r.label}
+                  </AppText>
+                  {arrow(-1)}
+                  {arrow(1)}
+                </View>
+              );
+            }
             const ref = effectiveReference(r.id, profile, goals, r.unit);
             const official = nutrientReference(r.id, profile);
             const status = refStatus(r.value, ref);
@@ -223,9 +305,29 @@ export function NutrientList({ totals, profile }: { totals: FoodTotals; profile:
               </View>
             );
           })}
-          <AppText variant="caption" tone="textMuted">
-            {t('food.nutrients.hint')}
-          </AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <AppText variant="caption" tone="textMuted" style={{ flex: 1 }}>
+              {t(sorting ? 'food.nutrients.sortHint' : 'food.nutrients.hint')}
+            </AppText>
+            <Pressable
+              onPress={toggleSorting}
+              accessibilityRole="button"
+              hitSlop={8}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                minHeight: 44,
+                paddingHorizontal: spacing.sm,
+                opacity: pressed ? 0.5 : 1,
+              })}
+            >
+              {sorting ? null : <Icon name="sort" size={13} color={colors.primary} />}
+              <AppText variant="callout" tone="primary" style={{ fontWeight: '600' }}>
+                {t(sorting ? 'common.done' : 'food.nutrients.sort')}
+              </AppText>
+            </Pressable>
+          </View>
         </View>
       ) : null}
     </View>
@@ -299,6 +401,7 @@ function GoalEditor({
             label={t('common.save')}
             onPress={() => onSave({ kind, value })}
             disabled={!valid}
+            compact
           />
         </View>
         <View style={{ flex: 1 }}>
@@ -307,9 +410,10 @@ function GoalEditor({
               label={t(official ? 'food.nutrients.reset' : 'food.nutrients.remove')}
               variant="secondary"
               onPress={() => onSave(null)}
+              compact
             />
           ) : (
-            <Button label={t('common.cancel')} variant="secondary" onPress={onCancel} />
+            <Button label={t('common.cancel')} variant="secondary" onPress={onCancel} compact />
           )}
         </View>
       </View>

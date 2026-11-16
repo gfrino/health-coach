@@ -96,6 +96,7 @@ export const icons = {
   lactose: { ios: 'waterbottle.fill', android: 'local_drink' },
   purines: { ios: 'hexagon.fill', android: 'hexagon' },
   customTracker: { ios: 'tag.fill', android: 'label' },
+  sort: { ios: 'arrow.up.arrow.down', android: 'swap_vert' },
 } satisfies Record<string, IconName>;
 
 export type AppIconName = keyof typeof icons;

@@ -1088,7 +1088,7 @@
     "photoNeedsOnlineAI": "Pour reconnaître les aliments sur une photo, il faut une IA en ligne (Services → Fournisseur IA). En attendant, tu peux écrire ce que tu as mangé.",
     "cameraDenied": "Autorise l'accès à l'appareil photo dans les Réglages du téléphone.",
     "nutrients": {
-      "title": "Autres valeurs ({{count}})",
+      "title": "Nutriments et objectifs ({{count}})",
       "show": "Affiche les fibres, le sodium et les autres valeurs",
       "hide": "Masque les autres valeurs",
       "min": "objectif {{value}}",
@@ -1110,7 +1110,11 @@
       "officialHint": "Valeur recommandée : {{value}}",
       "noOfficial": "Il n'y a pas de valeur officielle : à vous de choisir.",
       "reset": "Revenir à la recommandation",
-      "remove": "Supprimer"
+      "remove": "Supprimer",
+      "sort": "Réorganiser",
+      "sortHint": "Déplacez les valeurs avec les flèches : l'ordre est enregistré.",
+      "moveUp": "Monter {{name}}",
+      "moveDown": "Descendre {{name}}"
     },
     "saturatedOf": "saturés {{value}} g",
     "proteinLeft": "encore {{value}} g",

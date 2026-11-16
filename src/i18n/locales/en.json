@@ -1088,7 +1088,7 @@
     "photoNeedsOnlineAI": "Recognising food from photos needs an online AI (Services → AI provider). For now you can write what you ate.",
     "cameraDenied": "Allow camera access in your phone's Settings.",
     "nutrients": {
-      "title": "More values ({{count}})",
+      "title": "Nutrients & goals ({{count}})",
       "show": "Shows fibre, sodium and the other values",
       "hide": "Hides the other values",
       "min": "goal {{value}}",
@@ -1110,7 +1110,11 @@
       "officialHint": "Recommended: {{value}}",
       "noOfficial": "There is no official value: you choose.",
       "reset": "Back to recommended",
-      "remove": "Remove"
+      "remove": "Remove",
+      "sort": "Reorder",
+      "sortHint": "Move the values with the arrows: the order is saved.",
+      "moveUp": "Move {{name}} up",
+      "moveDown": "Move {{name}} down"
     },
     "saturatedOf": "saturated {{value}} g",
     "proteinLeft": "{{value}} g to go",

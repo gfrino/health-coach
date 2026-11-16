@@ -1088,7 +1088,7 @@
     "photoNeedsOnlineAI": "Per riconoscere il cibo dalle foto serve un'AI online (Servizi → Provider AI). Intanto puoi scrivere cosa hai mangiato.",
     "cameraDenied": "Consenti l'accesso alla fotocamera nelle Impostazioni del telefono.",
     "nutrients": {
-      "title": "Altri valori ({{count}})",
+      "title": "Nutrienti e obiettivi ({{count}})",
       "show": "Mostra fibre, sodio e gli altri valori",
       "hide": "Nasconde gli altri valori",
       "min": "consigliati {{value}}",
@@ -1110,7 +1110,11 @@
       "officialHint": "Valore consigliato: {{value}}",
       "noOfficial": "Non c'è un valore ufficiale: scegli tu quanto.",
       "reset": "Torna al consigliato",
-      "remove": "Rimuovi"
+      "remove": "Rimuovi",
+      "sort": "Riordina",
+      "sortHint": "Sposta i valori con le frecce: l'ordine resta salvato.",
+      "moveUp": "Sposta {{name}} più su",
+      "moveDown": "Sposta {{name}} più giù"
     },
     "saturatedOf": "saturi {{value}} g",
     "proteinLeft": "mancano {{value}} g",

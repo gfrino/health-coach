@@ -16,6 +16,8 @@ interface Props {
   accessibilityHint?: string;
   /** Icona a linee prima del testo (stesso stile delle icone dell'app). */
   icon?: AppIconName;
+  /** Testo più piccolo, al massimo su due righe (pulsanti affiancati in spazi stretti). */
+  compact?: boolean;
 }
 
 export function Button({
@@ -26,6 +28,7 @@ export function Button({
   loading,
   accessibilityHint,
   icon,
+  compact,
 }: Props) {
   const { colors, radius, spacing } = useTheme();
   const inactive = disabled || loading;
@@ -62,7 +65,7 @@ export function Button({
           backgroundColor: bg,
           overflow: variant === 'primary' ? 'hidden' : undefined,
           borderRadius: radius.md,
-          paddingHorizontal: spacing.lg,
+          paddingHorizontal: compact ? spacing.sm : spacing.lg,
           opacity: inactive ? 0.5 : pressed ? 0.8 : 1,
         },
       ]}
@@ -78,7 +81,12 @@ export function Button({
           </AppText>
         </View>
       ) : (
-        <AppText variant="headline" style={{ color: fg }} align="center">
+        <AppText
+          variant={compact ? 'callout' : 'headline'}
+          style={{ color: fg, fontWeight: '600' }}
+          align="center"
+          numberOfLines={compact ? 2 : undefined}
+        >
           {label}
         </AppText>
       )}
