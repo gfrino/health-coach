@@ -1092,12 +1092,23 @@
       "min": "consigliati {{value}}",
       "max": "max {{value}}",
       "avoid": "meno è meglio",
-      "hint": "Valori consigliati al giorno per adulti (EFSA, OMS), adattati a sesso ed età del profilo. Le quantità sono stime.",
+      "hint": "Valori consigliati al giorno per adulti (EFSA, OMS), adattati a sesso ed età del profilo. Tocca un valore per mettere il tuo obiettivo. Le quantità sono stime.",
       "names": {
         "fiber": "Fibre",
         "saturatedFat": "Grassi saturi",
         "sodium": "Sodio"
-      }
+      },
+      "myGoal": "il tuo obiettivo {{value}}",
+      "myMax": "il tuo max {{value}}",
+      "editHint": "Imposta il tuo obiettivo giornaliero",
+      "setGoal": "tocca per impostare un obiettivo",
+      "kindMin": "Da raggiungere",
+      "kindMax": "Da non superare",
+      "goalLabel": "{{name}} al giorno ({{unit}})",
+      "officialHint": "Valore consigliato: {{value}}",
+      "noOfficial": "Non c'è un valore ufficiale: scegli tu quanto.",
+      "reset": "Torna al consigliato",
+      "remove": "Rimuovi"
     },
     "saturatedOf": "saturi {{value}} g",
     "proteinLeft": "mancano {{value}} g",

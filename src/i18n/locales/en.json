@@ -1092,12 +1092,23 @@
       "min": "goal {{value}}",
       "max": "max {{value}}",
       "avoid": "less is better",
-      "hint": "Recommended daily values for adults (EFSA, WHO), adapted to the sex and age in your profile. Amounts are estimates.",
+      "hint": "Recommended daily values for adults (EFSA, WHO), adjusted to the sex and age in your profile. Tap a value to set your own goal. Amounts are estimates.",
       "names": {
         "fiber": "Fibre",
         "saturatedFat": "Saturated fat",
         "sodium": "Sodium"
-      }
+      },
+      "myGoal": "your goal {{value}}",
+      "myMax": "your max {{value}}",
+      "editHint": "Set your own daily goal",
+      "setGoal": "tap to set a goal",
+      "kindMin": "Reach at least",
+      "kindMax": "Stay under",
+      "goalLabel": "{{name}} per day ({{unit}})",
+      "officialHint": "Recommended: {{value}}",
+      "noOfficial": "There is no official value: you choose.",
+      "reset": "Back to recommended",
+      "remove": "Remove"
     },
     "saturatedOf": "saturated {{value}} g",
     "proteinLeft": "{{value}} g to go",

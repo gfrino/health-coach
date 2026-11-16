@@ -22,7 +22,7 @@ import { shiftDay } from '@/food/days';
 import { macroGuide } from '@/food/macroGuide';
 import { loadFoodTargets, type CalorieTarget, type ProteinTarget } from '@/food/target';
 import { NutrientList } from '@/food/NutrientList';
-import { ageFrom, nutrientReference, type RefProfile } from '@/food/references';
+import { ageFrom, effectiveReference, nutrientReference, type RefProfile } from '@/food/references';
 import { TrackerSettings } from '@/food/TrackerSettings';
 import { haptic } from '@/lib/haptics';
 import { localIsoDate } from '@/lib/dates';
@@ -247,7 +247,8 @@ export default function FoodScreen() {
   const carbsOver = carbsShown > guide.carbs.max;
   const sugarMax = guide.sugar.max;
   const freeSugarMax = nutrientReference('addedSugar', refProfile)!.value;
-  const satMax = nutrientReference('saturatedFat', refProfile)!.value;
+  // I saturati seguono l'obiettivo dell'utente se l'ha cambiato in "Altri valori".
+  const satMax = effectiveReference('saturatedFat', refProfile, settings.food.goals, 'g')!.value;
   const sugarOver = totals.sugar > sugarMax;
   const satOver = totals.saturatedFat > satMax;
   const fatRef = guide.fat.max ?? guide.fat.target ?? 0;
@@ -281,7 +282,9 @@ export default function FoodScreen() {
         max: g(sugarMax),
         diet: dietName,
       }),
-      ...(guide.sugar.basis === 'eu' ? [t('food.macroInfo.freeSugar', { free: g(freeSugarMax) })] : []),
+      ...(guide.sugar.basis === 'eu'
+        ? [t('food.macroInfo.freeSugar', { free: g(freeSugarMax) })]
+        : []),
     ],
     fat: [
       t(`food.macroInfo.fatBasis.${guide.fat.basis}`, {
@@ -291,7 +294,9 @@ export default function FoodScreen() {
         diet: dietName,
       }),
       t('food.macroInfo.saturated', { sat: g(totals.saturatedFat), max: g(satMax) }),
-      ...(guide.fat.basis === 'fuel' ? [t('food.macroInfo.saturatedLowCarb', { diet: dietName })] : []),
+      ...(guide.fat.basis === 'fuel'
+        ? [t('food.macroInfo.saturatedLowCarb', { diet: dietName })]
+        : []),
     ],
   };
 
@@ -352,9 +357,16 @@ export default function FoodScreen() {
                 color={left != null && left < 0 ? colors.warning : colors.primary}
               />
             </View>
-            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
+            <View
+              style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}
+            >
               <AppText variant="largeTitle">{num(totals.calories, locale, 0)}</AppText>
-              <AppText variant="callout" tone="textMuted" numberOfLines={1} style={{ flexShrink: 1 }}>
+              <AppText
+                variant="callout"
+                tone="textMuted"
+                numberOfLines={1}
+                style={{ flexShrink: 1 }}
+              >
                 {target != null
                   ? t('food.ofTarget', { kcal: num(target, locale, 0) })
                   : t('food.kcalEaten')}
@@ -406,7 +418,11 @@ export default function FoodScreen() {
                 grams: carbsShown,
                 of: guide.carbs.strict ? guide.carbs.max : null,
                 bar: carbsShown / guide.carbs.max,
-                barColor: carbsOver ? (guide.carbs.strict ? colors.danger : colors.warning) : undefined,
+                barColor: carbsOver
+                  ? guide.carbs.strict
+                    ? colors.danger
+                    : colors.warning
+                  : undefined,
                 detail: guide.carbs.strict
                   ? carbsOver
                     ? t('food.overLimit', { value: g(carbsShown - guide.carbs.max) })

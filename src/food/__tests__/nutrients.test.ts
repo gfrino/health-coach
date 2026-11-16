@@ -2,7 +2,7 @@ import type { DailyFoodTotals } from '@/db/repositories/foodRepository';
 import { foodSection } from '@/coach/context';
 
 import { buildNutrientReport, nutrientLines } from '../nutrientReport';
-import { ageFrom, nutrientReference, refStatus } from '../references';
+import { ageFrom, effectiveReference, nutrientReference, refStatus } from '../references';
 import { catalogueTracker } from '../trackers';
 
 const day = (
@@ -127,5 +127,40 @@ describe('zuccheri totali', () => {
     expect(ref).toEqual({ kind: 'max', value: 90, unit: 'g', source: 'EU' });
     expect(refStatus(95, ref)).toBe('high');
     expect(refStatus(31, ref)).toBe('ok');
+  });
+});
+
+describe("obiettivi scelti dall'utente", () => {
+  const profile = { sex: 'male' as const, age: 50, kcal: 2000 };
+
+  it('sostituiscono il valore consigliato e valgono anche senza riferimento ufficiale', () => {
+    const goals = {
+      vitaminC: { kind: 'min' as const, value: 500 },
+      cholesterol: { kind: 'max' as const, value: 300 },
+    };
+    expect(effectiveReference('vitaminC', profile, goals, 'mg')).toEqual({
+      kind: 'min',
+      value: 500,
+      unit: 'mg',
+      source: 'user',
+    });
+    expect(refStatus(250, effectiveReference('vitaminC', profile, goals, 'mg'))).toBe('low');
+    expect(effectiveReference('cholesterol', profile, goals, 'mg')!.kind).toBe('max');
+    // Senza obiettivo resta quello ufficiale (EFSA 110 mg per gli uomini).
+    expect(effectiveReference('vitaminC', profile, undefined, 'mg')!.value).toBe(110);
+    expect(effectiveReference('cholesterol', profile, undefined, 'mg')).toBeNull();
+  });
+
+  it("arrivano al coach come obiettivo dell'utente", () => {
+    const r = buildNutrientReport(
+      [day('2026-11-14', 2000, { vitaminC: 250 })],
+      [catalogueTracker('vitaminC')],
+      profile,
+      '2026-11-15',
+      { vitaminC: { kind: 'min', value: 500 } },
+    );
+    expect(nutrientLines(r)).toContain(
+      "- vitamin C (user's own daily goal 500 mg): yesterday 250 mg (50%, low)",
+    );
   });
 });

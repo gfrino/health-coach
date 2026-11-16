@@ -178,6 +178,7 @@ async function loadFoodContext(
     trackers,
     { sex: profile.sex, age: ageFrom(profile.birthDate, today), kcal },
     today,
+    settings.food.goals,
   );
   return {
     nutrients: nutrients.trends.length ? nutrients : null,

@@ -1092,12 +1092,23 @@
       "min": "Ziel {{value}}",
       "max": "max. {{value}}",
       "avoid": "weniger ist besser",
-      "hint": "Empfohlene Tageswerte für Erwachsene (EFSA, WHO), angepasst an Geschlecht und Alter im Profil. Die Mengen sind Schätzungen.",
+      "hint": "Empfohlene Tageswerte für Erwachsene (EFSA, WHO), angepasst an Geschlecht und Alter im Profil. Tippe auf einen Wert, um dein eigenes Ziel festzulegen. Die Mengen sind Schätzungen.",
       "names": {
         "fiber": "Ballaststoffe",
         "saturatedFat": "Gesättigte Fette",
         "sodium": "Natrium"
-      }
+      },
+      "myGoal": "dein Ziel {{value}}",
+      "myMax": "dein Max. {{value}}",
+      "editHint": "Eigenes Tagesziel festlegen",
+      "setGoal": "tippen, um ein Ziel festzulegen",
+      "kindMin": "Mindestens erreichen",
+      "kindMax": "Nicht überschreiten",
+      "goalLabel": "{{name}} pro Tag ({{unit}})",
+      "officialHint": "Empfohlen: {{value}}",
+      "noOfficial": "Es gibt keinen offiziellen Wert: du entscheidest.",
+      "reset": "Zurück zur Empfehlung",
+      "remove": "Entfernen"
     },
     "saturatedOf": "gesättigt {{value}} g",
     "proteinLeft": "noch {{value}} g",

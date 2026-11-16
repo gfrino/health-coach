@@ -4,8 +4,9 @@ import { localIsoDate } from '@/lib/dates';
 import {
   BASE_NUTRIENTS,
   BASE_UNITS,
-  nutrientReference,
+  effectiveReference,
   refStatus,
+  type NutrientGoals,
   type NutrientRef,
   type RefStatus,
 } from './references';
@@ -83,6 +84,7 @@ export function buildNutrientReport(
   trackers: Tracker[],
   profile: { sex: 'female' | 'male' | 'other' | null; age: number | null; kcal: number | null },
   today: string,
+  goals?: NutrientGoals,
 ): NutrientReport {
   // Giorno "completo": almeno il 60% delle calorie dell'obiettivo (o 1000 kcal senza obiettivo).
   const minKcal = profile.kcal ? profile.kcal * 0.6 : 1000;
@@ -96,7 +98,7 @@ export function buildNutrientReport(
   ];
   const trends: NutrientTrend[] = [];
   for (const n of nutrients) {
-    const ref = nutrientReference(n.id, profile);
+    const ref = effectiveReference(n.id, profile, goals, n.unit);
     if (!ref) continue;
     const periods: NutrientPeriod[] = [];
     for (const p of PERIODS) {
@@ -131,11 +133,13 @@ const LABEL: Record<PeriodKey, string> = {
 };
 
 const refText = (r: NutrientRef) =>
-  r.kind === 'min'
-    ? `${r.source} need ${r.value} ${r.unit}/day`
-    : r.kind === 'max'
-      ? `${r.source} limit ${r.value} ${r.unit}/day`
-      : `${r.source}: no safe amount`;
+  r.source === 'user'
+    ? `user's own ${r.kind === 'min' ? 'daily goal' : 'daily limit'} ${r.value} ${r.unit}`
+    : r.kind === 'min'
+      ? `${r.source} need ${r.value} ${r.unit}/day`
+      : r.kind === 'max'
+        ? `${r.source} limit ${r.value} ${r.unit}/day`
+        : `${r.source}: no safe amount`;
 
 const flagged = (s: RefStatus) => s === 'low' || s === 'high';
 

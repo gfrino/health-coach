@@ -23,8 +23,16 @@ export interface NutrientRef {
   /** Valore al giorno nell'unità del nutriente (0 per 'avoid'). */
   value: number;
   unit: string;
-  source: 'EFSA' | 'WHO' | 'EU';
+  /** 'user' = obiettivo scelto dall'utente al posto del valore ufficiale. */
+  source: 'EFSA' | 'WHO' | 'EU' | 'user';
 }
+
+/** Obiettivo giornaliero scelto dall'utente per un nutriente: da raggiungere o da non superare. */
+export interface NutrientGoal {
+  kind: 'min' | 'max';
+  value: number;
+}
+export type NutrientGoals = Record<string, NutrientGoal>;
 
 export interface RefProfile {
   sex: 'female' | 'male' | 'other' | null;
@@ -115,4 +123,20 @@ export function refStatus(value: number, ref: NutrientRef | null): RefStatus {
   if (ref.kind === 'max') return value > ref.value ? 'high' : 'ok';
   const pct = value / ref.value;
   return pct < 0.7 ? 'low' : pct < 1 ? 'below' : 'ok';
+}
+
+/**
+ * Riferimento effettivo: l'obiettivo dell'utente se l'ha impostato (es. 500 mg di vitamina C),
+ * altrimenti quello ufficiale. Vale anche per i valori senza riferimento (colesterolo, voci
+ * dell'utente), con l'unità del valore.
+ */
+export function effectiveReference(
+  id: string,
+  p: RefProfile,
+  goals: NutrientGoals | undefined,
+  unit: string,
+): NutrientRef | null {
+  const goal = goals?.[id];
+  if (goal && goal.value > 0) return { kind: goal.kind, value: goal.value, unit, source: 'user' };
+  return nutrientReference(id, p);
 }

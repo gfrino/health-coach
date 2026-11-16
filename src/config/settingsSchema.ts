@@ -83,6 +83,10 @@ export const foodSettingsSchema = z.object({
   trackers: z
     .array(z.object({ id: z.string(), name: z.string().optional(), unit: z.string() }))
     .optional(),
+  /** Obiettivi giornalieri scelti dall'utente al posto dei valori consigliati (id → obiettivo). */
+  goals: z
+    .record(z.string(), z.object({ kind: z.enum(['min', 'max']), value: z.number().positive() }))
+    .optional(),
 });
 
 export const ONBOARDING_FLOW_VERSION = 2;

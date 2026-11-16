@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LayoutAnimation, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AppText, Icon, type AppIconName } from '@/components';
+import { AppText, Button, Icon, SegmentedControl, TextField, type AppIconName } from '@/components';
 import type { FoodTotals } from '@/db/repositories/foodRepository';
 import { haptic } from '@/lib/haptics';
 import { num } from '@/lib/units';
@@ -12,8 +12,10 @@ import { useTheme } from '@/theme';
 import {
   BASE_NUTRIENTS,
   BASE_UNITS,
+  effectiveReference,
   nutrientReference,
   refStatus,
+  type NutrientGoal,
   type NutrientRef,
   type RefProfile,
 } from './references';
@@ -38,8 +40,12 @@ export function NutrientList({ totals, profile }: { totals: FoodTotals; profile:
   const { t, i18n } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const trackers = useSettingsStore((s) => s.settings.food.trackers ?? NO_TRACKERS);
+  const food = useSettingsStore((s) => s.settings.food);
+  const update = useSettingsStore((s) => s.update);
+  const goals = food.goals;
   const trackerLabel = useTrackerLabel();
   const [open, setOpen] = useState(openState);
+  const [editing, setEditing] = useState<string | null>(null);
   const locale = i18n.language;
 
   const rows = [
@@ -64,14 +70,33 @@ export function NutrientList({ totals, profile }: { totals: FoodTotals; profile:
     setOpen(!open);
   };
 
+  const edit = (id: string) => {
+    haptic.select();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setEditing(editing === id ? null : id);
+  };
+  const saveGoal = (id: string, goal: NutrientGoal | null) => {
+    const next = { ...goals };
+    if (goal) next[id] = goal;
+    else delete next[id];
+    void update({ food: { ...food, goals: next } });
+    haptic.success();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setEditing(null);
+  };
+
   const fmt = (v: number, unit: string) =>
     `${num(v, locale, v >= 100 || unit === 'mg' ? 0 : 1)} ${unit}`;
   const refLabel = (ref: NutrientRef) =>
-    ref.kind === 'min'
-      ? t('food.nutrients.min', { value: fmt(ref.value, ref.unit) })
-      : ref.kind === 'max'
-        ? t('food.nutrients.max', { value: fmt(ref.value, ref.unit) })
-        : t('food.nutrients.avoid');
+    ref.source === 'user'
+      ? t(ref.kind === 'min' ? 'food.nutrients.myGoal' : 'food.nutrients.myMax', {
+          value: fmt(ref.value, ref.unit),
+        })
+      : ref.kind === 'min'
+        ? t('food.nutrients.min', { value: fmt(ref.value, ref.unit) })
+        : ref.kind === 'max'
+          ? t('food.nutrients.max', { value: fmt(ref.value, ref.unit) })
+          : t('food.nutrients.avoid');
 
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: colors.border }}>
@@ -97,76 +122,104 @@ export function NutrientList({ totals, profile }: { totals: FoodTotals; profile:
       {open ? (
         <View style={{ gap: spacing.sm, paddingBottom: spacing.xs }}>
           {rows.map((r) => {
-            const ref = nutrientReference(r.id, profile);
+            const ref = effectiveReference(r.id, profile, goals, r.unit);
+            const official = nutrientReference(r.id, profile);
             const status = refStatus(r.value, ref);
             const over = status === 'high';
             const reached = ref?.kind === 'min' && status === 'ok';
             const tone = over ? colors.warning : reached ? colors.success : colors.primary;
             const pct = ref && ref.kind !== 'avoid' ? Math.min(1, r.value / ref.value) : null;
             return (
-              <View
-                key={r.id}
-                accessible
-                accessibilityLabel={`${r.label}: ${fmt(r.value, r.unit)}${ref ? `, ${refLabel(ref)}` : ''}`}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}
-              >
-                <View
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: radius.md,
+              <View key={r.id} style={{ gap: spacing.sm }}>
+                <Pressable
+                  onPress={() => edit(r.id)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${r.label}: ${fmt(r.value, r.unit)}${ref ? `, ${refLabel(ref)}` : ''}`}
+                  accessibilityHint={t('food.nutrients.editHint')}
+                  accessibilityState={{ expanded: editing === r.id }}
+                  style={({ pressed }) => ({
+                    flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: over ? colors.warningSoft : colors.primarySoft,
-                  }}
+                    gap: spacing.sm,
+                    opacity: pressed ? 0.6 : 1,
+                  })}
                 >
-                  <Icon
-                    name={nutrientIcon(r.id)}
-                    size={15}
-                    color={over ? colors.warning : colors.primary}
-                  />
-                </View>
-                <View style={{ flex: 1, gap: 3 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
-                    <AppText variant="callout" style={{ flex: 1 }} numberOfLines={1}>
-                      {r.label}
-                    </AppText>
-                    <AppText
-                      variant="callout"
-                      style={{ fontWeight: '600', color: over ? colors.warning : colors.text }}
-                    >
-                      {fmt(r.value, r.unit)}
-                    </AppText>
+                  <View
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: radius.md,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: over ? colors.warningSoft : colors.primarySoft,
+                    }}
+                  >
+                    <Icon
+                      name={nutrientIcon(r.id)}
+                      size={15}
+                      color={over ? colors.warning : colors.primary}
+                    />
                   </View>
-                  {ref ? (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                      {pct !== null ? (
-                        <View
-                          style={{
-                            flex: 1,
-                            height: 4,
-                            borderRadius: radius.pill,
-                            backgroundColor: colors.surfaceAlt,
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <View
-                            style={{
-                              width: `${pct * 100}%`,
-                              height: '100%',
-                              backgroundColor: tone,
-                            }}
-                          />
-                        </View>
-                      ) : (
-                        <View style={{ flex: 1 }} />
-                      )}
-                      <AppText variant="caption" tone="textMuted">
-                        {refLabel(ref)}
+                  <View style={{ flex: 1, gap: 3 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
+                      <AppText variant="callout" style={{ flex: 1 }} numberOfLines={1}>
+                        {r.label}
+                      </AppText>
+                      <AppText
+                        variant="callout"
+                        style={{ fontWeight: '600', color: over ? colors.warning : colors.text }}
+                      >
+                        {fmt(r.value, r.unit)}
                       </AppText>
                     </View>
-                  ) : null}
-                </View>
+                    {ref ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                        {pct !== null ? (
+                          <View
+                            style={{
+                              flex: 1,
+                              height: 4,
+                              borderRadius: radius.pill,
+                              backgroundColor: colors.surfaceAlt,
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <View
+                              style={{
+                                width: `${pct * 100}%`,
+                                height: '100%',
+                                backgroundColor: tone,
+                              }}
+                            />
+                          </View>
+                        ) : (
+                          <View style={{ flex: 1 }} />
+                        )}
+                        <AppText
+                          variant="caption"
+                          tone={ref.source === 'user' ? 'primary' : 'textMuted'}
+                        >
+                          {refLabel(ref)}
+                        </AppText>
+                      </View>
+                    ) : (
+                      <AppText variant="caption" tone="textMuted">
+                        {t('food.nutrients.setGoal')}
+                      </AppText>
+                    )}
+                  </View>
+                </Pressable>
+                {editing === r.id ? (
+                  <GoalEditor
+                    label={r.label}
+                    unit={r.unit}
+                    current={ref}
+                    official={official}
+                    officialLabel={official ? refLabel(official) : null}
+                    onSave={(goal) => saveGoal(r.id, goal)}
+                    onCancel={() => edit(r.id)}
+                  />
+                ) : null}
               </View>
             );
           })}
@@ -175,6 +228,91 @@ export function NutrientList({ totals, profile }: { totals: FoodTotals; profile:
           </AppText>
         </View>
       ) : null}
+    </View>
+  );
+}
+
+/** Obiettivo personale di un valore: da raggiungere o da non superare, o il ritorno a quello consigliato. */
+function GoalEditor({
+  label,
+  unit,
+  current,
+  official,
+  officialLabel,
+  onSave,
+  onCancel,
+}: {
+  label: string;
+  unit: string;
+  current: NutrientRef | null;
+  official: NutrientRef | null;
+  officialLabel: string | null;
+  onSave: (goal: NutrientGoal | null) => void;
+  onCancel: () => void;
+}) {
+  const { t } = useTranslation();
+  const { colors, spacing, radius } = useTheme();
+  const start: NutrientGoal | null =
+    current && current.kind !== 'avoid' ? { kind: current.kind, value: current.value } : null;
+  const [kind, setKind] = useState<'min' | 'max'>(
+    start?.kind ?? (official?.kind === 'max' || official?.kind === 'avoid' ? 'max' : 'min'),
+  );
+  const [text, setText] = useState(start ? String(start.value) : '');
+  const value = Number(text.replace(',', '.'));
+  const valid = text.trim() !== '' && Number.isFinite(value) && value > 0 && value < 1_000_000;
+  const custom = current?.source === 'user';
+
+  return (
+    <View
+      style={{
+        gap: spacing.sm,
+        padding: spacing.md,
+        borderRadius: radius.md,
+        backgroundColor: colors.primarySoft,
+      }}
+    >
+      <SegmentedControl
+        segments={[
+          { value: 'min', label: t('food.nutrients.kindMin') },
+          { value: 'max', label: t('food.nutrients.kindMax') },
+        ]}
+        value={kind}
+        onChange={setKind}
+      />
+      <TextField
+        label={t('food.nutrients.goalLabel', { name: label, unit })}
+        value={text}
+        onChangeText={setText}
+        keyboardType="decimal-pad"
+        returnKeyType="done"
+        autoFocus
+        onSubmitEditing={() => (valid ? onSave({ kind, value }) : undefined)}
+        hint={
+          officialLabel
+            ? t('food.nutrients.officialHint', { value: officialLabel })
+            : t('food.nutrients.noOfficial')
+        }
+      />
+      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+        <View style={{ flex: 1 }}>
+          <Button
+            label={t('common.save')}
+            onPress={() => onSave({ kind, value })}
+            disabled={!valid}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          {custom ? (
+            <Button
+              label={t(official ? 'food.nutrients.reset' : 'food.nutrients.remove')}
+              variant="secondary"
+              onPress={() => onSave(null)}
+            />
+          ) : (
+            <Button label={t('common.cancel')} variant="secondary" onPress={onCancel} />
+          )}
+        </View>
+      </View>
     </View>
   );
 }
