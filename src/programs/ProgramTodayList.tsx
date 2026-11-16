@@ -4,32 +4,15 @@ import type { TFunction } from 'i18next';
 
 import { AppText } from '@/components';
 import { itemScheduled, type Program, type ProgramItem } from '@/db/repositories/programRepository';
-import { localIsoDate } from '@/lib/dates';
 import { useTheme } from '@/theme';
 
 import { ProgramItemRow } from './ProgramItemRow';
 import type { ProgramView } from './usePrograms';
-import { lastProgramDay } from './week';
 
-/**
- * "Giorno 3 di 7", o "Finito il 15 nov · 7 giorni" se la durata è passata (prima restava
- * "Giorno 7 di 7" per sempre e sembrava ancora in corso).
- */
-export function programDayLabel(program: Program, day: number, t: TFunction, language: string) {
-  if (!program.durationDays) return t('programs.day', { day });
-  const today = localIsoDate(new Date());
-  const last = lastProgramDay(program, today);
-  if (last < today) {
-    const date = new Date(`${last}T12:00:00`).toLocaleDateString(language, {
-      day: 'numeric',
-      month: 'short',
-    });
-    return t('programs.endedOn', { date, total: program.durationDays });
-  }
-  return t('programs.dayOf', {
-    day: Math.min(day, program.durationDays),
-    total: program.durationDays,
-  });
+/** "Giorno 3 di 7"; oltre la durata prevista solo "Giorno 44" (lo spiega ProgramOverrun). */
+export function programDayLabel(program: Program, day: number, t: TFunction) {
+  if (!program.durationDays || day > program.durationDays) return t('programs.day', { day });
+  return t('programs.dayOf', { day, total: program.durationDays });
 }
 
 /** Azioni previste oggi e quante sono fatte (le altre restano visibili ma non contano). */

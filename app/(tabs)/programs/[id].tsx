@@ -29,6 +29,7 @@ import {
   progressLabel,
   todayProgress,
 } from '@/programs/ProgramTodayList';
+import { ProgramOverrun } from '@/programs/ProgramOverrun';
 import { ProgramWeekNav } from '@/programs/ProgramWeekNav';
 import { useProgram } from '@/programs/usePrograms';
 import { MAX_FONT_SCALE, useTheme } from '@/theme';
@@ -320,7 +321,7 @@ export default function ProgramScreen() {
                 <AppText variant="caption" tone="textMuted">
                   {[
                     program.status === 'active'
-                      ? programDayLabel(program, day, t, i18n.language)
+                      ? programDayLabel(program, day, t)
                       : t(`programs.status.${program.status}`),
                     program.source === 'coach' ? t('programs.byCoach') : null,
                   ]
@@ -335,7 +336,10 @@ export default function ProgramScreen() {
               {program.items.length ? (
                 <>
                   {program.status === 'active' ? (
-                    <ProgramWeekNav view={view} onSelect={(d) => void selectDay(program, d)} />
+                    <>
+                      <ProgramOverrun program={program} onChanged={() => void reload()} />
+                      <ProgramWeekNav view={view} onSelect={(d) => void selectDay(program, d)} />
+                    </>
                   ) : (
                     <AppText variant="headline">{t('programs.today')}</AppText>
                   )}

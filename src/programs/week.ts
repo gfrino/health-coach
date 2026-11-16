@@ -46,6 +46,26 @@ export function lastProgramDay(
   return end < today ? end : today;
 }
 
+/**
+ * Intervallo navigabile: un programma ancora attivo resta aperto fino a oggi anche oltre la durata
+ * prevista (c'è chi continua a seguirlo); quelli conclusi si fermano alla fine.
+ */
+export function navProgram<
+  T extends { startDay: string; durationDays: number | null; status: string },
+>(p: T): T {
+  return p.status === 'active' ? { ...p, durationDays: null } : p;
+}
+
+/** Fine della durata prevista se è già passata e il programma è ancora attivo, altrimenti null. */
+export function overrunEnd(
+  p: { startDay: string; durationDays: number | null; status: string },
+  today: string,
+): string | null {
+  if (p.status !== 'active' || !p.durationDays) return null;
+  const end = addDays(p.startDay, p.durationDays - 1);
+  return end < today ? end : null;
+}
+
 /** Giorno da mostrare di default: oggi, o l'ultimo giorno se il programma è già finito. */
 export function defaultProgramDay(
   p: { startDay: string; durationDays: number | null },

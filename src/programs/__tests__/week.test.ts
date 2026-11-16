@@ -10,6 +10,8 @@ import {
   dayInProgram,
   defaultProgramDay,
   lastProgramDay,
+  navProgram,
+  overrunEnd,
   shiftWeek,
   weekStart,
 } from '../week';
@@ -54,6 +56,14 @@ describe('settimana dei programmi', () => {
     expect(shiftWeek(ended, '2026-11-02', '2026-11-16', -1)).toBe('2026-10-27');
     expect(shiftWeek(ended, '2026-10-27', '2026-11-16', -1)).toBeNull();
     expect(shiftWeek(ended, '2026-11-02', '2026-11-16', 1)).toBeNull();
+    // Ancora attivo oltre la durata (chi lo segue ancora): si naviga fino a oggi, di default oggi.
+    const active = { ...ended, status: 'active' };
+    expect(defaultProgramDay(navProgram(active), '2026-11-16')).toBe('2026-11-16');
+    expect(shiftWeek(navProgram(active), '2026-11-16', '2026-11-16', -1)).toBe('2026-11-09');
+    expect(overrunEnd(active, '2026-11-16')).toBe('2026-11-02');
+    expect(overrunEnd({ ...active, durationDays: null }, '2026-11-16')).toBeNull();
+    expect(overrunEnd({ ...active, status: 'completed' }, '2026-11-16')).toBeNull();
+    expect(overrunEnd(active, '2026-11-01')).toBeNull();
     // In corso: di default oggi.
     expect(defaultProgramDay(prog, '2026-11-15')).toBe('2026-11-15');
   });

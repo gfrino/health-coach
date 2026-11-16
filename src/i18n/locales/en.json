@@ -899,8 +899,10 @@
     "backToToday": "Back to today",
     "dayStatus": "{{done}} of {{total}} done",
     "dayNothing": "nothing planned",
-    "endedOn": "Ended {{date}} · {{total}} days",
-    "backToLast": "Back to the last day"
+    "backToLast": "Back to the last day",
+    "overrun": "This program was planned for {{total}} days, which ended on {{date}}. Are you still following it?",
+    "overrunContinue": "Keep going, no end date",
+    "overrunComplete": "Mark as completed"
   },
   "memory": {
     "title": "What your coach remembers",

@@ -14,6 +14,7 @@ import {
   progressLabel,
   todayProgress,
 } from '@/programs/ProgramTodayList';
+import { ProgramOverrun } from '@/programs/ProgramOverrun';
 import { ProgramWeekNav } from '@/programs/ProgramWeekNav';
 import { usePrograms, type ProgramView } from '@/programs/usePrograms';
 import { useTheme } from '@/theme';
@@ -22,7 +23,7 @@ import { useTheme } from '@/theme';
 export default function ProgramsScreen() {
   const { t } = useTranslation();
   const { colors, spacing } = useTheme();
-  const { active, finished, toggle, selectDay } = usePrograms();
+  const { active, finished, toggle, selectDay, reload } = usePrograms();
 
   const create = () => {
     haptic.tap();
@@ -75,6 +76,7 @@ export default function ProgramsScreen() {
                   view={v}
                   onToggle={toggle}
                   onSelectDay={(day) => void selectDay(v.program, day)}
+                  onChanged={() => void reload()}
                   first={i === 0}
                 />
               ))
@@ -111,11 +113,13 @@ function ProgramCard({
   view,
   onToggle,
   onSelectDay,
+  onChanged,
   first,
 }: {
   view: ProgramView;
   onToggle: ReturnType<typeof usePrograms>['toggle'];
   onSelectDay: (day: string) => void;
+  onChanged: () => void;
   first: boolean;
 }) {
   const { t, i18n } = useTranslation();
@@ -165,7 +169,7 @@ function ProgramCard({
         <View style={{ flex: 1 }}>
           <AppText variant="headline">{program.title}</AppText>
           <AppText variant="caption" tone="textMuted">
-            {programDayLabel(program, day, t, i18n.language)}
+            {programDayLabel(program, day, t)}
           </AppText>
         </View>
         <Icon name={expanded ? 'chevronUp' : 'chevronDown'} size={14} color={colors.textMuted} />
@@ -182,6 +186,7 @@ function ProgramCard({
 
       {expanded ? (
         <>
+          <ProgramOverrun program={program} onChanged={onChanged} />
           <ProgramWeekNav view={view} onSelect={onSelectDay} />
           <ProgramTodayList view={view} onToggle={onToggle} />
           <Pressable

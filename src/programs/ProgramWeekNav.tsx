@@ -7,7 +7,7 @@ import { localIsoDate } from '@/lib/dates';
 import { useTheme } from '@/theme';
 
 import type { ProgramView } from './usePrograms';
-import { defaultProgramDay, shiftWeek } from './week';
+import { defaultProgramDay, navProgram, shiftWeek } from './week';
 
 const date = (day: string) => new Date(`${day}T12:00:00`);
 
@@ -25,10 +25,11 @@ export function ProgramWeekNav({
   const { t, i18n } = useTranslation();
   const { colors, spacing } = useTheme();
   const today = localIsoDate(new Date());
-  const prev = shiftWeek(view.program, view.today, today, -1);
-  const next = shiftWeek(view.program, view.today, today, 1);
+  const nav = navProgram(view.program);
+  const prev = shiftWeek(nav, view.today, today, -1);
+  const next = shiftWeek(nav, view.today, today, 1);
   // Programma finito: il "ritorno" porta all'ultimo giorno invece che a oggi.
-  const home = defaultProgramDay(view.program, today);
+  const home = defaultProgramDay(nav, today);
   const first = view.week[0]!.day;
   const last = view.week[6]!.day;
   const fmt = (d: string, o: Intl.DateTimeFormatOptions) =>

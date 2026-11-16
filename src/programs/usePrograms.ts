@@ -14,6 +14,7 @@ import {
   buildWeek,
   dayInProgram,
   defaultProgramDay,
+  navProgram,
   weekStart,
   type WeekDay,
 } from './week';
@@ -49,7 +50,7 @@ async function view(p: Program, day: string): Promise<ProgramView> {
     today: day,
     isToday: day === realToday,
     day: programRepository.programDay(p, day),
-    week: buildWeek(p, day, realToday, weekChecks),
+    week: buildWeek(navProgram(p), day, realToday, weekChecks),
   };
 }
 
@@ -82,7 +83,8 @@ const selectedDays = new Map<string, string>();
 
 function shownDay(p: Program, today: string): string {
   const d = selectedDays.get(p.id);
-  return d && dayInProgram(p, d, today) ? d : defaultProgramDay(p, today);
+  const nav = navProgram(p);
+  return d && dayInProgram(nav, d, today) ? d : defaultProgramDay(nav, today);
 }
 
 /** Ricarica quando una sincronizzazione finisce: nuovi allenamenti possono aver spuntato azioni. */
