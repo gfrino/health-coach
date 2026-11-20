@@ -2,7 +2,9 @@ import { Platform } from 'react-native';
 
 import { useSettingsStore } from '@/store/settingsStore';
 
-import { permissionIdentifiers } from './healthDataTypes';
+import { HEALTH_CONNECT_FULL_VERSION, nativeAtLeast } from '@/config/env';
+
+import { HC_EXTRA_RECORD_TYPES, permissionIdentifiers } from './healthDataTypes';
 
 import type { ConnectResult, HealthAvailability, ProfilePrefill } from './types';
 
@@ -41,23 +43,38 @@ export async function getHealthAvailability(): Promise<HealthAvailability> {
 
 export async function requestHealthReadAccess(): Promise<ConnectResult> {
   const res = await access().requestReadAccess();
-  if (Platform.OS === 'ios') {
-    await useSettingsStore
-      .getState()
-      .update({ healthReadAsked: permissionIdentifiers('ios').length });
+  if (Platform.OS === 'ios' || Platform.OS === 'android') {
+    await useSettingsStore.getState().update({ healthReadAsked: readTypesCount() });
   }
   return res;
 }
 
+/** Tipi di lettura chiesti su questa piattaforma (su Android dipende dai permessi della build). */
+export function readTypesCount(): number {
+  if (Platform.OS === 'ios') return permissionIdentifiers('ios').length;
+  return androidReadTypes().length;
+}
+
+/** Record type Health Connect da chiedere: i nuovi solo dalla build che li dichiara nel manifest. */
+export function androidReadTypes(): string[] {
+  const all = permissionIdentifiers('android');
+  if (nativeAtLeast(HEALTH_CONNECT_FULL_VERSION)) return all;
+  const extra = new Set(HC_EXTRA_RECORD_TYPES);
+  return all.filter((t) => !extra.has(t));
+}
+
 /**
- * Apple Salute già collegata e l'app ora legge tipi nuovi: si chiede una volta il permesso per
- * quelli (iOS mostra solo le voci nuove). Restituisce true se la richiesta è stata fatta.
+ * Sorgente già collegata e l'app ora legge tipi nuovi: si chiede una volta il permesso per quelli
+ * (iOS e Health Connect mostrano le voci nuove). Restituisce true se la richiesta è stata fatta.
  */
 export async function ensureNewHealthReadAccess(): Promise<boolean> {
-  if (Platform.OS !== 'ios') return false;
+  if (Platform.OS !== 'ios' && Platform.OS !== 'android') return false;
   const s = useSettingsStore.getState().settings;
   if (s.healthSourceConnectedAt === null) return false;
-  if ((s.healthReadAsked ?? 0) >= permissionIdentifiers('ios').length) return false;
+  // Android: chi ha collegato Health Connect prima della 1.40.0 ha healthReadAsked = 0, ma il
+  // numero di allora non conta: si chiede solo dalla build con i permessi nuovi.
+  if (Platform.OS === 'android' && !nativeAtLeast(HEALTH_CONNECT_FULL_VERSION)) return false;
+  if ((s.healthReadAsked ?? 0) >= readTypesCount()) return false;
   try {
     await requestHealthReadAccess();
     return true;

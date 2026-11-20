@@ -6,6 +6,7 @@ import {
   EXTRA_CUMULATIVE,
   EXTRA_LABELS,
   EXTRA_METRIC_UNITS,
+  HC_ONLY_LABELS,
   HK_EXTRA_CATEGORIES,
   HK_EXTRA_QUANTITIES,
 } from '../hkExtra';
@@ -31,6 +32,7 @@ describe('resto di Apple Salute', () => {
       ...HK_EXTRA_QUANTITIES.map((x) => x.type),
       ...HK_EXTRA_CATEGORIES.map((x) => x.type),
       'stateOfMind',
+      ...Object.keys(HC_ONLY_LABELS),
     ];
     const ids = [...HK_EXTRA_QUANTITIES, ...HK_EXTRA_CATEGORIES].map((x) => x.hk);
     expect(new Set(ids).size).toBe(ids.length);
@@ -49,12 +51,14 @@ describe('resto di Apple Salute', () => {
     expect(EXTRA_CUMULATIVE.has('symptomHeadache')).toBe(false);
   });
 
-  it('chiede su iPhone anche i tipi nuovi, su Android nulla di nuovo (serve una build)', () => {
+  it('chiede su iPhone e su Android anche i tipi nuovi', () => {
     const ios = permissionIdentifiers('ios');
     expect(ios).toContain('HKQuantityTypeIdentifierTimeInDaylight');
     expect(ios).toContain('HKCategoryTypeIdentifierHeadache');
     expect(ios).toContain('HKStateOfMindTypeIdentifier');
-    expect(permissionIdentifiers('android').some((x) => x.startsWith('HK'))).toBe(false);
+    const android = permissionIdentifiers('android');
+    expect(android.some((x) => x.startsWith('HK'))).toBe(false);
+    expect(android).toEqual(expect.arrayContaining(['SkinTemperature', 'OvulationTest', 'Speed']));
   });
 
   it('salta i tipi che la versione di iOS non ha', () => {

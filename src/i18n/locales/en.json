@@ -276,9 +276,16 @@
         "symptomVaginalDryness": "Vaginal dryness",
         "symptomVomiting": "Vomiting",
         "symptomWheezing": "Wheezing",
-        "stateOfMind": "State of mind"
+        "stateOfMind": "State of mind",
+        "elevationGained": "Elevation gained",
+        "bodyWaterMass": "Body water mass",
+        "boneMass": "Bone mass",
+        "skinTemperatureDelta": "Skin temperature change",
+        "speed": "Speed",
+        "power": "Power",
+        "stepsCadence": "Steps cadence"
       },
-      "more": "More Apple Health data ({{count}})",
+      "more": "More health data ({{count}})",
       "less": "Show less",
       "severity": {
         "0": "none",
@@ -1376,7 +1383,9 @@
       "targetHint": "Recommended {{value}} to drink (EFSA: about 80% of daily water; the rest comes from food). More when it's hot or you exercise.",
       "left": "{{value}} to go",
       "reached": "goal reached"
-    }
+    },
+    "writeHealthAndroid": "Also save to Health Connect",
+    "writeHealthNotConnectedAndroid": "Connect Health Connect in Integrations to use this."
   },
   "citations": {
     "title": "Scientific sources",

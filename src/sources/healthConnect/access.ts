@@ -10,7 +10,7 @@ import {
   type RecordType,
 } from 'react-native-health-connect';
 
-import { permissionIdentifiers } from '../healthDataTypes';
+import { androidReadTypes } from '../platformHealth';
 import type { ConnectResult, HealthAvailability, ProfilePrefill } from '../types';
 
 const HEALTH_CONNECT_PACKAGE = 'com.google.android.apps.healthdata';
@@ -46,7 +46,7 @@ export async function openInstallPage(): Promise<void> {
 export async function requestReadAccess(): Promise<ConnectResult> {
   if (!(await ensureInitialized())) return { completed: false };
   const permissions: Parameters<typeof requestPermission>[0] = [
-    ...permissionIdentifiers('android').map((recordType): Permission => ({
+    ...androidReadTypes().map((recordType): Permission => ({
       accessType: 'read',
       recordType: recordType as RecordType,
     })),

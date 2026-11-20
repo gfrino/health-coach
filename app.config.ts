@@ -1,7 +1,7 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 /**
- * Permessi Health Connect dichiarati nel manifest (solo lettura: la v1.0 non scrive mai).
+ * Permessi Health Connect dichiarati nel manifest (lettura; la scrittura è più sotto).
  * Devono restare allineati con i record type richiesti dall'adapter (src/sources/healthconnect).
  */
 const P = 'android.permission.health.';
@@ -32,9 +32,33 @@ const HEALTH_CONNECT_READ_PERMISSIONS = [
   `${P}READ_HYDRATION`,
   `${P}READ_MENSTRUATION`,
   `${P}READ_MINDFULNESS`,
+  // Il resto di Health Connect (1.40.0): tutti i tipi che l'app sa leggere.
+  `${P}READ_BASAL_BODY_TEMPERATURE`,
+  `${P}READ_BODY_WATER_MASS`,
+  `${P}READ_BONE_MASS`,
+  `${P}READ_CERVICAL_MUCUS`,
+  `${P}READ_ELEVATION_GAINED`,
+  `${P}READ_INTERMENSTRUAL_BLEEDING`,
+  `${P}READ_OVULATION_TEST`,
+  `${P}READ_POWER`,
+  `${P}READ_SEXUAL_ACTIVITY`,
+  `${P}READ_SKIN_TEMPERATURE`,
+  `${P}READ_SPEED`,
+  `${P}READ_WHEELCHAIR_PUSHES`,
   // Lettura in background e dello storico oltre i 30 giorni precedenti al consenso.
   `${P}READ_HEALTH_DATA_IN_BACKGROUND`,
   `${P}READ_HEALTH_DATA_HISTORY`,
+] as const;
+
+/**
+ * Scrittura in Health Connect (1.40.0), solo se l'utente attiva «Salva anche in Health Connect»:
+ * pasti del diario, acqua, peso e altezza inseriti a mano.
+ */
+const HEALTH_CONNECT_WRITE_PERMISSIONS = [
+  `${P}WRITE_NUTRITION`,
+  `${P}WRITE_HYDRATION`,
+  `${P}WRITE_WEIGHT`,
+  `${P}WRITE_HEIGHT`,
 ] as const;
 
 /**
@@ -77,16 +101,14 @@ const bundleId =
     ? BASE_BUNDLE_ID
     : `${BASE_BUNDLE_ID}.${variant === 'preview' ? 'preview' : 'dev'}`;
 const appName =
-  variant === 'production'
-    ? 'AlbA'
-    : `AlbA (${variant === 'preview' ? 'Preview' : 'Dev'})`;
+  variant === 'production' ? 'AlbA' : `AlbA (${variant === 'preview' ? 'Preview' : 'Dev'})`;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: appName,
   slug: 'health-coach',
   owner: process.env.EAS_OWNER ?? 'ticinoweb',
-  version: '1.23.2',
+  version: '1.40.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'healthcoach',
@@ -127,7 +149,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // I dati di salute non devono finire nei backup automatici di Google.
     allowBackup: false,
     predictiveBackGestureEnabled: false,
-    permissions: [...HEALTH_CONNECT_READ_PERMISSIONS],
+    permissions: [...HEALTH_CONNECT_READ_PERMISSIONS, ...HEALTH_CONNECT_WRITE_PERMISSIONS],
   },
   plugins: [
     'expo-router',
@@ -156,15 +178,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-image-picker',
       {
         photosPermission:
-          'AlbA accede alle foto solo per importare i referti che scegli tu.',
-        cameraPermission: 'AlbA usa la fotocamera solo per fotografare i tuoi referti.',
+          'AlbA accede alle foto solo per importare i referti, le foto dei pasti e la foto del profilo che scegli tu.',
+        cameraPermission:
+          'AlbA usa la fotocamera solo per fotografare referti, pasti e la tua foto del profilo.',
         microphonePermission: 'AlbA usa il microfono solo mentre parli con il coach.',
       },
     ],
     [
       'expo-camera',
       {
-        cameraPermission: 'AlbA usa la fotocamera solo per fotografare i tuoi referti.',
+        cameraPermission:
+          'AlbA usa la fotocamera solo per fotografare referti, pasti e la tua foto del profilo.',
         microphonePermission: 'AlbA usa il microfono solo mentre parli con il coach.',
         recordAudioAndroid: false,
       },
@@ -183,7 +207,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       '@config-plugins/react-native-webrtc',
       {
         microphonePermission: 'AlbA usa il microfono solo mentre parli con il coach.',
-        cameraPermission: 'AlbA usa la fotocamera solo per fotografare i tuoi referti.',
+        cameraPermission:
+          'AlbA usa la fotocamera solo per fotografare referti, pasti e la tua foto del profilo.',
       },
     ],
     [
@@ -211,20 +236,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         NSHealthShareUsageDescription:
           'AlbA legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.',
-        // Scrittura solo dei pasti del diario alimentare, se l'utente la attiva (scheda Cibo).
-        // Il testo deve dirlo: Apple rifiuta le descrizioni non veritiere.
+        // Scrittura (solo se l'utente la attiva nel diario alimentare): pasti, acqua, peso e altezza
+        // inseriti a mano, umore del Journal. Il testo deve dirlo: Apple rifiuta le descrizioni
+        // non veritiere. Uguale a locales/native/it.json.
         NSHealthUpdateUsageDescription:
-          'AlbA salva in Salute solo i pasti del tuo diario alimentare (calorie e nutrienti), e soltanto se attivi questa opzione nella scheda Cibo. Non modifica gli altri dati.',
+          "Se attivi l'opzione nel diario alimentare, AlbA salva in Salute i tuoi pasti (calorie, nutrienti e acqua), il peso e l'altezza che inserisci e l'umore del tuo diario. Non modifica gli altri dati.",
         background: true,
       },
     ],
     'react-native-health-connect',
     // Ciclo di vita UIScene richiesto dall'SDK iOS 27 (rimuovere con SDK 58).
     './plugins/withIosSceneLifecycle',
-    [
-      './plugins/withShareExtensionFixes',
-      { targetName: 'HealthCoachShare', displayName: 'AlbA' },
-    ],
+    ['./plugins/withShareExtensionFixes', { targetName: 'HealthCoachShare', displayName: 'AlbA' }],
   ],
   experiments: {
     typedRoutes: true,

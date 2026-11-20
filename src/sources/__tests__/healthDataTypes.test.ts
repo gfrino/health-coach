@@ -29,6 +29,19 @@ const HC_PERMISSION: Record<string, string> = {
   MenstruationFlow: 'READ_MENSTRUATION',
   MenstruationPeriod: 'READ_MENSTRUATION',
   MindfulnessSession: 'READ_MINDFULNESS',
+  BasalBodyTemperature: 'READ_BASAL_BODY_TEMPERATURE',
+  BodyWaterMass: 'READ_BODY_WATER_MASS',
+  BoneMass: 'READ_BONE_MASS',
+  CervicalMucus: 'READ_CERVICAL_MUCUS',
+  CyclingPedalingCadence: 'READ_EXERCISE',
+  ElevationGained: 'READ_ELEVATION_GAINED',
+  IntermenstrualBleeding: 'READ_INTERMENSTRUAL_BLEEDING',
+  OvulationTest: 'READ_OVULATION_TEST',
+  Power: 'READ_POWER',
+  SexualActivity: 'READ_SEXUAL_ACTIVITY',
+  SkinTemperature: 'READ_SKIN_TEMPERATURE',
+  Speed: 'READ_SPEED',
+  WheelchairPushes: 'READ_WHEELCHAIR_PUSHES',
 };
 
 describe('catalogo dei tipi di dato', () => {

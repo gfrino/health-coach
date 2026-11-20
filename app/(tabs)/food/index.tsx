@@ -24,6 +24,7 @@ import { loadFoodTargets, type CalorieTarget, type ProteinTarget } from '@/food/
 import { NutrientList } from '@/food/NutrientList';
 import { ageFrom, effectiveReference, nutrientReference, type RefProfile } from '@/food/references';
 import { TrackerSettings } from '@/food/TrackerSettings';
+import { canWriteToHealthHere } from '@/food/healthWrite';
 import { WaterBar, WaterQuickAdd } from '@/food/WaterQuickAdd';
 import { defaultWaterTarget, waterOfDay } from '@/food/water';
 import { haptic } from '@/lib/haptics';
@@ -655,13 +656,17 @@ export default function FoodScreen() {
               </View>
             </>
           )}
-          {Platform.OS === 'ios' ? (
+          {canWriteToHealthHere() ? (
             <SwitchRow
-              label={t('food.writeHealth')}
+              label={t(Platform.OS === 'ios' ? 'food.writeHealth' : 'food.writeHealthAndroid')}
               description={
                 settings.healthSourceConnectedAt
                   ? t('food.writeHealthHint')
-                  : t('food.writeHealthNotConnected')
+                  : t(
+                      Platform.OS === 'ios'
+                        ? 'food.writeHealthNotConnected'
+                        : 'food.writeHealthNotConnectedAndroid',
+                    )
               }
               value={settings.food.writeToHealth}
               // Riaccendendolo, iOS può chiedere di nuovo il permesso al prossimo salvataggio.

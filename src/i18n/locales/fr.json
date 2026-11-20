@@ -276,9 +276,16 @@
         "symptomVaginalDryness": "Sécheresse vaginale",
         "symptomVomiting": "Vomissements",
         "symptomWheezing": "Respiration sifflante",
-        "stateOfMind": "État d'esprit"
+        "stateOfMind": "État d'esprit",
+        "elevationGained": "Dénivelé positif",
+        "bodyWaterMass": "Masse hydrique",
+        "boneMass": "Masse osseuse",
+        "skinTemperatureDelta": "Variation de température cutanée",
+        "speed": "Vitesse",
+        "power": "Puissance",
+        "stepsCadence": "Cadence des pas"
       },
-      "more": "Autres données Santé ({{count}})",
+      "more": "Autres données de santé ({{count}})",
       "less": "Afficher moins",
       "severity": {
         "0": "aucun",
@@ -1376,7 +1383,9 @@
       "targetHint": "Recommandé : {{value}} à boire (EFSA : environ 80 % de l'eau de la journée ; le reste vient des aliments). Plus s'il fait chaud ou si vous faites du sport.",
       "left": "encore {{value}}",
       "reached": "objectif atteint"
-    }
+    },
+    "writeHealthAndroid": "Enregistrer aussi dans Health Connect",
+    "writeHealthNotConnectedAndroid": "Connecte Health Connect dans Intégrations pour l'utiliser."
   },
   "citations": {
     "title": "Sources scientifiques",

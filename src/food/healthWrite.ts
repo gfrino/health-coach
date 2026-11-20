@@ -5,6 +5,7 @@ import { foodRepository, getDb } from '@/db';
 import type { FoodEntry } from '@/db/repositories/foodRepository';
 import { HK_STATE_OF_MIND } from '@/sources/hkExtra';
 import { FOOD_ENTRY_METADATA_KEY, FOOD_WRITE_TYPES } from '@/sources/normalize/healthKit';
+import { HEALTH_CONNECT_FULL_VERSION, nativeAtLeast } from '@/config/env';
 import { useSettingsStore } from '@/store/settingsStore';
 
 /**
@@ -12,7 +13,8 @@ import { useSettingsStore } from '@/store/settingsStore';
  * grassi), così le vedono anche le altre app. Restano sul telefono: Apple Salute è locale.
  * Ogni campione porta l'id della voce nei metadati: in lettura l'app li salta (non li conta due
  * volte) e quando la voce cambia o viene cancellata li sostituisce o li elimina.
- * Android (Health Connect): richiede un permesso nativo, arriverà con la prossima build.
+ * Android (Health Connect, dalla build 1.40.0): stesse scritture in sources/healthConnect/write,
+ * con un clientRecordId "alba-…" al posto dei metadati.
  */
 
 type FoodType = (typeof FOOD_WRITE_TYPES)[number];
@@ -49,9 +51,22 @@ const EXTRA_FIELDS: { type: FoodType; id: string; unit: string }[] = [
 const SHARE_TYPES = [...FOOD_WRITE_TYPES, HK_STATE_OF_MIND] as const;
 type ShareType = (typeof SHARE_TYPES)[number];
 
+const isAndroid = Platform.OS === 'android';
+
+/* eslint-disable @typescript-eslint/no-require-imports -- modulo nativo solo Android */
+const hc = () =>
+  require('@/sources/healthConnect/write') as typeof import('@/sources/healthConnect/write');
+/* eslint-enable @typescript-eslint/no-require-imports */
+
+/** Scrittura possibile su questa piattaforma (Android: solo dalla build con i permessi). */
+export function canWriteToHealthHere(): boolean {
+  if (Platform.OS === 'ios') return true;
+  return isAndroid && nativeAtLeast(HEALTH_CONNECT_FULL_VERSION);
+}
+
 export function canWriteFoodToHealth(): boolean {
   const s = useSettingsStore.getState().settings;
-  return Platform.OS === 'ios' && s.food.writeToHealth && s.healthSourceConnectedAt !== null;
+  return canWriteToHealthHere() && s.food.writeToHealth && s.healthSourceConnectedAt !== null;
 }
 
 /* eslint-disable @typescript-eslint/no-require-imports -- modulo nativo solo iOS */
@@ -101,6 +116,15 @@ async function removeSamples(ids: Record<string, string> | null) {
 /** Scrive (o riscrive) la voce in Apple Salute. Silenzioso: il diario funziona anche senza. */
 export async function syncFoodEntryToHealth(entryId: string): Promise<void> {
   if (!canWriteFoodToHealth()) return;
+  if (isAndroid) {
+    try {
+      const entry = await foodRepository.getEntry(await getDb(), entryId);
+      if (entry) await hc().writeFoodEntry(entry);
+    } catch (e) {
+      console.warn(`[cibo] Health Connect non aggiornato: ${String(e)}`);
+    }
+    return;
+  }
   try {
     const db = await getDb();
     const entry = await foodRepository.getEntry(db, entryId);
@@ -151,6 +175,12 @@ export async function writeBodyToHealth(
   at: number,
 ): Promise<void> {
   if (!canWriteFoodToHealth()) return;
+  if (isAndroid) {
+    await hc()
+      .writeBody(kind, sourceId, value, at)
+      .catch((e: unknown) => console.warn(`[profilo] Health Connect non aggiornato: ${String(e)}`));
+    return;
+  }
   const type =
     kind === 'weight' ? 'HKQuantityTypeIdentifierBodyMass' : 'HKQuantityTypeIdentifierHeight';
   try {
@@ -185,6 +215,8 @@ export async function writeMoodToHealth(
   at: number,
 ): Promise<void> {
   if (!canWriteFoodToHealth()) return;
+  // Health Connect non ha lo stato d'animo.
+  if (isAndroid) return;
   try {
     const allowed = await writableTypes();
     if (!allowed.has(HK_STATE_OF_MIND)) return;
@@ -208,6 +240,11 @@ export async function writeWaterToHealth(
   at: number,
 ): Promise<string | null> {
   if (!canWriteFoodToHealth()) return null;
+  if (isAndroid) {
+    return hc()
+      .writeWater(sourceId, ml, at)
+      .catch(() => null);
+  }
   try {
     const allowed = await writableTypes();
     if (!allowed.has(WATER_TYPE)) return null;
@@ -224,6 +261,13 @@ export async function writeWaterToHealth(
 }
 
 export async function removeWaterFromHealth(uuid: string): Promise<void> {
+  if (isAndroid) {
+    if (canWriteToHealthHere())
+      await hc()
+        .deleteWater(uuid)
+        .catch(() => undefined);
+    return;
+  }
   if (Platform.OS !== 'ios') return;
   try {
     await healthKit().deleteObjects(WATER_TYPE, { uuid });
@@ -234,6 +278,13 @@ export async function removeWaterFromHealth(uuid: string): Promise<void> {
 
 /** Da chiamare prima di cancellare la voce dal DB. */
 export async function removeFoodEntryFromHealth(entry: FoodEntry): Promise<void> {
+  if (isAndroid) {
+    if (canWriteToHealthHere())
+      await hc()
+        .deleteFoodEntry(entry.id)
+        .catch(() => undefined);
+    return;
+  }
   if (Platform.OS !== 'ios' || !entry.healthSamples) return;
   try {
     await removeSamples(entry.healthSamples);

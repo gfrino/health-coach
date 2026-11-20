@@ -3,10 +3,10 @@
     "CFBundleDisplayName": "AlbA",
     "NSHealthShareUsageDescription": "AlbA liest deine Gesundheitsdaten (Aktivität, Schlaf, Vitalwerte, Ernährung), um dir Trends zu zeigen und dir persönliche Tipps zu geben. Deine Daten bleiben auf deinem iPhone.",
     "NSFaceIDUsageDescription": "Verwende Face ID, um AlbA zu entsperren.",
-    "NSPhotoLibraryUsageDescription": "AlbA greift nur auf Fotos zu, um die von dir gewählten Befunde zu importieren.",
-    "NSCameraUsageDescription": "AlbA verwendet die Kamera nur, um deine Befunde zu fotografieren.",
+    "NSPhotoLibraryUsageDescription": "AlbA greift nur auf Fotos zu, um die von dir gewählten Befunde, Essensfotos und dein Profilfoto zu importieren.",
+    "NSCameraUsageDescription": "AlbA verwendet die Kamera nur, um Befunde, Mahlzeiten und dein Profilfoto zu fotografieren.",
     "NSMicrophoneUsageDescription": "AlbA nutzt das Mikrofon nur, während du mit deinem Coach sprichst.",
     "NSSpeechRecognitionUsageDescription": "AlbA wandelt deine Sprache in Text um, damit du mit deinem Coach sprechen kannst. Wenn möglich, geschieht das auf deinem Telefon.",
-    "NSHealthUpdateUsageDescription": "AlbA speichert in Health nur die Mahlzeiten aus deinem Ernährungstagebuch (Kalorien und Nährstoffe), und nur wenn du das im Tab Essen einschaltest. Andere Daten ändert es nie."
+    "NSHealthUpdateUsageDescription": "Wenn du es im Ernährungstagebuch einschaltest, speichert AlbA in Health deine Mahlzeiten (Kalorien, Nährstoffe und Wasser), das eingegebene Gewicht und die Größe sowie die Stimmung aus deinem Tagebuch. Andere Daten ändert es nie."
   }
 }

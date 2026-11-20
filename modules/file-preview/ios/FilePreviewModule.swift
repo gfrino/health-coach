@@ -83,9 +83,45 @@ public final class FilePreviewModule: Module {
     } catch {
       return nil
     }
-    let lines = (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }
+    let items = (request.results ?? []).compactMap { observation -> OCRItem? in
+      guard let text = observation.topCandidates(1).first?.string else { return nil }
+      return OCRItem(text: text, box: observation.boundingBox)
+    }
+    return rowsText(items)
+  }
+
+  /// Ricostruisce le righe delle tabelle: Vision restituisce i blocchi per colonne (prima tutti i
+  /// nomi, poi tutti i valori) e l'AI accoppiava i numeri sbagliati (es. TSH 24 invece di 1,8).
+  /// Si raggruppano i blocchi alla stessa altezza e si leggono da sinistra a destra, separati da
+  /// " | ": "TSH | 1,8 | mU/L | 0,4–4,0".
+  static func rowsText(_ items: [OCRItem]) -> String? {
+    // Coordinate di Vision: origine in basso a sinistra, quindi dall'alto = midY decrescente.
+    let sorted = items.sorted { $0.box.midY > $1.box.midY }
+    var rows: [[OCRItem]] = []
+    for item in sorted {
+      if var last = rows.last, !last.isEmpty {
+        let mid = last.map { $0.box.midY }.reduce(0, +) / CGFloat(last.count)
+        let height = last.map { $0.box.height }.reduce(0, +) / CGFloat(last.count)
+        // Stessa riga se il centro è entro poco più di mezza altezza del testo.
+        if abs(item.box.midY - mid) <= max(min(height, item.box.height) * 0.6, 0.004) {
+          last.append(item)
+          rows[rows.count - 1] = last
+          continue
+        }
+      }
+      rows.append([item])
+    }
+    let lines = rows.map { row in
+      row.sorted { $0.box.minX < $1.box.minX }.map { $0.text }.joined(separator: " | ")
+    }
     return lines.isEmpty ? nil : lines.joined(separator: "\n")
   }
+}
+
+/// Blocco di testo riconosciuto con la sua posizione (coordinate normalizzate di Vision).
+struct OCRItem {
+  let text: String
+  let box: CGRect
 }
 
 private final class PreviewItem: NSObject, QLPreviewItem {

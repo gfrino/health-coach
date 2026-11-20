@@ -276,9 +276,16 @@
         "symptomVaginalDryness": "Scheidentrockenheit",
         "symptomVomiting": "Erbrechen",
         "symptomWheezing": "Pfeifende Atmung",
-        "stateOfMind": "Gemütszustand"
+        "stateOfMind": "Gemütszustand",
+        "elevationGained": "Höhenmeter",
+        "bodyWaterMass": "Körperwasser",
+        "boneMass": "Knochenmasse",
+        "skinTemperatureDelta": "Hauttemperatur-Abweichung",
+        "speed": "Geschwindigkeit",
+        "power": "Leistung",
+        "stepsCadence": "Schrittfrequenz"
       },
-      "more": "Weitere Apple-Health-Daten ({{count}})",
+      "more": "Weitere Gesundheitsdaten ({{count}})",
       "less": "Weniger anzeigen",
       "severity": {
         "0": "keine",
@@ -1376,7 +1383,9 @@
       "targetHint": "Empfohlen {{value}} zum Trinken (EFSA: etwa 80 % des täglichen Wassers; der Rest kommt aus dem Essen). Mehr bei Hitze oder Sport.",
       "left": "noch {{value}}",
       "reached": "Ziel erreicht"
-    }
+    },
+    "writeHealthAndroid": "Auch in Health Connect speichern",
+    "writeHealthNotConnectedAndroid": "Verbinde Health Connect unter Integrationen, um das zu nutzen."
   },
   "citations": {
     "title": "Wissenschaftliche Quellen",

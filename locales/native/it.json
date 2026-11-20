@@ -3,10 +3,10 @@
     "CFBundleDisplayName": "AlbA",
     "NSHealthShareUsageDescription": "AlbA legge i tuoi dati di salute (attività, sonno, parametri vitali, nutrizione) per mostrarti trend e darti consigli personalizzati. I dati restano sul tuo iPhone.",
     "NSFaceIDUsageDescription": "Usa Face ID per sbloccare AlbA.",
-    "NSPhotoLibraryUsageDescription": "AlbA accede alle foto solo per importare i referti che scegli tu.",
-    "NSCameraUsageDescription": "AlbA usa la fotocamera solo per fotografare i tuoi referti.",
+    "NSPhotoLibraryUsageDescription": "AlbA accede alle foto solo per importare i referti, le foto dei pasti e la foto del profilo che scegli tu.",
+    "NSCameraUsageDescription": "AlbA usa la fotocamera solo per fotografare referti, pasti e la tua foto del profilo.",
     "NSMicrophoneUsageDescription": "AlbA usa il microfono solo mentre parli con il coach.",
     "NSSpeechRecognitionUsageDescription": "AlbA trascrive la tua voce per parlare con il coach. Quando possibile, la trascrizione avviene sul telefono.",
-    "NSHealthUpdateUsageDescription": "AlbA salva in Salute solo i pasti del tuo diario alimentare (calorie e nutrienti), e soltanto se attivi questa opzione nella scheda Cibo. Non modifica gli altri dati."
+    "NSHealthUpdateUsageDescription": "Se attivi l'opzione nel diario alimentare, AlbA salva in Salute i tuoi pasti (calorie, nutrienti e acqua), il peso e l'altezza che inserisci e l'umore del tuo diario. Non modifica gli altri dati."
   }
 }

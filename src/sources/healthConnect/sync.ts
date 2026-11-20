@@ -7,6 +7,8 @@ import {
   type RecordType,
 } from 'react-native-health-connect';
 
+import Constants from 'expo-constants';
+
 import { healthDataRepository, type Db } from '@/db';
 import { DAY_MS } from '@/lib/dates';
 
@@ -14,6 +16,8 @@ import { mergeBatches, type NormalizedBatch } from '../model';
 import {
   HC_DAILY_AGGREGATES,
   normalizeHCDailyGroup,
+  ownContributions,
+  subtractOwn,
   normalizeHCRecord,
   SOURCE_HEALTH_CONNECT as SRC,
 } from '../normalize/healthConnect';
@@ -24,6 +28,8 @@ const HISTORY_DAYS = 365;
 const DEFAULT_DAYS = 30;
 const RECENT_DAYS = 3;
 const TOKEN_KEY = 'changes';
+/** Tipi coperti dal changes token: se ne arrivano di nuovi (aggiornamento o permessi) si leggono da capo. */
+const TOKEN_TYPES_KEY = 'changes_types';
 
 /** Record letti singolarmente (i cumulativi arrivano dagli aggregati giornalieri). */
 const RECORD_TYPES: RecordType[] = [
@@ -45,7 +51,25 @@ const RECORD_TYPES: RecordType[] = [
   'MindfulnessSession',
   'ExerciseSession',
   'SleepSession',
+  // Il resto di Health Connect (1.40.0)
+  'BasalBodyTemperature',
+  'BodyWaterMass',
+  'BoneMass',
+  'SkinTemperature',
+  'Speed',
+  'Power',
+  'StepsCadence',
+  'CyclingPedalingCadence',
+  'CervicalMucus',
+  'OvulationTest',
+  'IntermenstrualBleeding',
+  'SexualActivity',
 ];
+
+/** Tipi letti fino alla 1.39 (il token di allora copriva solo questi). */
+const LEGACY_TYPES = new Set<string>(
+  RECORD_TYPES.slice(0, RECORD_TYPES.indexOf('BasalBodyTemperature')),
+);
 
 const startOfDay = (ms: number) => {
   const d = new Date(ms);
@@ -59,6 +83,38 @@ async function writeBatch(db: Db, batch: NormalizedBatch) {
     (await healthDataRepository.upsertWorkouts(db, batch.workouts)) +
     (await healthDataRepository.upsertSleepSessions(db, batch.sleep))
   );
+}
+
+/** Record di AlbA (pasti, acqua) nel periodo: da togliere dai totali giornalieri di Health Connect. */
+async function ownTotals(recordType: string, fromMs: number, toMs: number) {
+  if (recordType !== 'Nutrition' && recordType !== 'Hydration') return [];
+  const pkg = Constants.expoConfig?.android?.package;
+  if (!pkg) return [];
+  try {
+    const out: ReturnType<typeof ownContributions> = [];
+    let pageToken: string | undefined;
+    for (let page = 0; page < 50; page++) {
+      const res = await readRecords(
+        recordType as RecordType,
+        {
+          timeRangeFilter: {
+            operator: 'between',
+            startTime: new Date(fromMs).toISOString(),
+            endTime: new Date(toMs).toISOString(),
+          },
+          dataOriginFilter: [pkg],
+          pageSize: 1000,
+          pageToken,
+        } as Parameters<typeof readRecords>[1],
+      );
+      for (const r of res.records) out.push(...ownContributions(r as never));
+      pageToken = res.pageToken;
+      if (!pageToken) break;
+    }
+    return out;
+  } catch {
+    return []; // senza permesso di lettura dei propri record: niente da togliere
+  }
 }
 
 async function readAll(recordType: RecordType, fromMs: number, toMs: number) {
@@ -98,6 +154,13 @@ export async function syncHealthConnect(
   const firstSync = !tokenState?.anchor;
 
   const types = RECORD_TYPES.filter((t) => readable.has(t));
+  const tokenTypes = await healthDataRepository.getSyncState(db, SRC, TOKEN_TYPES_KEY);
+  const known = new Set<string>(
+    tokenTypes?.anchor ? (JSON.parse(tokenTypes.anchor) as string[]) : [],
+  );
+  // Tipi nuovi rispetto al token (prima build con questi permessi o permesso dato dopo): storico
+  // completo solo per loro, poi un token nuovo per tutti.
+  const newTypes = firstSync || !tokenTypes?.anchor ? [] : types.filter((t) => !known.has(t));
   const aggregates = HC_DAILY_AGGREGATES.filter((a) => readable.has(a.recordType));
   const total = (firstSync ? types.length : 1) + aggregates.length;
   let done = 0;
@@ -124,7 +187,38 @@ export async function syncHealthConnect(
         lastSyncedAt: now,
         lastError: null,
       });
+      await healthDataRepository.setSyncState(db, SRC, TOKEN_TYPES_KEY, {
+        anchor: JSON.stringify(types),
+      });
     }
+  } else if (newTypes.length) {
+    // Prima le modifiche dei tipi già noti, poi lo storico dei nuovi e un token per tutti.
+    const from = now - (hasHistory ? HISTORY_DAYS : DEFAULT_DAYS) * DAY_MS;
+    for (const t of newTypes) {
+      try {
+        report.upserted += await writeBatch(db, await readAll(t, from, now));
+      } catch (e) {
+        fail(t, e);
+      }
+      tick(t);
+    }
+    const { nextChangesToken } = await getChanges({ recordTypes: types });
+    // Le modifiche dei tipi già noti dall'ultimo token si recuperano con la rilettura recente.
+    for (const t of types.filter((x) => known.has(x))) {
+      try {
+        report.upserted += await writeBatch(db, await readAll(t, now - RECENT_DAYS * DAY_MS, now));
+      } catch (e) {
+        fail(t, e);
+      }
+    }
+    await healthDataRepository.setSyncState(db, SRC, TOKEN_KEY, {
+      anchor: nextChangesToken,
+      lastSyncedAt: now,
+      lastError: null,
+    });
+    await healthDataRepository.setSyncState(db, SRC, TOKEN_TYPES_KEY, {
+      anchor: JSON.stringify(types),
+    });
   } else if (types.length) {
     // Incrementale: solo le modifiche dall'ultimo token.
     try {
@@ -152,6 +246,12 @@ export async function syncHealthConnect(
         lastSyncedAt: now,
         lastError: null,
       });
+      // Token creato prima della 1.40.0 (senza elenco dei tipi): era fatto con i tipi di allora.
+      if (!tokenTypes?.anchor) {
+        await healthDataRepository.setSyncState(db, SRC, TOKEN_TYPES_KEY, {
+          anchor: JSON.stringify(types.filter((t) => LEGACY_TYPES.has(t))),
+        });
+      }
     } catch (e) {
       fail(TOKEN_KEY, e);
     }
@@ -172,8 +272,13 @@ export async function syncHealthConnect(
         },
         timeRangeSlicer: { period: 'DAYS', length: 1 },
       });
-      const rows = groups.flatMap((g) => normalizeHCDailyGroup(a.recordType, g as never));
+      const all = groups.flatMap((g) => normalizeHCDailyGroup(a.recordType, g as never));
+      const rows = subtractOwn(all, await ownTotals(a.recordType, aggFrom, now));
       report.upserted += await healthDataRepository.upsertMetrics(db, rows);
+      // Giorni in cui c'era solo ciò che ha scritto AlbA: la riga del totale non serve più.
+      const kept = new Set(rows.map((r) => r.sourceId));
+      const dropped = all.filter((r) => !kept.has(r.sourceId)).map((r) => r.sourceId);
+      if (dropped.length) await healthDataRepository.deleteBySourceIds(db, SRC, dropped);
       await healthDataRepository.setSyncState(db, SRC, `daily:${a.recordType}`, {
         lastSyncedAt: now,
         lastError: null,
@@ -209,7 +314,10 @@ export async function refreshTodayHealthConnect(db: Db): Promise<number> {
           },
           timeRangeSlicer: { period: 'DAYS', length: 1 },
         });
-        return groups.flatMap((g) => normalizeHCDailyGroup(a.recordType, g as never));
+        return subtractOwn(
+          groups.flatMap((g) => normalizeHCDailyGroup(a.recordType, g as never)),
+          await ownTotals(a.recordType, from, now),
+        );
       } catch {
         return [];
       }

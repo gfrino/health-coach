@@ -184,6 +184,14 @@ export const EXTRA_METRIC_UNITS = {
   symptomWheezing: 'level',
   // Stato d'animo (Apple: valenza da -1 a +1)
   stateOfMind: 'valence',
+  // Solo Health Connect (Android)
+  elevationGained: 'm',
+  bodyWaterMass: 'kg',
+  boneMass: 'kg',
+  skinTemperatureDelta: 'degC',
+  speed: 'm/s',
+  power: 'W',
+  stepsCadence: 'count/min',
 } as const;
 
 export type ExtraMetricType = keyof typeof EXTRA_METRIC_UNITS;
@@ -688,8 +696,20 @@ export const HK_EXTRA_CATEGORIES: readonly HKExtraCategory[] = [
 export const HK_STATE_OF_MIND = 'HKStateOfMindTypeIdentifier';
 export const STATE_OF_MIND_MIN_IOS = 18;
 
+/** Metriche che esistono solo in Health Connect (Android), con il nome per il coach. */
+export const HC_ONLY_LABELS: Readonly<Partial<Record<ExtraMetricType, string>>> = {
+  elevationGained: 'Elevation gained',
+  bodyWaterMass: 'Body water mass',
+  boneMass: 'Bone mass',
+  skinTemperatureDelta: 'Skin temperature change from baseline',
+  speed: 'Speed (walking/running)',
+  power: 'Power (workouts)',
+  stepsCadence: 'Steps cadence',
+};
+
 /** Metriche che si sommano nel giorno (le altre: media; i sintomi: il valore più alto). */
 export const EXTRA_CUMULATIVE: ReadonlySet<ExtraMetricType> = new Set<ExtraMetricType>([
+  'elevationGained',
   ...HK_EXTRA_QUANTITIES.filter((x) => x.cumulative).map((x) => x.type),
   ...HK_EXTRA_CATEGORIES.filter((x) => x.kind === 'count' || x.kind === 'standHour').map(
     (x) => x.type,
@@ -701,6 +721,7 @@ export const EXTRA_LABELS: Readonly<Record<string, string>> = Object.fromEntries
   ...HK_EXTRA_QUANTITIES.map((x) => [x.type, x.label] as const),
   ...HK_EXTRA_CATEGORIES.map((x) => [x.type, x.label] as const),
   ['stateOfMind', 'State of mind (Apple, -1 very unpleasant … +1 very pleasant)'] as const,
+  ...Object.entries(HC_ONLY_LABELS),
 ]);
 
 /** Il tipo esiste nella versione di iOS indicata? */

@@ -276,9 +276,16 @@
         "symptomVaginalDryness": "Secchezza vaginale",
         "symptomVomiting": "Vomito",
         "symptomWheezing": "Respiro sibilante",
-        "stateOfMind": "Stato d'animo"
+        "stateOfMind": "Stato d'animo",
+        "elevationGained": "Dislivello in salita",
+        "bodyWaterMass": "Acqua corporea",
+        "boneMass": "Massa ossea",
+        "skinTemperatureDelta": "Variazione della temperatura cutanea",
+        "speed": "Velocità",
+        "power": "Potenza",
+        "stepsCadence": "Cadenza dei passi"
       },
-      "more": "Altri dati di Apple Salute ({{count}})",
+      "more": "Altri dati di salute ({{count}})",
       "less": "Mostra meno",
       "severity": {
         "0": "assente",
@@ -1376,7 +1383,9 @@
       "targetHint": "Consigliati {{value}} da bere (EFSA: circa l'80% dell'acqua del giorno; il resto arriva dal cibo). Di più se fa caldo o fai sport.",
       "left": "mancano {{value}}",
       "reached": "obiettivo raggiunto"
-    }
+    },
+    "writeHealthAndroid": "Salva anche in Health Connect",
+    "writeHealthNotConnectedAndroid": "Collega Health Connect in Integrazioni per usarlo."
   },
   "citations": {
     "title": "Fonti scientifiche",

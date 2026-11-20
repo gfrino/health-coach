@@ -262,9 +262,19 @@ const EXTRA_GROUP_CATEGORY: Record<ExtraGroup, HealthDataCategory> = {
   stateOfMind: 'mindfulness',
 };
 
+/** Record type Health Connect per gli stessi gruppi (permessi nel manifest dalla build 1.40.0). */
+const HC_EXTRA: Partial<Record<ExtraGroup, readonly string[]>> = {
+  activityMore: ['ElevationGained', 'WheelchairPushes', 'Speed', 'Power', 'CyclingPedalingCadence'],
+  bodyMore: ['BasalBodyTemperature', 'BodyWaterMass', 'BoneMass', 'SkinTemperature'],
+  reproductive: ['CervicalMucus', 'OvulationTest', 'IntermenstrualBleeding', 'SexualActivity'],
+};
+
+/** Tutti i record type Health Connect aggiunti con la build 1.40.0. */
+export const HC_EXTRA_RECORD_TYPES: readonly string[] = Object.values(HC_EXTRA).flat();
+
 /**
- * Il resto di Apple Salute (sources/hkExtra), un gruppo per voce. Solo iOS per ora: su Android
- * ogni tipo ha bisogno di un permesso nel manifest, quindi di una build nativa.
+ * Il resto di Apple Salute (sources/hkExtra), un gruppo per voce; su Android i record type di
+ * HC_EXTRA (gli altri gruppi non esistono in Health Connect).
  */
 const EXTRA_TYPES: HealthDataType[] = (Object.keys(EXTRA_GROUP_CATEGORY) as ExtraGroup[]).map(
   (group) => ({
@@ -275,7 +285,7 @@ const EXTRA_TYPES: HealthDataType[] = (Object.keys(EXTRA_GROUP_CATEGORY) as Extr
       ...HK_EXTRA_CATEGORIES.filter((x) => x.group === group).map((x) => x.hk),
       ...(group === 'stateOfMind' ? [HK_STATE_OF_MIND] : []),
     ],
-    healthConnect: [],
+    healthConnect: HC_EXTRA[group] ?? [],
   }),
 );
 
