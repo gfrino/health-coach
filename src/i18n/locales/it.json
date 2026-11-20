@@ -197,7 +197,8 @@
     "extractionRange": "Riferimento {{range}}",
     "extractionPrevious": "Prima: {{value}} ({{date}})",
     "extractionNote": "I valori sono letti dall'AI e possono contenere errori: confrontali con il documento. Restano su questo telefono, cifrati.",
-    "fromClipboard": "Incolla la foto copiata"
+    "fromClipboard": "Incolla la foto copiata",
+    "pasteDenied": "AlbA non ha ricevuto la foto: iOS non ha dato il permesso di incollare. Vai in Impostazioni › AlbA › Incolla da altre app e scegli «Consenti», poi riprova."
   },
   "settings": {
     "title": "Impostazioni",
@@ -609,7 +610,8 @@
     "savingFood": "Lo segno nel diario alimentare…",
     "copy": "Copia",
     "copied": "Copiato",
-    "pasteImage": "Incolla la foto copiata"
+    "pasteImage": "Incolla la foto copiata",
+    "copiedImage": "Foto copiata:"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",

@@ -10,7 +10,15 @@ import { parseNumber } from '@/records/labExtraction';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTheme } from '@/theme';
 
-import { addWater, undoLastWater, waterOfDay, waterTime, WATER_PRESETS } from './water';
+import { removeWaterFromHealth, writeWaterToHealth } from './healthWrite';
+import {
+  addWater,
+  setWaterHealthSample,
+  undoLastWater,
+  waterOfDay,
+  waterTime,
+  WATER_PRESETS,
+} from './water';
 
 /** "800 ml" o "1,2 L". */
 export function formatWater(ml: number, locale: string): string {
@@ -86,15 +94,27 @@ export function WaterQuickAdd({
 
   const add = async (ml: number) => {
     if (!(ml > 0 && ml <= 5000)) return;
-    await addWater(await getDb(), ml, waterTime(day, new Date()));
+    const db = await getDb();
+    const at = waterTime(day, new Date());
+    const id = await addWater(db, ml, at);
     haptic.success();
+    // Anche in Apple Salute, in background: il popup non aspetta.
+    if (id) {
+      void writeWaterToHealth(id, ml, at).then((uuid) =>
+        uuid ? setWaterHealthSample(db, id, uuid) : undefined,
+      );
+    }
     setAdded(ml);
     setOther('');
     await load();
     onChange?.();
   };
   const undo = async () => {
-    if (await undoLastWater(await getDb(), day)) haptic.select();
+    const removed = await undoLastWater(await getDb(), day);
+    if (removed) {
+      haptic.select();
+      if (removed.healthUuid) void removeWaterFromHealth(removed.healthUuid);
+    }
     setAdded(null);
     await load();
     onChange?.();

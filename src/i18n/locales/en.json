@@ -197,7 +197,8 @@
     "extractionRange": "Reference {{range}}",
     "extractionPrevious": "Before: {{value}} ({{date}})",
     "extractionNote": "The values are read by the AI and may contain mistakes: check them against the document. They stay on this phone, encrypted.",
-    "fromClipboard": "Paste copied photo"
+    "fromClipboard": "Paste copied photo",
+    "pasteDenied": "AlbA didn't receive the photo: iOS didn't allow pasting. Go to Settings › AlbA › Paste from Other Apps, choose “Allow”, then try again."
   },
   "settings": {
     "title": "Settings",
@@ -609,7 +610,8 @@
     "savingFood": "Adding it to your food diary…",
     "copy": "Copy",
     "copied": "Copied",
-    "pasteImage": "Paste copied photo"
+    "pasteImage": "Paste copied photo",
+    "copiedImage": "Copied photo:"
   },
   "integrations": {
     "healthTitle": "Phone health data",

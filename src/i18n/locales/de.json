@@ -197,7 +197,8 @@
     "extractionRange": "Referenz {{range}}",
     "extractionPrevious": "Vorher: {{value}} ({{date}})",
     "extractionNote": "Die Werte werden von der KI gelesen und können Fehler enthalten: vergleiche sie mit dem Dokument. Sie bleiben verschlüsselt auf diesem Telefon.",
-    "fromClipboard": "Kopiertes Foto einfügen"
+    "fromClipboard": "Kopiertes Foto einfügen",
+    "pasteDenied": "AlbA hat das Foto nicht erhalten: iOS hat das Einfügen nicht erlaubt. Öffne Einstellungen › AlbA › Aus anderen Apps einfügen, wähle „Erlauben“ und versuche es erneut."
   },
   "settings": {
     "title": "Einstellungen",
@@ -609,7 +610,8 @@
     "savingFood": "Ich trage es ins Ernährungstagebuch ein…",
     "copy": "Kopieren",
     "copied": "Kopiert",
-    "pasteImage": "Kopiertes Foto einfügen"
+    "pasteImage": "Kopiertes Foto einfügen",
+    "copiedImage": "Kopiertes Foto:"
   },
   "integrations": {
     "healthTitle": "Gesundheitsdaten des Telefons",

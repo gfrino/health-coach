@@ -95,10 +95,16 @@ export async function clipboardHasImage(): Promise<boolean> {
  */
 export async function pasteImageFromClipboard(): Promise<IncomingFile[]> {
   const img = await Clipboard.getImageAsync({ format: 'jpeg', jpegQuality: 0.85 });
-  if (!img?.data) return [];
+  // C'era un'immagine ma iOS non l'ha data: permesso di incollare negato.
+  if (!img?.data) throw new Error('paste_denied');
+  return [imageFileFromData(img.data)];
+}
+
+/** Immagine già letta (data URI JPEG, es. dal pulsante "Incolla" di Apple) → file temporaneo. */
+export function imageFileFromData(dataUri: string): IncomingFile {
   const file = new File(Paths.cache, `incollata-${Date.now()}.jpg`);
-  file.write(base64ToBytes(img.data));
-  return [{ uri: file.uri, mimeType: 'image/jpeg', fileName: null }];
+  file.write(base64ToBytes(dataUri));
+  return { uri: file.uri, mimeType: 'image/jpeg', fileName: null };
 }
 
 export async function pickDocument(): Promise<IncomingFile[]> {

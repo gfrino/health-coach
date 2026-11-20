@@ -3,7 +3,14 @@ import * as healthDataRepository from '@/db/repositories/healthDataRepository';
 import * as healthQueries from '@/db/repositories/healthQueries';
 import { createTestDb } from '@/test/nodeSqliteDb';
 
-import { addWater, defaultWaterTarget, undoLastWater, waterOfDay, waterTime } from '../water';
+import {
+  addWater,
+  defaultWaterTarget,
+  setWaterHealthSample,
+  undoLastWater,
+  waterOfDay,
+  waterTime,
+} from '../water';
 
 let mockSeq = 0;
 jest.mock('@/db/ids', () => ({ newId: () => `w-${++mockSeq}` }));
@@ -31,14 +38,16 @@ describe('acqua aggiunta dal diario', () => {
       },
     ]);
     await addWater(db, 200, at('2026-11-20', 10));
-    await addWater(db, 500, at('2026-11-20', 13));
+    const half = await addWater(db, 500, at('2026-11-20', 13));
+    // Scritta anche in Apple Salute: l'uuid resta collegato per l'annullamento.
+    await setWaterHealthSample(db, half!, 'hk-uuid-500');
     await addWater(db, 250, at('2026-11-19', 12)); // altro giorno
     expect(await waterOfDay(db, '2026-11-20')).toEqual({ total: 1000, manual: 700 });
 
     // Annulla l'ultima aggiunta a mano (500 ml), mai quella di Apple Salute.
-    expect(await undoLastWater(db, '2026-11-20')).toBe(true);
+    expect(await undoLastWater(db, '2026-11-20')).toEqual({ healthUuid: 'hk-uuid-500' });
     expect(await waterOfDay(db, '2026-11-20')).toEqual({ total: 500, manual: 200 });
-    expect(await undoLastWater(db, '2026-11-20')).toBe(true);
+    expect(await undoLastWater(db, '2026-11-20')).toEqual({ healthUuid: null });
     expect(await undoLastWater(db, '2026-11-20')).toBe(false);
     expect(await waterOfDay(db, '2026-11-20')).toEqual({ total: 300, manual: 0 });
 

@@ -8,7 +8,7 @@ import { retryLastTurn, runCoachTurn } from '@/coach/chatEngine';
 import { conversationRepository, getDb, labReportRepository } from '@/db';
 import type { MessageAttachment, StoredMessage } from '@/db/repositories/conversationRepository';
 import { useAddReport, useImportFrom } from '@/features/RecordsSection';
-import { pasteImageFromClipboard } from '@/records/importReport';
+import { imageFileFromData, pasteImageFromClipboard } from '@/records/importReport';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { useSettingsStore } from '@/store/settingsStore';
 import { speechLocale } from '@/voice/locale';
@@ -163,7 +163,10 @@ export function ChatView({
   };
   const attach = useAddReport(onImported);
   const importFrom = useImportFrom(onImported);
-  const pasteImage = () => void importFrom(pasteImageFromClipboard);
+  const pasteImage = (dataUri?: string) =>
+    void importFrom(async () =>
+      dataUri ? [imageFileFromData(dataUri)] : pasteImageFromClipboard(),
+    );
   const openAttachment = (a: MessageAttachment) =>
     router.push({ pathname: '/me/report/[id]', params: { id: a.reportId } }, { withAnchor: true });
 

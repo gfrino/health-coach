@@ -197,7 +197,8 @@
     "extractionRange": "Référence {{range}}",
     "extractionPrevious": "Avant : {{value}} ({{date}})",
     "extractionNote": "Les valeurs sont lues par l'IA et peuvent contenir des erreurs : compare-les avec le document. Elles restent sur ce téléphone, chiffrées.",
-    "fromClipboard": "Coller la photo copiée"
+    "fromClipboard": "Coller la photo copiée",
+    "pasteDenied": "AlbA n'a pas reçu la photo : iOS n'a pas autorisé le collage. Allez dans Réglages › AlbA › Coller depuis d'autres apps, choisissez « Autoriser », puis réessayez."
   },
   "settings": {
     "title": "Réglages",
@@ -609,7 +610,8 @@
     "savingFood": "Je l'ajoute à ton journal alimentaire…",
     "copy": "Copier",
     "copied": "Copié",
-    "pasteImage": "Coller la photo copiée"
+    "pasteImage": "Coller la photo copiée",
+    "copiedImage": "Photo copiée :"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",

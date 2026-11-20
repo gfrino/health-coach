@@ -47,7 +47,9 @@ export function useImportFrom(onAdded: (ids: string[]) => void) {
             ? t('records.unsupported')
             : code === 'permission_denied'
               ? t('records.cameraDenied')
-              : t('errors.generic'),
+              : code === 'paste_denied'
+                ? t('records.pasteDenied')
+                : t('errors.generic'),
       );
     }
   };

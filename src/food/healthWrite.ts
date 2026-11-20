@@ -106,6 +106,43 @@ export async function syncFoodEntryToHealth(entryId: string): Promise<void> {
   }
 }
 
+const WATER_TYPE = 'HKQuantityTypeIdentifierDietaryWater';
+
+/**
+ * Acqua aggiunta con la goccia: va anche in Apple Salute (se "Salva anche in Apple Salute" è
+ * acceso), con l'id della voce nei metadati così in lettura non si conta due volte.
+ * Restituisce l'uuid del campione, o null. Silenzioso: l'acqua resta comunque nell'app.
+ */
+export async function writeWaterToHealth(
+  sourceId: string,
+  ml: number,
+  at: number,
+): Promise<string | null> {
+  if (!canWriteFoodToHealth()) return null;
+  try {
+    const allowed = await writableTypes();
+    if (!allowed.has(WATER_TYPE)) return null;
+    const { saveQuantitySample } = healthKit();
+    const when = new Date(at);
+    const sample = await saveQuantitySample(WATER_TYPE, 'mL' as never, ml, when, when, {
+      [FOOD_ENTRY_METADATA_KEY]: sourceId,
+    } as never);
+    return sample?.uuid ?? null;
+  } catch (e) {
+    console.warn(`[acqua] Apple Salute non aggiornata: ${String(e)}`);
+    return null;
+  }
+}
+
+export async function removeWaterFromHealth(uuid: string): Promise<void> {
+  if (Platform.OS !== 'ios') return;
+  try {
+    await healthKit().deleteObjects(WATER_TYPE, { uuid });
+  } catch {
+    // campione già cancellato in Apple Salute
+  }
+}
+
 /** Da chiamare prima di cancellare la voce dal DB. */
 export async function removeFoodEntryFromHealth(entry: FoodEntry): Promise<void> {
   if (Platform.OS !== 'ios' || !entry.healthSamples) return;

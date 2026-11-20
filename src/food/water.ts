@@ -43,8 +43,10 @@ export function waterTime(day: string, now: Date): number {
   return dayStart(day) <= now.getTime() && now.getTime() < nextDayStart(day) ? now.getTime() : noon;
 }
 
-export async function addWater(db: Db, ml: number, at: number): Promise<void> {
-  if (!(ml > 0)) return;
+/** Salva l'acqua; restituisce l'id della voce (per collegarla al campione di Apple Salute). */
+export async function addWater(db: Db, ml: number, at: number): Promise<string | null> {
+  if (!(ml > 0)) return null;
+  const sourceId = `water-${newId()}`;
   await healthDataRepository.upsertMetrics(db, [
     {
       type: 'water',
@@ -53,8 +55,18 @@ export async function addWater(db: Db, ml: number, at: number): Promise<void> {
       startAt: at,
       endAt: at,
       source: WATER_SOURCE,
-      sourceId: `water-${newId()}`,
+      sourceId,
     },
+  ]);
+  return sourceId;
+}
+
+/** Ricorda il campione scritto in Apple Salute, per toglierlo se l'aggiunta viene annullata. */
+export async function setWaterHealthSample(db: Db, sourceId: string, uuid: string): Promise<void> {
+  await db.runAsync('UPDATE metrics SET metadata = ? WHERE source = ? AND source_id = ?', [
+    JSON.stringify({ healthUuid: uuid }),
+    WATER_SOURCE,
+    sourceId,
   ]);
 }
 
@@ -68,14 +80,27 @@ export async function waterOfDay(db: Db, day: string): Promise<{ total: number; 
   return { total: Math.round(row?.total ?? 0), manual: Math.round(row?.manual ?? 0) };
 }
 
-/** Toglie l'ultima aggiunta a mano del giorno (per un tocco sbagliato). */
-export async function undoLastWater(db: Db, day: string): Promise<boolean> {
-  const last = await db.getFirstAsync<{ id: string }>(
-    `SELECT id FROM metrics WHERE type = 'water' AND source = ? AND start_at >= ? AND start_at < ?
+/**
+ * Toglie l'ultima aggiunta a mano del giorno (per un tocco sbagliato). Restituisce l'uuid del
+ * campione di Apple Salute da cancellare (null se non c'era), o false se non c'era niente.
+ */
+export async function undoLastWater(
+  db: Db,
+  day: string,
+): Promise<{ healthUuid: string | null } | false> {
+  const last = await db.getFirstAsync<{ id: string; metadata: string | null }>(
+    `SELECT id, metadata FROM metrics WHERE type = 'water' AND source = ? AND start_at >= ? AND start_at < ?
      ORDER BY start_at DESC, rowid DESC LIMIT 1`,
     [WATER_SOURCE, dayStart(day), nextDayStart(day)],
   );
   if (!last) return false;
   await db.runAsync('DELETE FROM metrics WHERE id = ?', [last.id]);
-  return true;
+  let healthUuid: string | null = null;
+  try {
+    const meta = last.metadata ? (JSON.parse(last.metadata) as { healthUuid?: unknown }) : null;
+    healthUuid = typeof meta?.healthUuid === 'string' ? meta.healthUuid : null;
+  } catch {
+    // metadati illeggibili: niente da togliere in Apple Salute
+  }
+  return { healthUuid };
 }

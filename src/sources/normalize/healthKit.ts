@@ -102,6 +102,8 @@ export const FOOD_WRITE_TYPES = [
   'HKQuantityTypeIdentifierDietarySugar',
   'HKQuantityTypeIdentifierDietaryFatSaturated',
   'HKQuantityTypeIdentifierDietarySodium',
+  // Acqua aggiunta con la goccia del diario.
+  'HKQuantityTypeIdentifierDietaryWater',
 ] as const;
 
 const origin = (s: HKSampleLike) => {

@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, Platform, Pressable, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
@@ -18,8 +19,11 @@ interface Props {
   attachments: MessageAttachment[];
   onAttach: () => void;
   onRemoveAttachment: (reportId: string) => void;
-  /** Incolla la foto copiata negli appunti come allegato. */
-  onPasteImage?: () => void;
+  /**
+   * Incolla la foto copiata come allegato: con l'immagine già letta (pulsante di Apple) o, senza
+   * argomento, leggendola dagli appunti.
+   */
+  onPasteImage?: (dataUri?: string) => void;
   /** Conversazione a voce (tipo ChatGPT): se assente, il pulsante non compare. */
   onVoiceMode?: () => void;
   voice: {
@@ -30,6 +34,9 @@ interface Props {
     stop: () => void;
   };
 }
+
+/** Su iOS 16+ c'è il pulsante "Incolla" di sistema (UIPasteControl). */
+const APPLE_PASTE = Platform.OS === 'ios' && Clipboard.isPasteButtonAvailable;
 
 /** Campo di scrittura con microfono: se il campo è vuoto, il pulsante principale è "Parla". */
 export function Composer({
@@ -45,13 +52,27 @@ export function Composer({
   const { t } = useTranslation();
   const { colors, spacing, radius, typography } = useTheme();
   const [text, setText] = useState('');
-  // Il campo di testo accetta solo testo: una foto copiata si incolla con questo pulsante, che
-  // compare quando si tocca il campo e negli appunti c'è un'immagine.
+  // Il campo di testo accetta solo testo (anche il suggerimento "incolla" della tastiera non porta
+  // le foto): una foto copiata si incolla con il pulsante sopra il campo. Compare quando il campo
+  // è attivo e negli appunti c'è un'immagine, e si ricontrolla quando gli appunti cambiano o si
+  // torna nell'app (prima solo al tocco del campo: dalla seconda foto non ricompariva).
   const [canPaste, setCanPaste] = useState(false);
-  const checkClipboard = () => {
-    if (!onPasteImage) return;
+  const focused = useRef(false);
+  const pasteEnabled = !!onPasteImage;
+  const checkClipboard = useCallback(() => {
+    if (!pasteEnabled || !focused.current) return;
     void clipboardHasImage().then(setCanPaste);
-  };
+  }, [pasteEnabled]);
+  useEffect(() => {
+    const sub = Clipboard.addClipboardListener(checkClipboard);
+    const app = AppState.addEventListener('change', (state) => {
+      if (state === 'active') checkClipboard();
+    });
+    return () => {
+      sub.remove();
+      app.remove();
+    };
+  }, [checkClipboard]);
   const paste = () => {
     haptic.tap();
     setCanPaste(false);
@@ -139,27 +160,56 @@ export function Composer({
       ) : null}
       {canPaste ? (
         <View
-          style={{ flexDirection: 'row', paddingHorizontal: spacing.sm, paddingTop: spacing.sm }}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.sm,
+            paddingHorizontal: spacing.sm,
+            paddingTop: spacing.sm,
+          }}
         >
-          <Pressable
-            onPress={paste}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing.xs,
-              minHeight: 36,
-              paddingHorizontal: spacing.md,
-              borderRadius: radius.pill,
-              backgroundColor: colors.primarySoft,
-              opacity: pressed ? 0.6 : 1,
-            })}
-          >
-            <Icon name="copy" size={14} color={colors.primary} />
-            <AppText variant="callout" tone="primary" style={{ fontWeight: '600' }}>
-              {t('chat.pasteImage')}
-            </AppText>
-          </Pressable>
+          {APPLE_PASTE ? (
+            <>
+              <AppText variant="callout" tone="textMuted">
+                {t('chat.copiedImage')}
+              </AppText>
+              {/* Pulsante "Incolla" di Apple: non chiede il permesso e non può essere negato. */}
+              <Clipboard.ClipboardPasteButton
+                acceptedContentTypes={['image']}
+                imageOptions={{ format: 'jpeg', jpegQuality: 0.85 }}
+                backgroundColor={colors.primary}
+                foregroundColor={colors.onPrimary}
+                displayMode="iconAndLabel"
+                style={{ width: 120, height: 36 }}
+                onPress={(data) => {
+                  if (data.type !== 'image') return;
+                  haptic.tap();
+                  setCanPaste(false);
+                  onPasteImage?.(data.data);
+                }}
+              />
+            </>
+          ) : (
+            <Pressable
+              onPress={paste}
+              accessibilityRole="button"
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: spacing.xs,
+                minHeight: 36,
+                paddingHorizontal: spacing.md,
+                borderRadius: radius.pill,
+                backgroundColor: colors.primarySoft,
+                opacity: pressed ? 0.6 : 1,
+              })}
+            >
+              <Icon name="copy" size={14} color={colors.primary} />
+              <AppText variant="callout" tone="primary" style={{ fontWeight: '600' }}>
+                {t('chat.pasteImage')}
+              </AppText>
+            </Pressable>
+          )}
         </View>
       ) : null}
       {attachments.length ? (
@@ -212,8 +262,13 @@ export function Composer({
         <TextInput
           value={text}
           onChangeText={setText}
-          onFocus={checkClipboard}
-          onBlur={() => setCanPaste(false)}
+          onFocus={() => {
+            focused.current = true;
+            checkClipboard();
+          }}
+          onBlur={() => {
+            focused.current = false;
+          }}
           placeholder={t('chat.placeholder')}
           placeholderTextColor={colors.textMuted}
           accessibilityLabel={t('chat.placeholder')}
