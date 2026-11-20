@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Pressable, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Icon, Screen, SegmentedControl, SourcesLink } from '@/components';
+import { Icon, Screen, SourcesLink } from '@/components';
 import { RecordsSection, useAddReport } from '@/features/RecordsSection';
 import { TodaySection } from '@/features/today/TodaySection';
 import { syncHealthData, useSyncStore } from '@/sources/syncService';
@@ -13,19 +13,17 @@ import { useTheme } from '@/theme';
 
 type Section = 'today' | 'records';
 
-/** "Io" (dal menu laterale): Oggi e Cartella salute. Il Diario ha una tab propria. */
+/** Oggi e Cartella clinica: due voci del menu laterale, stessa schermata. */
 export default function MeScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const params = useLocalSearchParams<{ section?: Section }>();
-  const [section, setSection] = useState<Section>(params.section ?? 'today');
+  const params = useLocalSearchParams<{ section?: string }>();
   const [reloadKey, setReloadKey] = useState(0);
   // Spinner solo per l'aggiornamento chiesto dall'utente; quello automatico è silenzioso.
   const refreshing = useSyncStore((st) => st.syncing && st.manual);
-  // "journal" (vecchi link): il diario ora è una tab; qui si mostra Oggi.
-  const fromParams =
-    params.section === 'records' || params.section === 'today' ? params.section : null;
-  const current = fromParams && fromParams !== section ? fromParams : section;
+  // La sezione arriva dal menu laterale; "journal" e altri vecchi link mostrano Oggi.
+  const current: Section = params.section === 'records' ? 'records' : 'today';
+  const title = t(current === 'records' ? 'tabs.records' : 'tabs.today');
 
   const add = useAddReport((ids) => {
     setReloadKey((k) => k + 1);
@@ -33,23 +31,18 @@ export default function MeScreen() {
       router.push({ pathname: '/me/report/[id]', params: { id: ids[0] as string } });
   });
 
-  const select = (s: Section) => {
-    setSection(s);
-    router.setParams({ section: s });
-  };
-
   return (
     <>
-      <Stack.Screen options={{ headerShown: false, title: t('tabs.me') }} />
+      <Stack.Screen options={{ headerShown: false, title }} />
       <Screen
         menu
-        title={t('tabs.me')}
+        title={title}
         titleAction={
           current === 'records' ? (
             <Pressable
               onPress={() => {
                 haptic.tap();
-                add();
+                void add();
               }}
               accessibilityRole="button"
               accessibilityLabel={t('records.addTitle')}
@@ -77,14 +70,6 @@ export default function MeScreen() {
           ) : undefined
         }
       >
-        <SegmentedControl
-          value={current}
-          onChange={select}
-          segments={[
-            { value: 'today', label: t('tabs.today') },
-            { value: 'records', label: t('tabs.records') },
-          ]}
-        />
         {current === 'today' ? (
           <>
             <TodaySection />

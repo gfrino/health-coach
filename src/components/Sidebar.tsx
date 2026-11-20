@@ -1,4 +1,4 @@
-import { router, usePathname } from 'expo-router';
+import { router, useGlobalSearchParams, usePathname } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Animated, Modal, Pressable, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +12,7 @@ import { useTheme } from '@/theme';
 import { AppText } from './AppText';
 import { Icon, type AppIconName } from './Icon';
 
-/** Menu laterale (in alto a sinistra): Io, Servizi, Opzioni. */
+/** Menu laterale (in alto a sinistra): Oggi, Cartella clinica, Servizi, Opzioni. */
 export const useSidebar = create<{ open: boolean }>(() => ({ open: false }));
 export const openSidebar = () => {
   haptic.tap();
@@ -20,8 +20,15 @@ export const openSidebar = () => {
 };
 const closeSidebar = () => useSidebar.setState({ open: false });
 
-const ITEMS: { route: '/me' | '/integrations' | '/settings'; icon: AppIconName; key: string }[] = [
-  { route: '/me', icon: 'me', key: 'tabsShort.me' },
+/** Oggi e Cartella clinica sono la stessa schermata (/me) con una sezione diversa. */
+const ITEMS: {
+  route: '/me' | '/integrations' | '/settings';
+  section?: 'today' | 'records';
+  icon: AppIconName;
+  key: string;
+}[] = [
+  { route: '/me', section: 'today', icon: 'today', key: 'tabs.today' },
+  { route: '/me', section: 'records', icon: 'records', key: 'tabs.records' },
   { route: '/integrations', icon: 'integrations', key: 'tabsShort.integrations' },
   { route: '/settings', icon: 'settings', key: 'tabsShort.settings' },
 ];
@@ -58,6 +65,13 @@ export function Sidebar() {
   const open = useSidebar((s) => s.open);
   const coachName = useSettingsStore((s) => s.settings.coach.name);
   const pathname = usePathname();
+  const params = useGlobalSearchParams<{ section?: string }>();
+  // Su /me senza sezione (o su un referto) vale quella mostrata: Oggi di default, Cartella per i referti.
+  const shownSection = pathname.startsWith('/me/report')
+    ? 'records'
+    : params.section === 'records'
+      ? 'records'
+      : 'today';
   const panelWidth = Math.min(320, width * 0.8);
   const [x] = useState(() => new Animated.Value(-320));
 
@@ -105,17 +119,20 @@ export function Sidebar() {
             </AppText>
           </View>
           {ITEMS.map((it) => {
-            const active = pathname.startsWith(it.route);
+            const active =
+              pathname.startsWith(it.route) && (!it.section || it.section === shownSection);
             return (
               <Pressable
-                key={it.route}
+                key={`${it.route}-${it.section ?? ''}`}
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
                 onPress={() => {
                   haptic.select();
                   // Prima la navigazione, poi la chiusura: durante la chiusura animata del
                   // Modal iOS ignorerebbe il cambio di schermata.
-                  router.navigate(it.route);
+                  router.navigate(
+                    it.section ? { pathname: it.route, params: { section: it.section } } : it.route,
+                  );
                   closeSidebar();
                 }}
                 style={({ pressed }) => ({
@@ -133,7 +150,7 @@ export function Sidebar() {
                   variant="headline"
                   style={{ color: active ? colors.primary : colors.text }}
                 >
-                  {t(it.key as 'tabsShort.me')}
+                  {t(it.key as 'tabs.today')}
                 </AppText>
               </Pressable>
             );

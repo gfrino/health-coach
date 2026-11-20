@@ -126,7 +126,7 @@ export default function ReportScreen() {
         options={{
           title: report.title,
           headerLargeTitle: false,
-          // Aperto direttamente (es. da una condivisione) senza "Io" sotto: si torna comunque alla Cartella.
+          // Aperto direttamente (es. da una condivisione) senza la Cartella sotto: ci si torna comunque.
           headerLeft: router.canGoBack()
             ? undefined
             : () => (
@@ -135,7 +135,7 @@ export default function ReportScreen() {
                     router.replace({ pathname: '/me', params: { section: 'records' } })
                   }
                   accessibilityRole="button"
-                  accessibilityLabel={t('tabs.me')}
+                  accessibilityLabel={t('tabs.records')}
                   hitSlop={10}
                   style={{
                     flexDirection: 'row',
@@ -145,7 +145,7 @@ export default function ReportScreen() {
                   }}
                 >
                   <Icon name="chevronLeft" color={colors.primary} />
-                  <AppText tone="primary">{t('tabs.me')}</AppText>
+                  <AppText tone="primary">{t('tabs.records')}</AppText>
                 </Pressable>
               ),
         }}
