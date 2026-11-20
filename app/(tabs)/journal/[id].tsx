@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText, Button, DateField, Screen, TextField } from '@/components';
 import { getDb, journalRepository } from '@/db';
+import { writeMoodToHealth } from '@/food/healthWrite';
 import { ENERGY_EMOJI, MOOD_EMOJI, splitList } from '@/features/journal/scale';
 import { localIsoDate } from '@/lib/dates';
 import { useTheme } from '@/theme';
@@ -116,8 +117,11 @@ export default function JournalEntryScreen() {
         symptoms: splitList(symptoms),
         text,
       };
-      if (isNew) await journalRepository.createEntry(db, input);
-      else await journalRepository.updateEntry(db, id, input);
+      if (isNew) {
+        const newId = await journalRepository.createEntry(db, input);
+        // Umore anche in Apple Salute (stato d'animo), in background.
+        if (mood != null) void writeMoodToHealth(newId, mood, input.entryAt);
+      } else await journalRepository.updateEntry(db, id, input);
       router.back();
     } finally {
       setSaving(false);

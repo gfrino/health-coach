@@ -29,6 +29,7 @@ jest.mock('@/store/settingsStore', () => ({
   useSettingsStore: { getState: () => ({ settings: { healthSourceConnectedAt: 1 } }) },
 }));
 jest.mock('../platformHealth', () => ({ platformHealthSource: 'apple_health' }));
+jest.mock('@/profile/body', () => ({ syncProfileBody: jest.fn(async () => false) }));
 jest.mock('../demo/demoData', () => ({ generateDemoData: jest.fn(), SOURCE_DEMO: 'demo' }));
 const mockSyncAppleHealth = jest.fn(async () => ({ upserted: 0, deleted: 0, errors: [] }));
 jest.mock('../appleHealth/sync', () => ({

@@ -59,7 +59,8 @@ Dernière mise à jour : ${LEGAL_UPDATED}
 ${contact}. La loi fédérale suisse sur la protection des données (LPD) s'applique et, pour les utilisateurs dans l'UE/EEE, le RGPD.
 
 ## Quelles données l'app traite (sur le téléphone)
-- **Données de santé** que tu autorises depuis Apple Health ou Health Connect (p. ex. pas, sommeil, fréquence cardiaque, poids, entraînements).
+- **Données de santé** que tu autorises depuis Apple Health ou Health Connect (p. ex. pas, sommeil, fréquence cardiaque, poids, entraînements, symptômes, nutriments, lumière du jour et bruit).
+- **Écriture dans Apple Health**, seulement si tu actives « Enregistrer aussi dans Santé » : l'app y écrit ton journal alimentaire (calories, nutriments, eau), le poids et la taille que tu saisis à la main et l'humeur du journal. Apple Health reste sur ton téléphone et ne se synchronise avec iCloud que selon tes réglages Apple.
 - **Journal alimentaire** : les aliments que toi ou le coach enregistrez, avec calories et nutriments estimés. Sur iPhone, si tu l'actives, l'app les enregistre aussi dans Apple Health, qui reste sur ton téléphone.
 - **Profil** : nom, âge, taille, objectifs, affections, médicaments et allergies que tu saisis.
 - **Journal** : humeur, énergie, symptômes et notes (écrits par toi ou notés par le coach à ta demande).

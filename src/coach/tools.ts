@@ -349,13 +349,17 @@ class ToolInputError extends Error {}
  */
 let onFoodLogged: ((entryId: string) => Promise<void>) | null = null;
 let onFoodDeleted: ((entry: FoodEntry) => Promise<void>) | null = null;
+let onMoodLogged: ((journalId: string, mood: number, at: number) => Promise<void>) | null = null;
 
 export function setFoodHealthHooks(hooks: {
   logged: (entryId: string) => Promise<void>;
   deleted: (entry: FoodEntry) => Promise<void>;
+  /** Umore di una nota del Journal creata dal coach → stato d'animo in Apple Salute. */
+  mood?: (journalId: string, mood: number, at: number) => Promise<void>;
 }) {
   onFoodLogged = hooks.logged;
   onFoodDeleted = hooks.deleted;
+  onMoodLogged = hooks.mood ?? null;
 }
 
 /** "YYYY-MM-DD HH:MM" (o con la T) in ora locale → millisecondi; null se non valido o nel futuro. */
@@ -478,6 +482,7 @@ export async function executeTool(db: Db, call: ToolCall): Promise<ToolOutcome> 
         if (input.mood == null && input.energy == null && !input.text && !input.symptoms?.length)
           throw new ToolInputError('nothing to save: give mood, energy, symptoms or text');
         const id = await journalRepository.createEntry(db, input, 'coach');
+        if (input.mood != null) void onMoodLogged?.(id, input.mood, input.entryAt ?? Date.now());
         return ok({ saved: true, entry_id: id });
       }
       case 'create_program': {

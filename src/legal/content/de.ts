@@ -59,7 +59,8 @@ Letzte Aktualisierung: ${LEGAL_UPDATED}
 ${contact}. Es gilt das Schweizer Datenschutzgesetz (DSG) und für Nutzerinnen und Nutzer in der EU/im EWR die DSGVO.
 
 ## Welche Daten die App verarbeitet (auf dem Telefon)
-- **Gesundheitsdaten**, die du aus Apple Health oder Health Connect freigibst (z. B. Schritte, Schlaf, Herzfrequenz, Gewicht, Trainings).
+- **Gesundheitsdaten**, die du aus Apple Health oder Health Connect freigibst (z. B. Schritte, Schlaf, Herzfrequenz, Gewicht, Trainings, Symptome, Nährstoffe, Tageslicht und Lärm).
+- **Schreiben in Apple Health**, nur wenn du „Auch in Apple Health speichern“ aktivierst: Die App schreibt dein Ernährungstagebuch (Kalorien, Nährstoffe, Wasser), das von Hand eingegebene Gewicht und die Größe sowie die Stimmung aus dem Tagebuch. Apple Health bleibt auf deinem Telefon und wird nur gemäß deinen Apple-Einstellungen mit iCloud synchronisiert.
 - **Ernährungstagebuch**: die Lebensmittel, die du oder der Coach einträgt, mit geschätzten Kalorien und Nährstoffen. Auf dem iPhone speichert die App sie, wenn du es einschaltest, auch in Apple Health, das auf deinem Telefon bleibt.
 - **Profil**: Name, Alter, Grösse, Ziele, Erkrankungen, Medikamente und Allergien, die du eingibst.
 - **Tagebuch**: Stimmung, Energie, Symptome und Notizen (von dir geschrieben oder auf deinen Wunsch vom Coach notiert).

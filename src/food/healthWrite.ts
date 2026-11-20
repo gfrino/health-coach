@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { setFoodHealthHooks } from '@/coach/tools';
 import { foodRepository, getDb } from '@/db';
 import type { FoodEntry } from '@/db/repositories/foodRepository';
+import { HK_STATE_OF_MIND } from '@/sources/hkExtra';
 import { FOOD_ENTRY_METADATA_KEY, FOOD_WRITE_TYPES } from '@/sources/normalize/healthKit';
 import { useSettingsStore } from '@/store/settingsStore';
 
@@ -31,6 +32,23 @@ const FIELDS: {
   { type: 'HKQuantityTypeIdentifierDietarySodium', key: 'sodium', unit: 'mg' },
 ];
 
+/** Valori in più del diario (Altri valori) che Apple Salute conosce: id del valore → tipo. */
+const EXTRA_FIELDS: { type: FoodType; id: string; unit: string }[] = [
+  { type: 'HKQuantityTypeIdentifierDietaryCaffeine', id: 'caffeine', unit: 'mg' },
+  { type: 'HKQuantityTypeIdentifierDietaryCholesterol', id: 'cholesterol', unit: 'mg' },
+  { type: 'HKQuantityTypeIdentifierDietaryPotassium', id: 'potassium', unit: 'mg' },
+  { type: 'HKQuantityTypeIdentifierDietaryMagnesium', id: 'magnesium', unit: 'mg' },
+  { type: 'HKQuantityTypeIdentifierDietaryCalcium', id: 'calcium', unit: 'mg' },
+  { type: 'HKQuantityTypeIdentifierDietaryIron', id: 'iron', unit: 'mg' },
+  { type: 'HKQuantityTypeIdentifierDietaryVitaminC', id: 'vitaminC', unit: 'mg' },
+  // Nel diario in µg, in HealthKit "mcg".
+  { type: 'HKQuantityTypeIdentifierDietaryVitaminD', id: 'vitaminD', unit: 'mcg' },
+];
+
+/** Tutto ciò che l'app può scrivere: i tipi quantità più lo stato d'animo (dal Journal). */
+const SHARE_TYPES = [...FOOD_WRITE_TYPES, HK_STATE_OF_MIND] as const;
+type ShareType = (typeof SHARE_TYPES)[number];
+
 export function canWriteFoodToHealth(): boolean {
   const s = useSettingsStore.getState().settings;
   return Platform.OS === 'ios' && s.food.writeToHealth && s.healthSourceConnectedAt !== null;
@@ -49,29 +67,34 @@ const SHARING_AUTHORIZED = 2; // AuthorizationStatus.sharingAuthorized
  * basta spegnere e riaccendere "Salva anche in Apple Salute" nella scheda Cibo.
  * Ritorna i tipi che l'utente ha permesso di scrivere.
  */
-async function writableTypes(): Promise<Set<FoodType>> {
+async function writableTypes(): Promise<Set<ShareType>> {
   const hk = healthKit();
   const store = useSettingsStore.getState();
   const food = store.settings.food;
   // Si richiede anche quando l'app scrive tipi nuovi (prima versione: 4 tipi), una volta sola.
   const asked = food.healthAskedAt ? (food.healthAskedTypes ?? 4) : 0;
-  if (asked < FOOD_WRITE_TYPES.length) {
+  if (asked < SHARE_TYPES.length) {
     await store.update({
-      food: { ...food, healthAskedAt: Date.now(), healthAskedTypes: FOOD_WRITE_TYPES.length },
+      food: { ...food, healthAskedAt: Date.now(), healthAskedTypes: SHARE_TYPES.length },
     });
-    await hk.requestAuthorization({ toShare: FOOD_WRITE_TYPES });
+    await hk.requestAuthorization({ toShare: SHARE_TYPES as never });
   }
   return new Set(
-    FOOD_WRITE_TYPES.filter((t) => Number(hk.authorizationStatusFor(t)) === SHARING_AUTHORIZED),
+    SHARE_TYPES.filter((t) => {
+      try {
+        return Number(hk.authorizationStatusFor(t as never)) === SHARING_AUTHORIZED;
+      } catch {
+        return false; // tipo che questa versione di iOS non conosce (stato d'animo prima di iOS 18)
+      }
+    }),
   );
 }
 
 async function removeSamples(ids: Record<string, string> | null) {
   if (!ids) return;
   const { deleteObjects } = healthKit();
-  for (const f of FIELDS) {
-    const uuid = ids[f.type];
-    if (uuid) await deleteObjects(f.type, { uuid }).catch(() => 0);
+  for (const [type, uuid] of Object.entries(ids)) {
+    if (uuid) await deleteObjects(type as FoodType, { uuid }).catch(() => 0);
   }
 }
 
@@ -100,6 +123,15 @@ export async function syncFoodEntryToHealth(entryId: string): Promise<void> {
       } as never);
       if (sample?.uuid) saved[f.type] = sample.uuid;
     }
+    for (const f of EXTRA_FIELDS) {
+      const value = entry.extras?.[f.id];
+      if (value == null || value <= 0 || !allowed.has(f.type)) continue;
+      const sample = await saveQuantitySample(f.type, f.unit as never, value, at, at, {
+        HKFoodType: entry.name,
+        [FOOD_ENTRY_METADATA_KEY]: entry.id,
+      } as never);
+      if (sample?.uuid) saved[f.type] = sample.uuid;
+    }
     await foodRepository.setHealthSamples(db, entry.id, saved);
   } catch (e) {
     console.warn(`[cibo] Apple Salute non aggiornata: ${String(e)}`);
@@ -107,6 +139,63 @@ export async function syncFoodEntryToHealth(entryId: string): Promise<void> {
 }
 
 const WATER_TYPE = 'HKQuantityTypeIdentifierDietaryWater';
+
+/**
+ * Peso o altezza scritti a mano nel profilo: anche in Apple Salute. Nei metadati l'id della misura
+ * (già nell'app), così in lettura non si conta due volte.
+ */
+export async function writeBodyToHealth(
+  kind: 'weight' | 'height',
+  sourceId: string,
+  value: number,
+  at: number,
+): Promise<void> {
+  if (!canWriteFoodToHealth()) return;
+  const type =
+    kind === 'weight' ? 'HKQuantityTypeIdentifierBodyMass' : 'HKQuantityTypeIdentifierHeight';
+  try {
+    const allowed = await writableTypes();
+    if (!allowed.has(type)) return;
+    const when = new Date(at);
+    await healthKit().saveQuantitySample(
+      type,
+      (kind === 'weight' ? 'kg' : 'cm') as never,
+      value,
+      when,
+      when,
+      {
+        [FOOD_ENTRY_METADATA_KEY]: sourceId,
+      } as never,
+    );
+  } catch (e) {
+    console.warn(`[profilo] Apple Salute non aggiornata: ${String(e)}`);
+  }
+}
+
+/** Umore del Journal (1–5) → valenza di Apple (-1 … +1). */
+export const moodToValence = (mood: number) => Math.max(-1, Math.min(1, (mood - 3) / 2));
+
+/**
+ * Umore di una nuova nota del Journal → "Stato d'animo" di Apple Salute (iOS 18), come umore del
+ * giorno. Nei metadati l'id della nota: in lettura si salta.
+ */
+export async function writeMoodToHealth(
+  journalId: string,
+  mood: number,
+  at: number,
+): Promise<void> {
+  if (!canWriteFoodToHealth()) return;
+  try {
+    const allowed = await writableTypes();
+    if (!allowed.has(HK_STATE_OF_MIND)) return;
+    // StateOfMindKind.dailyMood = 2
+    await healthKit().saveStateOfMindSample(new Date(at), 2 as never, moodToValence(mood), [], [], {
+      [FOOD_ENTRY_METADATA_KEY]: journalId,
+    } as never);
+  } catch (e) {
+    console.warn(`[journal] Apple Salute non aggiornata: ${String(e)}`);
+  }
+}
 
 /**
  * Acqua aggiunta con la goccia: va anche in Apple Salute (se "Salva anche in Apple Salute" è
@@ -154,4 +243,8 @@ export async function removeFoodEntryFromHealth(entry: FoodEntry): Promise<void>
 }
 
 // Le voci registrate dal coach in chat vanno in Apple Salute come quelle scritte a mano.
-setFoodHealthHooks({ logged: syncFoodEntryToHealth, deleted: removeFoodEntryFromHealth });
+setFoodHealthHooks({
+  logged: syncFoodEntryToHealth,
+  deleted: removeFoodEntryFromHealth,
+  mood: writeMoodToHealth,
+});

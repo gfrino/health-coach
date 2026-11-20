@@ -1,5 +1,9 @@
 import { Platform } from 'react-native';
 
+import { useSettingsStore } from '@/store/settingsStore';
+
+import { permissionIdentifiers } from './healthDataTypes';
+
 import type { ConnectResult, HealthAvailability, ProfilePrefill } from './types';
 
 /**
@@ -35,7 +39,32 @@ export async function getHealthAvailability(): Promise<HealthAvailability> {
   }
 }
 
-export const requestHealthReadAccess = () => access().requestReadAccess();
+export async function requestHealthReadAccess(): Promise<ConnectResult> {
+  const res = await access().requestReadAccess();
+  if (Platform.OS === 'ios') {
+    await useSettingsStore
+      .getState()
+      .update({ healthReadAsked: permissionIdentifiers('ios').length });
+  }
+  return res;
+}
+
+/**
+ * Apple Salute già collegata e l'app ora legge tipi nuovi: si chiede una volta il permesso per
+ * quelli (iOS mostra solo le voci nuove). Restituisce true se la richiesta è stata fatta.
+ */
+export async function ensureNewHealthReadAccess(): Promise<boolean> {
+  if (Platform.OS !== 'ios') return false;
+  const s = useSettingsStore.getState().settings;
+  if (s.healthSourceConnectedAt === null) return false;
+  if ((s.healthReadAsked ?? 0) >= permissionIdentifiers('ios').length) return false;
+  try {
+    await requestHealthReadAccess();
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function readHealthProfilePrefill(): Promise<ProfilePrefill> {
   try {

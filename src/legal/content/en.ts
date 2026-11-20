@@ -59,7 +59,8 @@ Last updated: ${LEGAL_UPDATED}
 ${contact}. The Swiss Federal Act on Data Protection (FADP) applies and, for users in the EU/EEA, the GDPR.
 
 ## What data the app processes (on your phone)
-- **Health data** you authorise from Apple Health or Health Connect (e.g. steps, sleep, heart rate, weight, workouts).
+- **Health data** you authorise from Apple Health or Health Connect (e.g. steps, sleep, heart rate, weight, workouts, symptoms, nutrients, daylight and noise).
+- **Writing to Apple Health**, only if you turn on “Also save to Apple Health”: the app writes your food diary (calories, nutrients, water), the weight and height you enter by hand and your journal mood. Apple Health stays on your phone and syncs with iCloud only according to your Apple settings.
 - **Food diary**: the foods you or the coach log, with estimated calories and nutrients. On iPhone, if you turn it on, the app also saves them to Apple Health, which stays on your phone.
 - **Profile**: name, age, height, goals, conditions, medications and allergies you enter.
 - **Journal**: mood, energy, symptoms and notes (written by you or noted by the coach at your request).

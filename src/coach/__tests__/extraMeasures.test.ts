@@ -3,6 +3,7 @@ import * as repo from '@/db/repositories/healthDataRepository';
 import { createTestDb } from '@/test/nodeSqliteDb';
 
 import { loadCycle, loadExtraMeasures } from '../extraMeasures';
+import { extraMeasuresSection } from '../extraMeasuresText';
 
 let mockSeq = 0;
 jest.mock('@/db/ids', () => ({ newId: () => `id-${++mockSeq}` }));
@@ -44,5 +45,25 @@ describe('altre misure', () => {
     });
     expect(extras[1]).toMatchObject({ latest: 2000, daily: true, avg7: 1750 });
     expect(await loadCycle(db, now)).toEqual({ lastStart: '2026-09-30', avgLength: 28 });
+  });
+
+  it('include il resto di Apple Salute con il nome per il coach', async () => {
+    const db = createTestDb();
+    await migrate(db);
+    await repo.upsertMetrics(db, [
+      m('exerciseTime', 28, 20, 'min'),
+      m('exerciseTime', 28, 10, 'min'),
+      m('exerciseTime', 29, 40, 'min'),
+      m('symptomHeadache', 29, 2, 'level'),
+      m('runningPower', 29, 250, 'W'),
+    ] as never);
+    const extras = await loadExtraMeasures(db, new Date(2026, 8, 30, 12));
+    const byType = Object.fromEntries(extras.map((e) => [e.type, e]));
+    expect(byType.exerciseTime).toMatchObject({ daily: true, latest: 40, avg7: 35 });
+    expect(byType.symptomHeadache).toMatchObject({ daily: false, latest: 2 });
+    expect(byType.runningPower).toMatchObject({ unit: 'W', latest: 250 });
+    const text = extraMeasuresSection(extras, null)!;
+    expect(text).toContain('Exercise minutes (Apple ring): 35 min/day');
+    expect(text).toContain('Symptom: headache (0 none – 3 severe): 2 level');
   });
 });

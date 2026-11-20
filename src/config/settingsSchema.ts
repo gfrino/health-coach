@@ -113,6 +113,11 @@ export const settingsShape = {
   proactivity: proactivitySchema,
   /** Sorgente di salute di piattaforma collegata (Apple Health su iOS, Health Connect su Android). */
   healthSourceConnectedAt: z.number().int().nullable(),
+  /**
+   * Quanti tipi di lettura sono stati chiesti ad Apple Salute: quando l'app ne legge di nuovi, iOS
+   * mostra una volta la schermata dei permessi con le voci nuove.
+   */
+  healthReadAsked: z.number().int().min(0),
   food: foodSettingsSchema,
 } as const;
 
@@ -162,6 +167,7 @@ export function getDefaultSettings(region?: string | null): AppSettings {
       reports: { daily: true, weekly: true, monthly: false },
     },
     healthSourceConnectedAt: null,
+    healthReadAsked: 0,
     food: { calorieTarget: null, writeToHealth: true },
   };
 }

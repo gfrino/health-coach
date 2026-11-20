@@ -1,3 +1,4 @@
+import { EXTRA_LABELS } from '@/sources/hkExtra';
 import type { MetricType } from '@/sources/model';
 
 export const EXTRA_MEASURES = [
@@ -22,7 +23,8 @@ export const EXTRA_MEASURES = [
 export type ExtraMeasureType = (typeof EXTRA_MEASURES)[number];
 
 export interface ExtraMeasure {
-  type: ExtraMeasureType;
+  /** Una delle misure qui sopra o una del resto di Apple Salute (sources/hkExtra). */
+  type: ExtraMeasureType | MetricType;
   unit: string;
   /** Somma giornaliera (passi, acqua…) invece di un valore misurato (VO2 max, grasso…). */
   daily: boolean;
@@ -58,6 +60,9 @@ const LABELS: Record<ExtraMeasureType, string> = {
   mindfulness: 'Mindfulness',
 };
 
+const label = (type: string) =>
+  (LABELS as Record<string, string>)[type] ?? EXTRA_LABELS[type] ?? type;
+
 /** Sezione del prompt: una riga per misura presente (anche nel prompt compatto del telefono). */
 export function extraMeasuresSection(
   extras: ExtraMeasure[] | undefined,
@@ -66,10 +71,10 @@ export function extraMeasuresSection(
   const lines = (extras ?? []).map((m) => {
     const u = m.unit === 'count' ? '' : ` ${m.unit}`;
     if (m.daily) {
-      return `- ${LABELS[m.type]}: ${m.avg7 ?? m.latest}${u}/day (7-day avg), 30-day avg ${m.avg30}${u}/day`;
+      return `- ${label(m.type)}: ${m.avg7 ?? m.latest}${u}/day (7-day avg), 30-day avg ${m.avg30}${u}/day`;
     }
     const avg30 = m.avg30 != null && m.avg30 !== m.latest ? `, 30-day avg ${m.avg30}${u}` : '';
-    return `- ${LABELS[m.type]}: ${m.latest}${u} (${m.latestDay})${avg30}`;
+    return `- ${label(m.type)}: ${m.latest}${u} (${m.latestDay})${avg30}`;
   });
   if (cycle) {
     lines.push(

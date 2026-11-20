@@ -8,6 +8,7 @@ import {
   type NormalizedWorkout,
   type StageInterval,
 } from '../model';
+import { categoryValue, HK_EXTRA_QUANTITIES, type HKExtraCategory } from '../hkExtra';
 
 /**
  * Normalizzazione HealthKit → modello comune. Funzioni pure: ricevono oggetti "a forma di"
@@ -18,16 +19,18 @@ export const SOURCE_APPLE_HEALTH = 'apple_health';
 
 export interface HKQuantityMapping {
   type: MetricType;
-  /** Unità richiesta a HealthKit (stringa HKUnit). */
-  unit: string;
+  /** Unità richiesta a HealthKit (stringa HKUnit); assente = unità preferita dell'utente. */
+  unit?: string;
   /** Moltiplicatore verso l'unità canonica (es. HealthKit restituisce le percentuali come 0–1). */
   scale?: number;
   /** Cumulativa: il sync usa le statistiche giornaliere deduplicate tra dispositivi. */
   cumulative?: boolean;
+  /** Versione di iOS in cui il tipo esiste. */
+  minIos?: number;
 }
 
 /** Tipi quantità HealthKit → metrica normalizzata. */
-export const HK_QUANTITY: Record<string, HKQuantityMapping> = {
+const BASE_HK_QUANTITY: Record<string, HKQuantityMapping> = {
   HKQuantityTypeIdentifierStepCount: { type: 'steps', unit: 'count', cumulative: true },
   HKQuantityTypeIdentifierDistanceWalkingRunning: { type: 'distance', unit: 'm', cumulative: true },
   HKQuantityTypeIdentifierDistanceCycling: { type: 'distance', unit: 'm', cumulative: true },
@@ -69,6 +72,17 @@ export const HK_QUANTITY: Record<string, HKQuantityMapping> = {
   HKQuantityTypeIdentifierDietaryCaffeine: { type: 'caffeine', unit: 'mg', cumulative: true },
 };
 
+/** Tutti i tipi quantità letti: quelli storici più il resto di Apple Salute (hkExtra). */
+export const HK_QUANTITY: Record<string, HKQuantityMapping> = {
+  ...BASE_HK_QUANTITY,
+  ...Object.fromEntries(
+    HK_EXTRA_QUANTITIES.map((x) => [
+      x.hk,
+      { type: x.type, unit: x.unit, scale: x.scale, cumulative: x.cumulative, minIos: x.minIos },
+    ]),
+  ),
+};
+
 export const HK_SLEEP = 'HKCategoryTypeIdentifierSleepAnalysis';
 export const HK_MINDFUL = 'HKCategoryTypeIdentifierMindfulSession';
 export const HK_MENSTRUAL_FLOW = 'HKCategoryTypeIdentifierMenstrualFlow';
@@ -104,6 +118,18 @@ export const FOOD_WRITE_TYPES = [
   'HKQuantityTypeIdentifierDietarySodium',
   // Acqua aggiunta con la goccia del diario.
   'HKQuantityTypeIdentifierDietaryWater',
+  // Valori tracciati nel diario (Altri valori), quelli che Apple Salute conosce.
+  'HKQuantityTypeIdentifierDietaryCaffeine',
+  'HKQuantityTypeIdentifierDietaryCholesterol',
+  'HKQuantityTypeIdentifierDietaryPotassium',
+  'HKQuantityTypeIdentifierDietaryMagnesium',
+  'HKQuantityTypeIdentifierDietaryCalcium',
+  'HKQuantityTypeIdentifierDietaryIron',
+  'HKQuantityTypeIdentifierDietaryVitaminC',
+  'HKQuantityTypeIdentifierDietaryVitaminD',
+  // Peso e altezza scritti a mano nel profilo.
+  'HKQuantityTypeIdentifierBodyMass',
+  'HKQuantityTypeIdentifierHeight',
 ] as const;
 
 const origin = (s: HKSampleLike) => {
@@ -113,14 +139,15 @@ const origin = (s: HKSampleLike) => {
 
 export function normalizeQuantitySample(
   identifier: string,
-  sample: HKSampleLike & { quantity: number },
+  sample: HKSampleLike & { quantity: number; unit?: string },
 ): NormalizedMetric | null {
   const m = HK_QUANTITY[identifier];
   if (!m || !Number.isFinite(sample.quantity) || isOwnFoodSample(sample)) return null;
   return {
     type: m.type,
     value: round(sample.quantity * (m.scale ?? 1)),
-    unit: unitOf(m.type),
+    // Senza unità chiesta resta quella preferita, che HealthKit indica nel campione.
+    unit: m.unit ? unitOf(m.type) : (sample.unit ?? unitOf(m.type)),
     startAt: sample.startDate.getTime(),
     endAt: sample.endDate.getTime(),
     source: SOURCE_APPLE_HEALTH,
@@ -204,6 +231,43 @@ export function normalizeMindfulSample(sample: HKSampleLike): NormalizedMetric {
     endAt: sample.endDate.getTime(),
     source: SOURCE_APPLE_HEALTH,
     sourceId: sample.uuid,
+  };
+}
+
+/** Tipo categoria del resto di Apple Salute (eventi, sintomi, test…) → una riga per campione. */
+export function normalizeExtraCategorySample(
+  def: Pick<HKExtraCategory, 'type' | 'kind'>,
+  sample: HKSampleLike & { value: number },
+): NormalizedMetric | null {
+  if (isOwnFoodSample(sample)) return null;
+  const value = categoryValue(def.kind, sample.value);
+  if (value === null) return null;
+  return {
+    type: def.type,
+    value,
+    unit: unitOf(def.type),
+    startAt: sample.startDate.getTime(),
+    endAt: sample.endDate.getTime(),
+    source: SOURCE_APPLE_HEALTH,
+    sourceId: sample.uuid,
+    metadata: origin(sample),
+  };
+}
+
+/** Stato d'animo di Apple (iOS 18): valenza da -1 (molto spiacevole) a +1 (molto piacevole). */
+export function normalizeStateOfMind(
+  sample: HKSampleLike & { valence: number },
+): NormalizedMetric | null {
+  if (isOwnFoodSample(sample) || !Number.isFinite(sample.valence)) return null;
+  return {
+    type: 'stateOfMind',
+    value: round(sample.valence),
+    unit: unitOf('stateOfMind'),
+    startAt: sample.startDate.getTime(),
+    endAt: sample.endDate.getTime(),
+    source: SOURCE_APPLE_HEALTH,
+    sourceId: sample.uuid,
+    metadata: origin(sample),
   };
 }
 

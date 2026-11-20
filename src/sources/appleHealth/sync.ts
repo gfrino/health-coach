@@ -1,15 +1,25 @@
 import {
   queryCategorySamplesWithAnchor,
   queryQuantitySamplesWithAnchor,
+  queryStateOfMindSamplesWithAnchor,
   queryStatisticsCollectionForQuantity,
   queryWorkoutSamplesWithAnchor,
   type CategoryTypeIdentifier,
   type QuantityTypeIdentifier,
 } from '@kingstinct/react-native-healthkit';
 
+import { Platform } from 'react-native';
+
 import { healthDataRepository, type Db } from '@/db';
 import { DAY_MS } from '@/lib/dates';
 
+import {
+  availableOn,
+  HK_EXTRA_CATEGORIES,
+  HK_EXTRA_QUANTITIES,
+  HK_STATE_OF_MIND,
+  STATE_OF_MIND_MIN_IOS,
+} from '../hkExtra';
 import type { NormalizedMetric } from '../model';
 import {
   FOOD_ENTRY_METADATA_KEY,
@@ -19,10 +29,12 @@ import {
   HK_QUANTITY,
   HK_SLEEP,
   normalizeDailyStatistic,
+  normalizeExtraCategorySample,
   normalizeMenstrualSample,
   normalizeMindfulSample,
   normalizeQuantitySample,
   normalizeSleepSample,
+  normalizeStateOfMind,
   normalizeWorkout,
   SOURCE_APPLE_HEALTH as SRC,
 } from '../normalize/healthKit';
@@ -30,6 +42,26 @@ import { buildSleepSessions } from '../sleep';
 import type { SyncProgress, SyncReport } from '../syncTypes';
 
 const ownFood = (id: string) => (FOOD_WRITE_TYPES as readonly string[]).includes(id);
+
+/** Versione principale di iOS (i tipi più nuovi si saltano sulle versioni che non li hanno). */
+const IOS_MAJOR = Platform.OS === 'ios' ? parseInt(String(Platform.Version), 10) || 0 : 0;
+
+/** Tipi quantità esistenti su questo iPhone. */
+const quantityIdsHere = () =>
+  (Object.keys(HK_QUANTITY) as QuantityTypeIdentifier[]).filter((id) =>
+    availableOn(HK_QUANTITY[id]?.minIos, IOS_MAJOR),
+  );
+
+const HK_EXTRA_IDS = new Set(HK_EXTRA_QUANTITIES.map((x) => x.hk));
+const TODAY_EXTRA = new Set([
+  'HKQuantityTypeIdentifierAppleExerciseTime',
+  'HKQuantityTypeIdentifierAppleStandTime',
+  'HKQuantityTypeIdentifierTimeInDaylight',
+]);
+
+/** Tipi categoria letti oltre a sonno, mindfulness e ciclo: eventi, sintomi, test… */
+const extraCategoriesHere = () =>
+  HK_EXTRA_CATEGORIES.filter((x) => availableOn(x.minIos, IOS_MAJOR));
 
 /** Storico letto alla prima sincronizzazione. */
 const INITIAL_DAYS = 365;
@@ -159,8 +191,9 @@ export async function syncAppleHealth(
 ): Promise<SyncReport> {
   const now = Date.now();
   const report: SyncReport = { upserted: 0, deleted: 0, errors: [] };
-  const quantityIds = Object.keys(HK_QUANTITY) as QuantityTypeIdentifier[];
-  const steps = quantityIds.length + 4;
+  const quantityIds = quantityIdsHere();
+  const extraCategories = extraCategoriesHere();
+  const steps = quantityIds.length + extraCategories.length + 5;
   let done = 0;
   const tick = (label: string) => onProgress?.({ done: ++done, total: steps, label });
 
@@ -312,6 +345,63 @@ export async function syncAppleHealth(
     tick(id === HK_MINDFUL ? 'mindfulness' : 'cycle');
   }
 
+  // 3b) Tutti gli altri tipi categoria (eventi del cuore, sintomi, test, ore in piedi…)
+  for (const def of extraCategories) {
+    if (signal?.aborted) break;
+    await guard(def.hk, async () => {
+      const state = await healthDataRepository.getSyncState(db, SRC, def.hk);
+      const res = await anchored(async (anchor) => {
+        const r = await hk(
+          queryCategorySamplesWithAnchor(def.hk as CategoryTypeIdentifier, {
+            limit: PAGE,
+            anchor,
+            filter: anchor
+              ? undefined
+              : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
+          }),
+          def.hk,
+        );
+        return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
+      }, state?.anchor ?? undefined);
+      const rows = res.items
+        .map((x) => normalizeExtraCategorySample(def, { ...x, value: Number(x.value) }))
+        .filter((m): m is NormalizedMetric => m !== null);
+      report.upserted += await healthDataRepository.upsertMetrics(db, rows);
+      report.deleted += await healthDataRepository.deleteBySourceIds(db, SRC, res.deleted);
+      await healthDataRepository.setSyncState(db, SRC, def.hk, { anchor: res.anchor ?? null });
+    });
+    tick(def.type);
+  }
+
+  // 3c) Stato d'animo (iOS 18): API propria.
+  if (availableOn(STATE_OF_MIND_MIN_IOS, IOS_MAJOR)) {
+    await guard(HK_STATE_OF_MIND, async () => {
+      const state = await healthDataRepository.getSyncState(db, SRC, HK_STATE_OF_MIND);
+      const res = await anchored(async (anchor) => {
+        const r = await hk(
+          queryStateOfMindSamplesWithAnchor({
+            limit: PAGE,
+            anchor,
+            filter: anchor
+              ? undefined
+              : { date: { startDate: new Date(now - INITIAL_DAYS * DAY_MS) } },
+          }),
+          HK_STATE_OF_MIND,
+        );
+        return { items: r.samples, deleted: r.deletedSamples, newAnchor: r.newAnchor };
+      }, state?.anchor ?? undefined);
+      const rows = res.items
+        .map((x) => normalizeStateOfMind(x))
+        .filter((m): m is NormalizedMetric => m !== null);
+      report.upserted += await healthDataRepository.upsertMetrics(db, rows);
+      report.deleted += await healthDataRepository.deleteBySourceIds(db, SRC, res.deleted);
+      await healthDataRepository.setSyncState(db, SRC, HK_STATE_OF_MIND, {
+        anchor: res.anchor ?? null,
+      });
+    });
+  }
+  tick('stateOfMind');
+
   // 4) Allenamenti
   await guard('workouts', async () => {
     const state = await healthDataRepository.getSyncState(db, SRC, 'workouts');
@@ -346,8 +436,10 @@ export async function syncAppleHealth(
 export async function refreshTodayAppleHealth(db: Db): Promise<number> {
   const now = Date.now();
   const from = startOfDay(now - DAY_MS);
-  const ids = (Object.keys(HK_QUANTITY) as QuantityTypeIdentifier[]).filter(
-    (id) => HK_QUANTITY[id]?.cumulative,
+  // Solo i totali che cambiano durante il giorno (non i ~40 nutrienti delle altre app): prima di
+  // ogni risposta del coach deve restare veloce. Gli altri arrivano con la sincronizzazione.
+  const ids = quantityIdsHere().filter(
+    (id) => HK_QUANTITY[id]?.cumulative && (!HK_EXTRA_IDS.has(id) || TODAY_EXTRA.has(id)),
   );
   const results = await Promise.all(
     ids.map(async (id) => {

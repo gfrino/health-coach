@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText, Card, ChipGroup, DateField, TextField } from '@/components';
 import { getDb, profileRepository } from '@/db';
+import { writeBodyToHealth } from '@/food/healthWrite';
+import { latestBody, recordManualBody, type LatestBody } from '@/profile/body';
 import type { Profile } from '@/db/repositories/profileRepository';
 import { GOALS } from '@/goals/goals';
 import { readHealthProfilePrefill } from '@/sources/platformHealth';
@@ -22,7 +24,7 @@ function parseNumber(v: string): number | null {
  * Apple Salute / Health Connect e salvataggio. Usato nell'onboarding e in Opzioni → Il mio profilo.
  */
 export function useProfileForm() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { spacing } = useTheme();
   const units = useSettingsStore((s) => s.settings.units);
   const healthConnected = useSettingsStore((s) => s.settings.healthSourceConnectedAt !== null);
@@ -33,12 +35,26 @@ export function useProfileForm() {
   const [weight, setWeight] = useState('');
   const [targetWeight, setTargetWeight] = useState('');
   const [prefilled, setPrefilled] = useState(false);
+  // Ultima pesata (Apple Salute, Health Connect o a mano): il campo parte da lì e lo dice.
+  const [lastWeight, setLastWeight] = useState<LatestBody | null>(null);
+  const [loaded, setLoaded] = useState<{ weightKg: number | null; heightCm: number | null }>({
+    weightKg: null,
+    heightCm: null,
+  });
 
   useEffect(() => {
     let active = true;
     (async () => {
       const db = await getDb();
       let p = await profileRepository.getProfile(db);
+      const [w, h] = await Promise.all([latestBody(db, 'weight'), latestBody(db, 'height')]);
+      // Il profilo segue l'ultima misura, anche se la sincronizzazione non l'ha ancora copiata.
+      if (w) p = { ...p, weightKg: Math.round(w.value * 10) / 10 };
+      if (h) p = { ...p, heightCm: Math.round(h.value) };
+      if (active) {
+        setLastWeight(w);
+        setLoaded({ weightKg: p.weightKg, heightCm: p.heightCm });
+      }
       // Precompila dai dati della sorgente solo i campi vuoti.
       if (healthConnected) {
         const pre = await readHealthProfilePrefill();
@@ -92,10 +108,24 @@ export function useProfileForm() {
       return n === null ? null : Math.round((lb ? n / LB_PER_KG : n) * 10) / 10;
     };
     const target = weightGoal ? kg(targetWeight) : null;
+    const weightKg = kg(weight);
+    const heightCm = parseNumber(height);
+    // Peso o altezza cambiati a mano: diventano una misura di adesso (e vanno in Apple Salute).
+    const now = Date.now();
+    // Tolleranza: in libbre l'andata e ritorno kg → lb → kg può spostare di 0,1.
+    if (weightKg && (loaded.weightKg === null || Math.abs(weightKg - loaded.weightKg) > 0.15)) {
+      const id = await recordManualBody(db, 'weight', weightKg, now);
+      void writeBodyToHealth('weight', id, weightKg, now);
+    }
+    if (heightCm && Math.round(heightCm) !== loaded.heightCm) {
+      const id = await recordManualBody(db, 'height', heightCm, now);
+      void writeBodyToHealth('height', id, heightCm, now);
+    }
+    setLoaded({ weightKg, heightCm });
     await profileRepository.saveProfile(db, {
       ...profile,
-      heightCm: parseNumber(height),
-      weightKg: kg(weight),
+      heightCm,
+      weightKg,
       targetWeightKg: target,
       targetDate: target ? profile.targetDate : null,
     });
@@ -139,6 +169,24 @@ export function useProfileForm() {
             onChangeText={setWeight}
             keyboardType="decimal-pad"
             placeholder={lb ? '150' : '70'}
+            hint={
+              lastWeight
+                ? t('profileSetup.weightLatest', {
+                    date: new Date(lastWeight.at).toLocaleDateString(i18n.language, {
+                      day: 'numeric',
+                      month: 'short',
+                    }),
+                    source: t(
+                      `profileSetup.weightSource.${
+                        lastWeight.source === 'apple_health' ||
+                        lastWeight.source === 'health_connect'
+                          ? lastWeight.source
+                          : 'manual'
+                      }` as 'profileSetup.weightSource.manual',
+                    ),
+                  })
+                : undefined
+            }
           />
         </View>
       </View>

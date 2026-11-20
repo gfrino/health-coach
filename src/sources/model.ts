@@ -3,8 +3,10 @@
  * Unità canoniche: le conversioni per l'utente (lb, mi, °F, mmol/L) avvengono solo in visualizzazione.
  */
 
+import { EXTRA_CUMULATIVE, EXTRA_METRIC_UNITS } from './hkExtra';
+
 /** Tipi di metrica salvati nella tabella `metrics`, con unità canonica. */
-export const METRIC_UNITS = {
+const BASE_METRIC_UNITS = {
   steps: 'count',
   distance: 'm',
   floors: 'count',
@@ -36,6 +38,9 @@ export const METRIC_UNITS = {
   sleepStage: 'stage',
 } as const;
 
+/** Tutte le metriche: quelle storiche più il resto di Apple Salute (sources/hkExtra). */
+export const METRIC_UNITS = { ...BASE_METRIC_UNITS, ...EXTRA_METRIC_UNITS } as const;
+
 export type MetricType = keyof typeof METRIC_UNITS;
 
 /** Metriche cumulative: il valore del giorno è una somma (le altre sono medie/ultimi valori). */
@@ -52,6 +57,7 @@ export const CUMULATIVE_METRICS: ReadonlySet<MetricType> = new Set([
   'water',
   'caffeine',
   'mindfulness',
+  ...EXTRA_CUMULATIVE,
 ]);
 
 /**

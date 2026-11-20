@@ -5,6 +5,7 @@ import { ensureNotificationPermission, refreshCheckins } from '@/proactive/notif
 import { useSettingsStore } from '@/store/settingsStore';
 
 import { enableHealthKitBackgroundDelivery, registerBackgroundSync } from './background';
+import { ensureNewHealthReadAccess } from './platformHealth';
 import { startForegroundSync, syncHealthData } from './syncService';
 
 /** Gli aggiornamenti di HealthKit arrivano a raffica (il Watch scrive spesso): si raggruppano. */
@@ -35,6 +36,10 @@ export function HealthSyncManager() {
 
   useEffect(() => {
     if (!connected) return;
+    // Tipi nuovi da leggere (aggiornamento dell'app): permesso una volta, poi lettura completa.
+    void ensureNewHealthReadAccess().then((asked) => {
+      if (asked) void syncHealthData({ force: true });
+    });
     const stopForeground = startForegroundSync();
     let stopHealthKit: () => void = () => undefined;
     let timer: ReturnType<typeof setTimeout> | null = null;

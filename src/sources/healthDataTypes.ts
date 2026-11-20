@@ -6,8 +6,24 @@
  * Nessun import nativo qui: il file è usato dall'UI dei permessi, dagli adapter e dai test.
  */
 
+import {
+  HK_EXTRA_CATEGORIES,
+  HK_EXTRA_QUANTITIES,
+  HK_STATE_OF_MIND,
+  type ExtraGroup,
+} from './hkExtra';
+
 export type HealthDataCategory =
-  'activity' | 'heart' | 'sleep' | 'body' | 'vitals' | 'nutrition' | 'cycle' | 'mindfulness';
+  | 'activity'
+  | 'heart'
+  | 'sleep'
+  | 'body'
+  | 'vitals'
+  | 'nutrition'
+  | 'cycle'
+  | 'mindfulness'
+  | 'environment'
+  | 'symptoms';
 
 export type HealthDataTypeId =
   | 'steps'
@@ -35,7 +51,8 @@ export type HealthDataTypeId =
   | 'water'
   | 'caffeine'
   | 'menstrualCycle'
-  | 'mindfulness';
+  | 'mindfulness'
+  | ExtraGroup;
 
 export interface HealthDataType {
   id: HealthDataTypeId;
@@ -46,7 +63,7 @@ export interface HealthDataType {
   healthConnect: readonly string[];
 }
 
-export const HEALTH_DATA_TYPES: readonly HealthDataType[] = [
+const BASE_TYPES: readonly HealthDataType[] = [
   // Attività
   {
     id: 'steps',
@@ -230,6 +247,40 @@ export const HEALTH_DATA_TYPES: readonly HealthDataType[] = [
   },
 ];
 
+/** Categoria di ogni gruppo del resto di Apple Salute. */
+const EXTRA_GROUP_CATEGORY: Record<ExtraGroup, HealthDataCategory> = {
+  activityMore: 'activity',
+  mobility: 'activity',
+  heartMore: 'heart',
+  respiratory: 'vitals',
+  bodyMore: 'body',
+  environment: 'environment',
+  nutrients: 'nutrition',
+  healthEvents: 'symptoms',
+  reproductive: 'cycle',
+  symptoms: 'symptoms',
+  stateOfMind: 'mindfulness',
+};
+
+/**
+ * Il resto di Apple Salute (sources/hkExtra), un gruppo per voce. Solo iOS per ora: su Android
+ * ogni tipo ha bisogno di un permesso nel manifest, quindi di una build nativa.
+ */
+const EXTRA_TYPES: HealthDataType[] = (Object.keys(EXTRA_GROUP_CATEGORY) as ExtraGroup[]).map(
+  (group) => ({
+    id: group,
+    category: EXTRA_GROUP_CATEGORY[group],
+    healthKit: [
+      ...HK_EXTRA_QUANTITIES.filter((x) => x.group === group).map((x) => x.hk),
+      ...HK_EXTRA_CATEGORIES.filter((x) => x.group === group).map((x) => x.hk),
+      ...(group === 'stateOfMind' ? [HK_STATE_OF_MIND] : []),
+    ],
+    healthConnect: [],
+  }),
+);
+
+export const HEALTH_DATA_TYPES: readonly HealthDataType[] = [...BASE_TYPES, ...EXTRA_TYPES];
+
 export const HEALTH_DATA_CATEGORIES: readonly HealthDataCategory[] = [
   'activity',
   'heart',
@@ -239,6 +290,8 @@ export const HEALTH_DATA_CATEGORIES: readonly HealthDataCategory[] = [
   'nutrition',
   'cycle',
   'mindfulness',
+  'environment',
+  'symptoms',
 ];
 
 /** Caratteristiche fisse lette da HealthKit per precompilare il profilo. */
