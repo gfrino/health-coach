@@ -1,8 +1,10 @@
+import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
-import { File } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 
 import { getDb, labReportRepository } from '@/db';
+import { base64ToBytes } from '@/lib/base64';
 import { localIsoDate } from '@/lib/dates';
 
 import { ACCEPTED_MIME, guessMime, titleFromFileName, type IncomingFile } from './fileMeta';
@@ -75,6 +77,28 @@ export async function pickFromLibrary(): Promise<IncomingFile[]> {
         mimeType: a.mimeType ?? 'image/jpeg',
         fileName: a.fileName ?? null,
       }));
+}
+
+/** C'è un'immagine copiata negli appunti? (Non mostra l'avviso "incolla" di iOS.) */
+export async function clipboardHasImage(): Promise<boolean> {
+  try {
+    return await Clipboard.hasImageAsync();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Foto copiata (es. "Copia" in Foto o uno screenshot): diventa un file temporaneo JPEG, poi entra
+ * nella Cartella salute come le altre. iOS può chiedere il permesso di incollare: se l'utente
+ * rifiuta non arriva niente.
+ */
+export async function pasteImageFromClipboard(): Promise<IncomingFile[]> {
+  const img = await Clipboard.getImageAsync({ format: 'jpeg', jpegQuality: 0.85 });
+  if (!img?.data) return [];
+  const file = new File(Paths.cache, `incollata-${Date.now()}.jpg`);
+  file.write(base64ToBytes(img.data));
+  return [{ uri: file.uri, mimeType: 'image/jpeg', fileName: null }];
 }
 
 export async function pickDocument(): Promise<IncomingFile[]> {

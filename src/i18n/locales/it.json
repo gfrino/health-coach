@@ -196,7 +196,8 @@
     "extraction_low": "Basso",
     "extractionRange": "Riferimento {{range}}",
     "extractionPrevious": "Prima: {{value}} ({{date}})",
-    "extractionNote": "I valori sono letti dall'AI e possono contenere errori: confrontali con il documento. Restano su questo telefono, cifrati."
+    "extractionNote": "I valori sono letti dall'AI e possono contenere errori: confrontali con il documento. Restano su questo telefono, cifrati.",
+    "fromClipboard": "Incolla la foto copiata"
   },
   "settings": {
     "title": "Impostazioni",
@@ -607,7 +608,8 @@
     "savingRecipe": "Salvo la ricetta…",
     "savingFood": "Lo segno nel diario alimentare…",
     "copy": "Copia",
-    "copied": "Copiato"
+    "copied": "Copiato",
+    "pasteImage": "Incolla la foto copiata"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",

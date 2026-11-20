@@ -7,7 +7,9 @@ import { AppText, Button, ChipGroup, EmptyState, Icon } from '@/components';
 import { getDb, labReportRepository } from '@/db';
 import type { LabReport } from '@/db/repositories/labReportRepository';
 import {
+  clipboardHasImage,
   importFiles,
+  pasteImageFromClipboard,
   pickDocument,
   pickFromCamera,
   pickFromLibrary,
@@ -26,10 +28,10 @@ function formatBytes(bytes: number, locale: string): string {
   return `${(bytes / 1024 / 1024).toLocaleString(locale, { maximumFractionDigits: 1 })} MB`;
 }
 
-/** Scelta della fonte e import: usata dal "+" nell'header e dal pulsante dello stato vuoto. */
-export function useAddReport(onAdded: (ids: string[]) => void) {
+/** Import con gestione degli errori (avviso all'utente); restituisce la funzione che importa da una fonte. */
+export function useImportFrom(onAdded: (ids: string[]) => void) {
   const { t } = useTranslation();
-  const run = async (pick: () => Promise<IncomingFile[]>) => {
+  return async (pick: () => Promise<IncomingFile[]>) => {
     try {
       const files = await pick();
       if (!files.length) return;
@@ -49,13 +51,27 @@ export function useAddReport(onAdded: (ids: string[]) => void) {
       );
     }
   };
-  return () =>
+}
+
+/**
+ * Scelta della fonte e import: usata dal "+" nell'header e dal pulsante dello stato vuoto. Se negli
+ * appunti c'è una foto copiata, la prima scelta è incollarla.
+ */
+export function useAddReport(onAdded: (ids: string[]) => void) {
+  const { t } = useTranslation();
+  const run = useImportFrom(onAdded);
+  return async () => {
+    const pasted = await clipboardHasImage();
     Alert.alert(t('records.addTitle'), t('records.addBody'), [
+      ...(pasted
+        ? [{ text: t('records.fromClipboard'), onPress: () => void run(pasteImageFromClipboard) }]
+        : []),
       { text: t('records.fromCamera'), onPress: () => void run(pickFromCamera) },
       { text: t('records.fromPhotos'), onPress: () => void run(pickFromLibrary) },
       { text: t('records.fromFiles'), onPress: () => void run(pickDocument) },
-      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('common.cancel'), style: 'cancel' as const },
     ]);
+  };
 }
 
 export function RecordsSection({ reloadKey }: { reloadKey: number }) {

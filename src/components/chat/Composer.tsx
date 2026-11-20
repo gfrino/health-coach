@@ -3,6 +3,7 @@ import { Pressable, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
+import { clipboardHasImage } from '@/records/importReport';
 import type { VoiceError } from '@/voice/useVoiceInput';
 import { haptic } from '@/lib/haptics';
 import { MAX_FONT_SCALE, useTheme } from '@/theme';
@@ -17,6 +18,8 @@ interface Props {
   attachments: MessageAttachment[];
   onAttach: () => void;
   onRemoveAttachment: (reportId: string) => void;
+  /** Incolla la foto copiata negli appunti come allegato. */
+  onPasteImage?: () => void;
   /** Conversazione a voce (tipo ChatGPT): se assente, il pulsante non compare. */
   onVoiceMode?: () => void;
   voice: {
@@ -36,11 +39,24 @@ export function Composer({
   attachments,
   onAttach,
   onRemoveAttachment,
+  onPasteImage,
   onVoiceMode,
 }: Props) {
   const { t } = useTranslation();
   const { colors, spacing, radius, typography } = useTheme();
   const [text, setText] = useState('');
+  // Il campo di testo accetta solo testo: una foto copiata si incolla con questo pulsante, che
+  // compare quando si tocca il campo e negli appunti c'è un'immagine.
+  const [canPaste, setCanPaste] = useState(false);
+  const checkClipboard = () => {
+    if (!onPasteImage) return;
+    void clipboardHasImage().then(setCanPaste);
+  };
+  const paste = () => {
+    haptic.tap();
+    setCanPaste(false);
+    onPasteImage?.();
+  };
   const canSend = !disabled && (text.trim().length > 0 || attachments.length > 0);
   const showMic = !text.trim() && !attachments.length;
 
@@ -121,6 +137,31 @@ export function Composer({
           {t(`voice.errors.${voice.error}`)}
         </AppText>
       ) : null}
+      {canPaste ? (
+        <View
+          style={{ flexDirection: 'row', paddingHorizontal: spacing.sm, paddingTop: spacing.sm }}
+        >
+          <Pressable
+            onPress={paste}
+            accessibilityRole="button"
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.xs,
+              minHeight: 36,
+              paddingHorizontal: spacing.md,
+              borderRadius: radius.pill,
+              backgroundColor: colors.primarySoft,
+              opacity: pressed ? 0.6 : 1,
+            })}
+          >
+            <Icon name="copy" size={14} color={colors.primary} />
+            <AppText variant="callout" tone="primary" style={{ fontWeight: '600' }}>
+              {t('chat.pasteImage')}
+            </AppText>
+          </Pressable>
+        </View>
+      ) : null}
       {attachments.length ? (
         <View
           style={{
@@ -171,6 +212,8 @@ export function Composer({
         <TextInput
           value={text}
           onChangeText={setText}
+          onFocus={checkClipboard}
+          onBlur={() => setCanPaste(false)}
           placeholder={t('chat.placeholder')}
           placeholderTextColor={colors.textMuted}
           accessibilityLabel={t('chat.placeholder')}

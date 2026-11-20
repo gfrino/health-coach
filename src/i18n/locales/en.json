@@ -196,7 +196,8 @@
     "extraction_low": "Low",
     "extractionRange": "Reference {{range}}",
     "extractionPrevious": "Before: {{value}} ({{date}})",
-    "extractionNote": "The values are read by the AI and may contain mistakes: check them against the document. They stay on this phone, encrypted."
+    "extractionNote": "The values are read by the AI and may contain mistakes: check them against the document. They stay on this phone, encrypted.",
+    "fromClipboard": "Paste copied photo"
   },
   "settings": {
     "title": "Settings",
@@ -607,7 +608,8 @@
     "savingRecipe": "Saving the recipe…",
     "savingFood": "Adding it to your food diary…",
     "copy": "Copy",
-    "copied": "Copied"
+    "copied": "Copied",
+    "pasteImage": "Paste copied photo"
   },
   "integrations": {
     "healthTitle": "Phone health data",

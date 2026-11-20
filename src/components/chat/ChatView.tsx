@@ -7,7 +7,8 @@ import { toAIError } from '@/ai/errors';
 import { retryLastTurn, runCoachTurn } from '@/coach/chatEngine';
 import { conversationRepository, getDb, labReportRepository } from '@/db';
 import type { MessageAttachment, StoredMessage } from '@/db/repositories/conversationRepository';
-import { useAddReport } from '@/features/RecordsSection';
+import { useAddReport, useImportFrom } from '@/features/RecordsSection';
+import { pasteImageFromClipboard } from '@/records/importReport';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { useSettingsStore } from '@/store/settingsStore';
 import { speechLocale } from '@/voice/locale';
@@ -147,8 +148,9 @@ export function ChatView({
     return run((id, cb) => runCoachTurn(settings, id, text, cb, sent), text, sent);
   };
 
-  // Allegati: salvati subito nella Cartella salute (cifrati), poi inviati col messaggio.
-  const attach = useAddReport((ids) => {
+  // Allegati (scelti con il "+" o foto incollata): salvati subito nella Cartella salute
+  // (cifrati), poi inviati col messaggio.
+  const onImported = (ids: string[]) => {
     void (async () => {
       const db = await getDb();
       const added: MessageAttachment[] = [];
@@ -158,7 +160,10 @@ export function ChatView({
       }
       setAttachments((cur) => [...cur, ...added].slice(0, 5));
     })();
-  });
+  };
+  const attach = useAddReport(onImported);
+  const importFrom = useImportFrom(onImported);
+  const pasteImage = () => void importFrom(pasteImageFromClipboard);
   const openAttachment = (a: MessageAttachment) =>
     router.push({ pathname: '/me/report/[id]', params: { id: a.reportId } }, { withAnchor: true });
 
@@ -312,6 +317,7 @@ export function ChatView({
         voice={voice}
         attachments={attachments}
         onAttach={attach}
+        onPasteImage={pasteImage}
         onRemoveAttachment={(rid) => setAttachments((cur) => cur.filter((a) => a.reportId !== rid))}
         onVoiceMode={() => void openVoiceMode()}
       />

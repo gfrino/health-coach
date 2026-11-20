@@ -196,7 +196,8 @@
     "extraction_low": "Bas",
     "extractionRange": "Référence {{range}}",
     "extractionPrevious": "Avant : {{value}} ({{date}})",
-    "extractionNote": "Les valeurs sont lues par l'IA et peuvent contenir des erreurs : compare-les avec le document. Elles restent sur ce téléphone, chiffrées."
+    "extractionNote": "Les valeurs sont lues par l'IA et peuvent contenir des erreurs : compare-les avec le document. Elles restent sur ce téléphone, chiffrées.",
+    "fromClipboard": "Coller la photo copiée"
   },
   "settings": {
     "title": "Réglages",
@@ -607,7 +608,8 @@
     "savingRecipe": "J'enregistre la recette…",
     "savingFood": "Je l'ajoute à ton journal alimentaire…",
     "copy": "Copier",
-    "copied": "Copié"
+    "copied": "Copié",
+    "pasteImage": "Coller la photo copiée"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",

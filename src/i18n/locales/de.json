@@ -196,7 +196,8 @@
     "extraction_low": "Niedrig",
     "extractionRange": "Referenz {{range}}",
     "extractionPrevious": "Vorher: {{value}} ({{date}})",
-    "extractionNote": "Die Werte werden von der KI gelesen und können Fehler enthalten: vergleiche sie mit dem Dokument. Sie bleiben verschlüsselt auf diesem Telefon."
+    "extractionNote": "Die Werte werden von der KI gelesen und können Fehler enthalten: vergleiche sie mit dem Dokument. Sie bleiben verschlüsselt auf diesem Telefon.",
+    "fromClipboard": "Kopiertes Foto einfügen"
   },
   "settings": {
     "title": "Einstellungen",
@@ -607,7 +608,8 @@
     "savingRecipe": "Rezept wird gespeichert…",
     "savingFood": "Ich trage es ins Ernährungstagebuch ein…",
     "copy": "Kopieren",
-    "copied": "Kopiert"
+    "copied": "Kopiert",
+    "pasteImage": "Kopiertes Foto einfügen"
   },
   "integrations": {
     "healthTitle": "Gesundheitsdaten des Telefons",

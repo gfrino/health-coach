@@ -7,3 +7,12 @@ export function bytesToBase64(bytes: Uint8Array): string {
   }
   return btoa(binary);
 }
+
+/** base64 (anche con il prefisso "data:…;base64,") → Uint8Array. */
+export function base64ToBytes(base64: string): Uint8Array {
+  const clean = base64.replace(/^data:[^,]*,/, '');
+  const binary = atob(clean);
+  const out = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+  return out;
+}
