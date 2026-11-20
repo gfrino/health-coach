@@ -605,7 +605,9 @@
     "savingProgram": "Aggiorno il tuo programma…",
     "savingMemory": "Me lo segno…",
     "savingRecipe": "Salvo la ricetta…",
-    "savingFood": "Lo segno nel diario alimentare…"
+    "savingFood": "Lo segno nel diario alimentare…",
+    "copy": "Copia",
+    "copied": "Copiato"
   },
   "integrations": {
     "healthTitle": "Salute del telefono",

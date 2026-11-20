@@ -62,6 +62,7 @@ export function Markdown({ children }: { children: string }) {
               <Text
                 key={i}
                 accessibilityRole="header"
+                selectable
                 maxFontSizeMultiplier={MAX_FONT_SCALE}
                 style={[
                   b.level === 1 ? typography.title : typography.headline,
@@ -73,7 +74,7 @@ export function Markdown({ children }: { children: string }) {
             );
           case 'paragraph':
             return (
-              <Text key={i} maxFontSizeMultiplier={MAX_FONT_SCALE} style={base}>
+              <Text key={i} selectable maxFontSizeMultiplier={MAX_FONT_SCALE} style={base}>
                 {renderInline(b.inline, colors.primary, colors.surfaceAlt)}
               </Text>
             );
@@ -88,6 +89,7 @@ export function Markdown({ children }: { children: string }) {
                 }}
               >
                 <Text
+                  selectable
                   maxFontSizeMultiplier={MAX_FONT_SCALE}
                   style={[base, { color: colors.textMuted }]}
                 >
@@ -106,6 +108,7 @@ export function Markdown({ children }: { children: string }) {
                 }}
               >
                 <Text
+                  selectable
                   maxFontSizeMultiplier={MAX_FONT_SCALE}
                   style={[typography.callout, { color: colors.text, fontFamily: 'Menlo' }]}
                 >
@@ -118,10 +121,18 @@ export function Markdown({ children }: { children: string }) {
               <View key={i} style={{ gap: spacing.xs }}>
                 {b.items.map((item, j) => (
                   <View key={j} style={{ flexDirection: 'row', gap: spacing.sm }}>
-                    <Text maxFontSizeMultiplier={MAX_FONT_SCALE} style={[base, { minWidth: 18 }]}>
+                    <Text
+                      selectable
+                      maxFontSizeMultiplier={MAX_FONT_SCALE}
+                      style={[base, { minWidth: 18 }]}
+                    >
                       {b.ordered ? `${j + 1}.` : '•'}
                     </Text>
-                    <Text maxFontSizeMultiplier={MAX_FONT_SCALE} style={[base, { flex: 1 }]}>
+                    <Text
+                      selectable
+                      maxFontSizeMultiplier={MAX_FONT_SCALE}
+                      style={[base, { flex: 1 }]}
+                    >
                       {renderInline(item, colors.primary, colors.surfaceAlt)}
                     </Text>
                   </View>

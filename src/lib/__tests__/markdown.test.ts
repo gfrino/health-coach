@@ -48,3 +48,18 @@ describe('parseInline', () => {
     });
   });
 });
+
+describe('testo da copiare', () => {
+  it('toglie i segni del Markdown e tiene elenchi e link', () => {
+    const { markdownToPlainText } = jest.requireActual(
+      '../markdown',
+    ) as typeof import('../markdown');
+    expect(
+      markdownToPlainText(
+        'Il **pH 7,3** viene da uno *screenshot*.\n\n- primo\n- [fonte](https://x.org)\n\n1. uno\n2. due',
+      ),
+    ).toBe(
+      'Il pH 7,3 viene da uno screenshot.\n\n- primo\n- fonte (https://x.org)\n\n1. uno\n2. due',
+    );
+  });
+});

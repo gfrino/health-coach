@@ -99,6 +99,7 @@ export const icons = {
   sort: { ios: 'arrow.up.arrow.down', android: 'swap_vert' },
   water: { ios: 'drop.fill', android: 'water_drop' },
   undo: { ios: 'arrow.uturn.backward', android: 'undo' },
+  copy: { ios: 'doc.on.doc', android: 'content_copy' },
 } satisfies Record<string, IconName>;
 
 export type AppIconName = keyof typeof icons;

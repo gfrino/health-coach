@@ -605,7 +605,9 @@
     "savingProgram": "Mise à jour de ton programme…",
     "savingMemory": "Je le note…",
     "savingRecipe": "J'enregistre la recette…",
-    "savingFood": "Je l'ajoute à ton journal alimentaire…"
+    "savingFood": "Je l'ajoute à ton journal alimentaire…",
+    "copy": "Copier",
+    "copied": "Copié"
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",

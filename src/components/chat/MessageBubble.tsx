@@ -1,7 +1,11 @@
+import * as Clipboard from 'expo-clipboard';
+import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
+import { haptic } from '@/lib/haptics';
+import { markdownToPlainText } from '@/lib/markdown';
 import { useTheme } from '@/theme';
 
 import { AppText } from '../AppText';
@@ -34,6 +38,17 @@ export function MessageBubble({
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const isUser = role === 'user';
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+  const copy = async () => {
+    await Clipboard.setStringAsync(isUser ? text : markdownToPlainText(text));
+    haptic.success();
+    setCopied(true);
+  };
 
   if (error) {
     return (
@@ -92,29 +107,53 @@ export function MessageBubble({
       {/* Il testo è un unico elemento per VoiceOver/TalkBack; il pulsante "Leggi" resta raggiungibile. */}
       {text ? (
         <View accessible accessibilityLabel={`${isUser ? t('chat.you') : coachName}: ${text}`}>
-          {isUser ? <AppText tone="onPrimary">{text}</AppText> : <Markdown>{text}</Markdown>}
+          {isUser ? (
+            <AppText tone="onPrimary" selectable>
+              {text}
+            </AppText>
+          ) : (
+            <Markdown>{text}</Markdown>
+          )}
         </View>
       ) : null}
-      {onSpeak ? (
-        <Pressable
-          onPress={onSpeak}
-          accessibilityRole="button"
-          accessibilityLabel={speaking ? t('voice.stopReading') : t('voice.read')}
-          hitSlop={8}
+      {/* Azioni sotto le risposte del coach: copia (tutto il messaggio) e leggi ad alta voce.
+          Il testo si può anche selezionare con una pressione lunga. */}
+      {!isUser && text ? (
+        <View
           style={{
-            alignSelf: 'flex-end',
             flexDirection: 'row',
-            alignItems: 'center',
-            gap: 4,
+            justifyContent: 'flex-end',
+            gap: spacing.md,
             marginTop: spacing.xs,
-            minHeight: 32,
           }}
         >
-          <Icon name={speaking ? 'stop' : 'speaker'} size={16} color={colors.primary} />
-          <AppText variant="caption" tone="primary">
-            {speaking ? t('voice.stopReading') : t('voice.read')}
-          </AppText>
-        </Pressable>
+          <Pressable
+            onPress={() => void copy()}
+            accessibilityRole="button"
+            accessibilityLabel={copied ? t('chat.copied') : t('chat.copy')}
+            hitSlop={8}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 32 }}
+          >
+            <Icon name={copied ? 'check' : 'copy'} size={15} color={colors.primary} />
+            <AppText variant="caption" tone="primary">
+              {copied ? t('chat.copied') : t('chat.copy')}
+            </AppText>
+          </Pressable>
+          {onSpeak ? (
+            <Pressable
+              onPress={onSpeak}
+              accessibilityRole="button"
+              accessibilityLabel={speaking ? t('voice.stopReading') : t('voice.read')}
+              hitSlop={8}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 32 }}
+            >
+              <Icon name={speaking ? 'stop' : 'speaker'} size={16} color={colors.primary} />
+              <AppText variant="caption" tone="primary">
+                {speaking ? t('voice.stopReading') : t('voice.read')}
+              </AppText>
+            </Pressable>
+          ) : null}
+        </View>
       ) : null}
     </View>
   );

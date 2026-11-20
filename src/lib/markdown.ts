@@ -136,3 +136,33 @@ export function parseInline(src: string): Inline[] {
   pushText();
   return out;
 }
+
+function inlineText(nodes: Inline[]): string {
+  return nodes
+    .map((n) =>
+      n.type === 'text' || n.type === 'code'
+        ? n.text
+        : n.type === 'link'
+          ? `${inlineText(n.children)} (${n.url})`
+          : inlineText(n.children),
+    )
+    .join('');
+}
+
+/** Testo semplice da copiare (senza asterischi e segni del Markdown, elenchi con trattino). */
+export function markdownToPlainText(src: string): string {
+  return parseMarkdown(src)
+    .map((b) => {
+      switch (b.type) {
+        case 'code':
+          return b.text;
+        case 'list':
+          return b.items
+            .map((item, i) => `${b.ordered ? `${i + 1}.` : '-'} ${inlineText(item)}`)
+            .join('\n');
+        default:
+          return inlineText(b.inline);
+      }
+    })
+    .join('\n\n');
+}

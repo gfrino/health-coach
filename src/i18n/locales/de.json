@@ -605,7 +605,9 @@
     "savingProgram": "Dein Programm wird aktualisiert…",
     "savingMemory": "Ich merke es mir…",
     "savingRecipe": "Rezept wird gespeichert…",
-    "savingFood": "Ich trage es ins Ernährungstagebuch ein…"
+    "savingFood": "Ich trage es ins Ernährungstagebuch ein…",
+    "copy": "Kopieren",
+    "copied": "Kopiert"
   },
   "integrations": {
     "healthTitle": "Gesundheitsdaten des Telefons",
