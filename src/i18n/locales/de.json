@@ -20,10 +20,11 @@
     "journal": "Tagebuch",
     "records": "Krankenakte",
     "settings": "Einstellungen",
-    "integrations": "Dienste",
+    "integrations": "Integrationen",
     "programs": "Programme",
     "food": "Ernährungstagebuch",
-    "recipes": "Rezepte"
+    "recipes": "Rezepte",
+    "ai": "KI-Anbieter"
   },
   "coach": {
     "emptyTitle": "Dein Coach wartet auf dich",
@@ -614,7 +615,6 @@
   },
   "integrations": {
     "healthTitle": "Gesundheitsdaten des Telefons",
-    "aiTitle": "Künstliche Intelligenz",
     "comingSoonTitle": "Demnächst verfügbar",
     "comingSoonIntro": "Direkte Verbindungen mit Diensten und Geräten. Tippe auf „Benachrichtigen“, um zu erfahren, wann sie kommen.",
     "categories": {
@@ -709,7 +709,7 @@
   },
   "tabsShort": {
     "coach": "Coach",
-    "integrations": "Dienste",
+    "integrations": "Integrationen",
     "settings": "Optionen",
     "programs": "Programme",
     "food": "Essen",
@@ -1054,7 +1054,7 @@
     "targetReset": "Schätzung verwenden",
     "writeHealth": "Auch in Apple Health speichern",
     "writeHealthHint": "So siehst du Kalorien und Nährstoffe auch in deinen anderen Apps. Sie bleiben auf deinem Telefon.",
-    "writeHealthNotConnected": "Verbinde Apple Health unter Dienste, um das zu nutzen.",
+    "writeHealthNotConnected": "Verbinde Apple Health unter Integrationen, um das zu nutzen.",
     "meal": "Mahlzeit",
     "whatAte": "Was hast du gegessen?",
     "whatAtePlaceholder": "Z. B. 2 Rühreier, eine Scheibe Vollkornbrot und ein Kaffee",
@@ -1091,7 +1091,7 @@
     "photoLibrary": "Aus der Galerie",
     "photoReading": "{{name}} schaut sich deinen Teller an…",
     "photoNotSaved": "Das Foto dient nur der Schätzung: Es wird nicht gespeichert.",
-    "photoNeedsOnlineAI": "Um Essen auf Fotos zu erkennen, brauchst du eine Online-KI (Dienste → KI-Anbieter). Bis dahin kannst du aufschreiben, was du gegessen hast.",
+    "photoNeedsOnlineAI": "Um Essen auf Fotos zu erkennen, brauchst du eine Online-KI (Menü ☰ → KI-Anbieter). Bis dahin kannst du aufschreiben, was du gegessen hast.",
     "cameraDenied": "Erlaube den Kamerazugriff in den Einstellungen deines Telefons.",
     "nutrients": {
       "title": "Nährstoffe & Ziele ({{count}})",

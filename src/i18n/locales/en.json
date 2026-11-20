@@ -20,10 +20,11 @@
     "journal": "Journal",
     "records": "Medical Records",
     "settings": "Settings",
-    "integrations": "Services",
+    "integrations": "Integrations",
     "programs": "Programs",
     "food": "Food diary",
-    "recipes": "Recipes"
+    "recipes": "Recipes",
+    "ai": "AI Provider"
   },
   "coach": {
     "emptyTitle": "Your coach is waiting",
@@ -614,7 +615,6 @@
   },
   "integrations": {
     "healthTitle": "Phone health data",
-    "aiTitle": "Artificial intelligence",
     "comingSoonTitle": "Coming soon",
     "comingSoonIntro": "Direct connections with services and devices. Tap \"Notify me\" to know when they arrive.",
     "categories": {
@@ -709,7 +709,7 @@
   },
   "tabsShort": {
     "coach": "Coach",
-    "integrations": "Services",
+    "integrations": "Integrations",
     "settings": "Settings",
     "programs": "Programs",
     "food": "Food",
@@ -1054,7 +1054,7 @@
     "targetReset": "Use the estimate",
     "writeHealth": "Also save to Apple Health",
     "writeHealthHint": "So calories and nutrients show up in your other apps too. They stay on your phone.",
-    "writeHealthNotConnected": "Connect Apple Health in Services to use this.",
+    "writeHealthNotConnected": "Connect Apple Health in Integrations to use this.",
     "meal": "Meal",
     "whatAte": "What did you eat?",
     "whatAtePlaceholder": "E.g. 2 scrambled eggs, a slice of wholegrain bread and a coffee",
@@ -1091,7 +1091,7 @@
     "photoLibrary": "From gallery",
     "photoReading": "{{name}} is looking at your plate…",
     "photoNotSaved": "The photo is only used for the estimate: it isn't saved.",
-    "photoNeedsOnlineAI": "Recognising food from photos needs an online AI (Services → AI provider). For now you can write what you ate.",
+    "photoNeedsOnlineAI": "Recognising food from photos needs an online AI (menu ☰ → AI Provider). For now you can write what you ate.",
     "cameraDenied": "Allow camera access in your phone's Settings.",
     "nutrients": {
       "title": "Nutrients & goals ({{count}})",

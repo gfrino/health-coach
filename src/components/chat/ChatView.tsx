@@ -215,7 +215,7 @@ export function ChatView({
         body={t('chat.noProviderBody')}
         action={{
           label: t('chat.noProviderAction'),
-          onPress: () => router.push('/integrations/ai'),
+          onPress: () => router.navigate('/ai'),
         }}
       />
     );

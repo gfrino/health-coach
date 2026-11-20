@@ -12,7 +12,7 @@ import { useTheme } from '@/theme';
 import { AppText } from './AppText';
 import { Icon, type AppIconName } from './Icon';
 
-/** Menu laterale (in alto a sinistra): Oggi, Cartella clinica, Servizi, Opzioni. */
+/** Menu laterale (in alto a sinistra): Oggi, Cartella clinica, Integrazioni, Provider AI, Opzioni. */
 export const useSidebar = create<{ open: boolean }>(() => ({ open: false }));
 export const openSidebar = () => {
   haptic.tap();
@@ -22,7 +22,7 @@ const closeSidebar = () => useSidebar.setState({ open: false });
 
 /** Oggi e Cartella clinica sono la stessa schermata (/me) con una sezione diversa. */
 const ITEMS: {
-  route: '/me' | '/integrations' | '/settings';
+  route: '/me' | '/integrations' | '/ai' | '/settings';
   section?: 'today' | 'records';
   icon: AppIconName;
   key: string;
@@ -30,6 +30,7 @@ const ITEMS: {
   { route: '/me', section: 'today', icon: 'today', key: 'tabs.today' },
   { route: '/me', section: 'records', icon: 'records', key: 'tabs.records' },
   { route: '/integrations', icon: 'integrations', key: 'tabsShort.integrations' },
+  { route: '/ai', icon: 'sparkles', key: 'tabs.ai' },
   { route: '/settings', icon: 'settings', key: 'tabsShort.settings' },
 ];
 

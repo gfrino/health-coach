@@ -20,10 +20,11 @@
     "journal": "Journal",
     "records": "Dossier médical",
     "settings": "Réglages",
-    "integrations": "Services",
+    "integrations": "Intégrations",
     "programs": "Programmes",
     "food": "Journal alimentaire",
-    "recipes": "Recettes"
+    "recipes": "Recettes",
+    "ai": "Fournisseur d'IA"
   },
   "coach": {
     "emptyTitle": "Votre coach vous attend",
@@ -614,7 +615,6 @@
   },
   "integrations": {
     "healthTitle": "Données santé du téléphone",
-    "aiTitle": "Intelligence artificielle",
     "comingSoonTitle": "Bientôt disponibles",
     "comingSoonIntro": "Connexions directes avec des services et des appareils. Touchez « Me prévenir » pour savoir quand ils arrivent.",
     "categories": {
@@ -709,7 +709,7 @@
   },
   "tabsShort": {
     "coach": "Coach",
-    "integrations": "Services",
+    "integrations": "Intégrations",
     "settings": "Réglages",
     "programs": "Programmes",
     "food": "Repas",
@@ -1054,7 +1054,7 @@
     "targetReset": "Utiliser l'estimation",
     "writeHealth": "Enregistrer aussi dans Santé",
     "writeHealthHint": "Ainsi, calories et nutriments apparaissent aussi dans tes autres apps. Ils restent sur ton téléphone.",
-    "writeHealthNotConnected": "Connecte Apple Santé dans Services pour l'utiliser.",
+    "writeHealthNotConnected": "Connecte Apple Santé dans Intégrations pour l'utiliser.",
     "meal": "Repas",
     "whatAte": "Qu'as-tu mangé ?",
     "whatAtePlaceholder": "Ex. 2 œufs brouillés, une tranche de pain complet et un café",
@@ -1091,7 +1091,7 @@
     "photoLibrary": "Depuis la galerie",
     "photoReading": "{{name}} regarde ton assiette…",
     "photoNotSaved": "La photo sert seulement au calcul : elle n'est pas enregistrée.",
-    "photoNeedsOnlineAI": "Pour reconnaître les aliments sur une photo, il faut une IA en ligne (Services → Fournisseur IA). En attendant, tu peux écrire ce que tu as mangé.",
+    "photoNeedsOnlineAI": "Pour reconnaître les aliments sur une photo, il faut une IA en ligne (menu ☰ → Fournisseur d'IA). En attendant, tu peux écrire ce que tu as mangé.",
     "cameraDenied": "Autorise l'accès à l'appareil photo dans les Réglages du téléphone.",
     "nutrients": {
       "title": "Nutriments et objectifs ({{count}})",

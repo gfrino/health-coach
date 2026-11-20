@@ -20,10 +20,11 @@
     "journal": "Diario",
     "records": "Cartella clinica",
     "settings": "Impostazioni",
-    "integrations": "Servizi",
+    "integrations": "Integrazioni",
     "programs": "Programmi",
     "food": "Diario alimentare",
-    "recipes": "Ricette"
+    "recipes": "Ricette",
+    "ai": "Provider AI"
   },
   "coach": {
     "emptyTitle": "Il tuo coach ti aspetta",
@@ -614,7 +615,6 @@
   },
   "integrations": {
     "healthTitle": "Salute del telefono",
-    "aiTitle": "Intelligenza artificiale",
     "comingSoonTitle": "Presto disponibili",
     "comingSoonIntro": "Collegamenti diretti con servizi e dispositivi. Tocca \"Avvisami\" per sapere quando arrivano.",
     "categories": {
@@ -709,7 +709,7 @@
   },
   "tabsShort": {
     "coach": "Coach",
-    "integrations": "Servizi",
+    "integrations": "Integrazioni",
     "settings": "Opzioni",
     "programs": "Programmi",
     "food": "Cibo",
@@ -1054,7 +1054,7 @@
     "targetReset": "Usa la stima",
     "writeHealth": "Salva anche in Apple Salute",
     "writeHealthHint": "Così calorie e nutrienti si vedono anche nelle altre app. Restano sul telefono.",
-    "writeHealthNotConnected": "Collega Apple Salute in Servizi per usarlo.",
+    "writeHealthNotConnected": "Collega Apple Salute in Integrazioni per usarlo.",
     "meal": "Pasto",
     "whatAte": "Cosa hai mangiato?",
     "whatAtePlaceholder": "Es. 2 uova strapazzate, una fetta di pane integrale e un caffè",
@@ -1091,7 +1091,7 @@
     "photoLibrary": "Dalla galleria",
     "photoReading": "{{name}} sta guardando il piatto…",
     "photoNotSaved": "La foto serve solo per il calcolo: non viene salvata.",
-    "photoNeedsOnlineAI": "Per riconoscere il cibo dalle foto serve un'AI online (Servizi → Provider AI). Intanto puoi scrivere cosa hai mangiato.",
+    "photoNeedsOnlineAI": "Per riconoscere il cibo dalle foto serve un'AI online (menu ☰ → Provider AI). Intanto puoi scrivere cosa hai mangiato.",
     "cameraDenied": "Consenti l'accesso alla fotocamera nelle Impostazioni del telefono.",
     "nutrients": {
       "title": "Nutrienti e obiettivi ({{count}})",
