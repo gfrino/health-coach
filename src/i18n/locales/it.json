@@ -1165,7 +1165,6 @@
     "water": {
       "open": "Aggiungi acqua",
       "title": "Acqua",
-      "total": "Oggi {{value}}",
       "added": "+{{value}}",
       "undo": "Annulla l'ultima",
       "other": "Altra quantità (ml)",
@@ -1178,7 +1177,15 @@
         "half": "Mezzo litro",
         "bottle": "Bottiglia",
         "liter": "1 litro"
-      }
+      },
+      "totalOf": "Oggi {{value}} di {{target}}",
+      "targetEfsa": "Obiettivo {{value}} al giorno (consigliato)",
+      "targetMine": "Il tuo obiettivo: {{value}} al giorno",
+      "targetEdit": "Modifica",
+      "targetLabel": "Obiettivo al giorno (litri)",
+      "targetHint": "Consigliati {{value}} da bere (EFSA: circa l'80% dell'acqua del giorno; il resto arriva dal cibo). Di più se fa caldo o fai sport.",
+      "left": "mancano {{value}}",
+      "reached": "obiettivo raggiunto"
     }
   },
   "citations": {

@@ -21,6 +21,15 @@ export const WATER_PRESETS = [
 ] as const;
 export type WaterPresetKey = (typeof WATER_PRESETS)[number]['key'];
 
+/**
+ * Obiettivo di acqua da bere se l'utente non l'ha scelto. L'EFSA (2010, tema "hydration" delle
+ * fonti) indica un'assunzione adeguata di acqua totale di 2,0 L per le donne e 2,5 L per gli uomini;
+ * circa l'80% arriva dalle bevande, il resto dal cibo: 1,6 L e 2,0 L da bere. Senza sesso: 2,0 L.
+ */
+export function defaultWaterTarget(sex: 'female' | 'male' | 'other' | null): number {
+  return sex === 'female' ? 1600 : 2000;
+}
+
 const dayStart = (day: string) => new Date(`${day}T00:00:00`).getTime();
 const nextDayStart = (day: string) => {
   const d = new Date(`${day}T00:00:00`);

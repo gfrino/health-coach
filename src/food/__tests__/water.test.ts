@@ -3,7 +3,7 @@ import * as healthDataRepository from '@/db/repositories/healthDataRepository';
 import * as healthQueries from '@/db/repositories/healthQueries';
 import { createTestDb } from '@/test/nodeSqliteDb';
 
-import { addWater, undoLastWater, waterOfDay, waterTime } from '../water';
+import { addWater, defaultWaterTarget, undoLastWater, waterOfDay, waterTime } from '../water';
 
 let mockSeq = 0;
 jest.mock('@/db/ids', () => ({ newId: () => `w-${++mockSeq}` }));
@@ -59,5 +59,13 @@ describe('acqua aggiunta dal diario', () => {
     const now = new Date(at('2026-11-20', 9) + 15 * 60_000);
     expect(waterTime('2026-11-20', now)).toBe(now.getTime());
     expect(waterTime('2026-11-18', now)).toBe(at('2026-11-18', 12));
+  });
+});
+
+describe("obiettivo dell'acqua", () => {
+  it("EFSA: circa l'80% dell'acqua totale arriva dalle bevande", () => {
+    expect(defaultWaterTarget('female')).toBe(1600);
+    expect(defaultWaterTarget('male')).toBe(2000);
+    expect(defaultWaterTarget(null)).toBe(2000);
   });
 });

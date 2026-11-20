@@ -1165,7 +1165,6 @@
     "water": {
       "open": "Add water",
       "title": "Water",
-      "total": "Today {{value}}",
       "added": "+{{value}}",
       "undo": "Undo last",
       "other": "Other amount (ml)",
@@ -1178,7 +1177,15 @@
         "half": "Half litre",
         "bottle": "Bottle",
         "liter": "1 litre"
-      }
+      },
+      "totalOf": "Today {{value}} of {{target}}",
+      "targetEfsa": "Goal {{value}} a day (recommended)",
+      "targetMine": "Your goal: {{value}} a day",
+      "targetEdit": "Edit",
+      "targetLabel": "Daily goal (litres)",
+      "targetHint": "Recommended {{value}} to drink (EFSA: about 80% of daily water; the rest comes from food). More when it's hot or you exercise.",
+      "left": "{{value}} to go",
+      "reached": "goal reached"
     }
   },
   "citations": {

@@ -1165,7 +1165,6 @@
     "water": {
       "open": "Wasser hinzufügen",
       "title": "Wasser",
-      "total": "Heute {{value}}",
       "added": "+{{value}}",
       "undo": "Letzte rückgängig",
       "other": "Andere Menge (ml)",
@@ -1178,7 +1177,15 @@
         "half": "Halber Liter",
         "bottle": "Flasche",
         "liter": "1 Liter"
-      }
+      },
+      "totalOf": "Heute {{value}} von {{target}}",
+      "targetEfsa": "Ziel {{value}} pro Tag (empfohlen)",
+      "targetMine": "Dein Ziel: {{value}} pro Tag",
+      "targetEdit": "Ändern",
+      "targetLabel": "Tagesziel (Liter)",
+      "targetHint": "Empfohlen {{value}} zum Trinken (EFSA: etwa 80 % des täglichen Wassers; der Rest kommt aus dem Essen). Mehr bei Hitze oder Sport.",
+      "left": "noch {{value}}",
+      "reached": "Ziel erreicht"
     }
   },
   "citations": {

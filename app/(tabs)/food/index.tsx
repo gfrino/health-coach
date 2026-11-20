@@ -24,7 +24,8 @@ import { loadFoodTargets, type CalorieTarget, type ProteinTarget } from '@/food/
 import { NutrientList } from '@/food/NutrientList';
 import { ageFrom, effectiveReference, nutrientReference, type RefProfile } from '@/food/references';
 import { TrackerSettings } from '@/food/TrackerSettings';
-import { WaterQuickAdd } from '@/food/WaterQuickAdd';
+import { WaterBar, WaterQuickAdd } from '@/food/WaterQuickAdd';
+import { defaultWaterTarget, waterOfDay } from '@/food/water';
 import { haptic } from '@/lib/haptics';
 import { localIsoDate } from '@/lib/dates';
 import { num } from '@/lib/units';
@@ -61,15 +62,18 @@ export default function FoodScreen() {
   const [explain, setExplain] = useState<MacroKey | null>(null);
   const [targetInput, setTargetInput] = useState('');
   const [waterOpen, setWaterOpen] = useState(false);
+  const [water, setWater] = useState(0);
 
   const load = useCallback(async () => {
     const db = await getDb();
-    const [list, targets, profile] = await Promise.all([
+    const [list, targets, profile, drunk] = await Promise.all([
       foodRepository.listDay(db, day),
       loadFoodTargets(db).catch(() => ({ calories: null, protein: null })),
       profileRepository.getProfile(db),
+      waterOfDay(db, day).catch(() => ({ total: 0, manual: 0 })),
     ]);
     setEntries(list);
+    setWater(drunk.total);
     setEstimated(targets.calories);
     setProtein(targets.protein);
     setPerson({ sex: profile.sex, age: ageFrom(profile.birthDate, localIsoDate(new Date())) });
@@ -86,6 +90,8 @@ export default function FoodScreen() {
   };
 
   const totals = foodRepository.totals(entries ?? []);
+  const waterDefault = defaultWaterTarget(person.sex);
+  const waterTarget = settings.food.waterTarget ?? waterDefault;
   const custom = settings.food.calorieTarget;
   const target = custom ?? estimated?.kcal ?? null;
   const left = target != null ? target - totals.calories : null;
@@ -496,6 +502,7 @@ export default function FoodScreen() {
               ))}
             </View>
           ) : null}
+          <WaterBar total={water} target={waterTarget} onPress={() => setWaterOpen(true)} />
           <NutrientList totals={totals} profile={refProfile} />
           <Button label={t('food.askCoach')} icon="coach" variant="secondary" onPress={askCoach} />
           <SourcesLink topic="energy" />
@@ -674,7 +681,13 @@ export default function FoodScreen() {
           <TrackerSettings />
         </Card>
       </Screen>
-      <WaterQuickAdd day={day} visible={waterOpen} onClose={() => setWaterOpen(false)} />
+      <WaterQuickAdd
+        day={day}
+        visible={waterOpen}
+        defaultTarget={waterDefault}
+        onClose={() => setWaterOpen(false)}
+        onChange={() => void load()}
+      />
     </>
   );
 }

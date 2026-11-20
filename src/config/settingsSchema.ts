@@ -83,6 +83,8 @@ export const foodSettingsSchema = z.object({
   trackers: z
     .array(z.object({ id: z.string(), name: z.string().optional(), unit: z.string() }))
     .optional(),
+  /** Obiettivo di acqua da bere al giorno in ml (null/assente = stimato dall'app, vedi food/water). */
+  waterTarget: z.number().int().min(500).max(6000).nullable().optional(),
   /** Ordine scelto dall'utente per le righe dei nutrienti (id); quelli non elencati vanno in fondo. */
   order: z.array(z.string()).optional(),
   /** Obiettivi giornalieri scelti dall'utente al posto dei valori consigliati (id → obiettivo). */
