@@ -24,6 +24,7 @@ import { loadFoodTargets, type CalorieTarget, type ProteinTarget } from '@/food/
 import { NutrientList } from '@/food/NutrientList';
 import { ageFrom, effectiveReference, nutrientReference, type RefProfile } from '@/food/references';
 import { TrackerSettings } from '@/food/TrackerSettings';
+import { WaterQuickAdd } from '@/food/WaterQuickAdd';
 import { haptic } from '@/lib/haptics';
 import { localIsoDate } from '@/lib/dates';
 import { num } from '@/lib/units';
@@ -59,6 +60,7 @@ export default function FoodScreen() {
   const [editingTarget, setEditingTarget] = useState(false);
   const [explain, setExplain] = useState<MacroKey | null>(null);
   const [targetInput, setTargetInput] = useState('');
+  const [waterOpen, setWaterOpen] = useState(false);
 
   const load = useCallback(async () => {
     const db = await getDb();
@@ -307,22 +309,43 @@ export default function FoodScreen() {
         menu
         title={t('tabs.food')}
         titleAction={
-          <Pressable
-            onPress={() => add()}
-            accessibilityRole="button"
-            accessibilityLabel={t('food.addTitle')}
-            hitSlop={10}
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 22,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.primarySoft,
-            }}
-          >
-            <Icon name="add" color={colors.primary} />
-          </Pressable>
+          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+            <Pressable
+              onPress={() => {
+                haptic.tap();
+                setWaterOpen(true);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t('food.water.open')}
+              hitSlop={6}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.primarySoft,
+              }}
+            >
+              <Icon name="water" size={20} color={colors.primary} />
+            </Pressable>
+            <Pressable
+              onPress={() => add()}
+              accessibilityRole="button"
+              accessibilityLabel={t('food.addTitle')}
+              hitSlop={10}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.primarySoft,
+              }}
+            >
+              <Icon name="add" color={colors.primary} />
+            </Pressable>
+          </View>
         }
       >
         {/* Giorno */}
@@ -651,6 +674,7 @@ export default function FoodScreen() {
           <TrackerSettings />
         </Card>
       </Screen>
+      <WaterQuickAdd day={day} visible={waterOpen} onClose={() => setWaterOpen(false)} />
     </>
   );
 }

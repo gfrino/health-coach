@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useTheme } from '@/theme';
 
-import { AppText } from './AppText';
 import { Icon } from './Icon';
 
 interface Props {
@@ -15,10 +14,15 @@ interface Props {
 }
 
 const SIZE = 62;
+/**
+ * Distanza del cerchio dal fondo della tab. Senza l'etichetta sotto (tolta: l'icona basta, il nome
+ * resta per VoiceOver/TalkBack) il cerchio sta 12 pt (circa 2 mm) più in basso di prima.
+ */
+const LIFT = 5;
 
 /**
  * Tab del Coach al centro della barra: un cerchio più grande che esce in parte sopra la barra,
- * con il bordo del colore della barra (sembra "ritagliato"). L'etichetta resta sotto, come le altre.
+ * con il bordo del colore della barra (sembra "ritagliato"). Senza etichetta visibile.
  */
 export function CoachTabButton({ onPress, onLongPress, accessibilityState }: Props) {
   const { t } = useTranslation();
@@ -31,7 +35,7 @@ export function CoachTabButton({ onPress, onLongPress, accessibilityState }: Pro
       accessibilityRole="tab"
       accessibilityState={{ selected }}
       accessibilityLabel={t('tabs.coach')}
-      style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 2 }}
+      style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: LIFT }}
     >
       <View
         style={{
@@ -53,19 +57,6 @@ export function CoachTabButton({ onPress, onLongPress, accessibilityState }: Pro
       >
         <Icon name="coach" color={colors.onPrimary} size={28} />
       </View>
-      <AppText
-        variant="caption"
-        style={{
-          fontSize: 10,
-          lineHeight: 13,
-          marginTop: 2,
-          fontWeight: '600',
-          color: selected ? colors.primary : colors.textMuted,
-        }}
-        maxFontSizeMultiplier={1.3}
-      >
-        {t('tabsShort.coach')}
-      </AppText>
     </Pressable>
   );
 }

@@ -97,6 +97,8 @@ export const icons = {
   purines: { ios: 'hexagon.fill', android: 'hexagon' },
   customTracker: { ios: 'tag.fill', android: 'label' },
   sort: { ios: 'arrow.up.arrow.down', android: 'swap_vert' },
+  water: { ios: 'drop.fill', android: 'water_drop' },
+  undo: { ios: 'arrow.uturn.backward', android: 'undo' },
 } satisfies Record<string, IconName>;
 
 export type AppIconName = keyof typeof icons;

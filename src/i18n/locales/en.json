@@ -1159,7 +1159,25 @@
     "netCarbs": "Net carbs",
     "askCoach": "Talk to your coach about it",
     "askCoachPrompt": "Let's look at my food diary for today: how am I doing with protein, carbs, sugars and fat for my diet, and what am I missing?",
-    "askCoachPromptDay": "Let's look at my food diary for {{day}} ({{date}}): how did I do with protein, carbs, sugars and fat for my diet, and what was missing?"
+    "askCoachPromptDay": "Let's look at my food diary for {{day}} ({{date}}): how did I do with protein, carbs, sugars and fat for my diet, and what was missing?",
+    "water": {
+      "open": "Add water",
+      "title": "Water",
+      "total": "Today {{value}}",
+      "added": "+{{value}}",
+      "undo": "Undo last",
+      "other": "Other amount (ml)",
+      "add": "Add",
+      "close": "Close",
+      "presets": {
+        "glass": "Glass",
+        "cup": "Cup",
+        "can": "Can",
+        "half": "Half litre",
+        "bottle": "Bottle",
+        "liter": "1 litre"
+      }
+    }
   },
   "citations": {
     "title": "Scientific sources",

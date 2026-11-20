@@ -1159,7 +1159,25 @@
     "netCarbs": "Netto-Kohlenhydrate",
     "askCoach": "Sprich mit deinem Coach darüber",
     "askCoachPrompt": "Schauen wir uns mein heutiges Ernährungstagebuch an: Wie stehe ich bei Eiweiß, Kohlenhydraten, Zucker und Fett für meine Ernährungsweise, und was fehlt mir?",
-    "askCoachPromptDay": "Schauen wir uns mein Ernährungstagebuch von {{day}} ({{date}}) an: Wie lief es bei Eiweiß, Kohlenhydraten, Zucker und Fett für meine Ernährungsweise, und was hat gefehlt?"
+    "askCoachPromptDay": "Schauen wir uns mein Ernährungstagebuch von {{day}} ({{date}}) an: Wie lief es bei Eiweiß, Kohlenhydraten, Zucker und Fett für meine Ernährungsweise, und was hat gefehlt?",
+    "water": {
+      "open": "Wasser hinzufügen",
+      "title": "Wasser",
+      "total": "Heute {{value}}",
+      "added": "+{{value}}",
+      "undo": "Letzte rückgängig",
+      "other": "Andere Menge (ml)",
+      "add": "Hinzufügen",
+      "close": "Schließen",
+      "presets": {
+        "glass": "Glas",
+        "cup": "Tasse",
+        "can": "Dose",
+        "half": "Halber Liter",
+        "bottle": "Flasche",
+        "liter": "1 Liter"
+      }
+    }
   },
   "citations": {
     "title": "Wissenschaftliche Quellen",

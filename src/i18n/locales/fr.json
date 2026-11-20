@@ -1159,7 +1159,25 @@
     "netCarbs": "Glucides nets",
     "askCoach": "En parler avec votre coach",
     "askCoachPrompt": "Regardons mon journal alimentaire d'aujourd'hui : où en suis-je pour les protéines, glucides, sucres et lipides par rapport à mon régime, et que me manque-t-il ?",
-    "askCoachPromptDay": "Regardons mon journal alimentaire de {{day}} ({{date}}) : comment cela s'est-il passé pour les protéines, glucides, sucres et lipides par rapport à mon régime, et qu'est-ce qui a manqué ?"
+    "askCoachPromptDay": "Regardons mon journal alimentaire de {{day}} ({{date}}) : comment cela s'est-il passé pour les protéines, glucides, sucres et lipides par rapport à mon régime, et qu'est-ce qui a manqué ?",
+    "water": {
+      "open": "Ajouter de l'eau",
+      "title": "Eau",
+      "total": "Aujourd'hui {{value}}",
+      "added": "+{{value}}",
+      "undo": "Annuler la dernière",
+      "other": "Autre quantité (ml)",
+      "add": "Ajouter",
+      "close": "Fermer",
+      "presets": {
+        "glass": "Verre",
+        "cup": "Tasse",
+        "can": "Canette",
+        "half": "Demi-litre",
+        "bottle": "Bouteille",
+        "liter": "1 litre"
+      }
+    }
   },
   "citations": {
     "title": "Sources scientifiques",

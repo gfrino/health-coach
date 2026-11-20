@@ -1159,7 +1159,25 @@
     "netCarbs": "Carboidrati netti",
     "askCoach": "Parlane con il tuo coach",
     "askCoachPrompt": "Guardiamo insieme il mio diario alimentare di oggi: come sto andando con proteine, carboidrati, zuccheri e grassi rispetto alla mia dieta, e cosa mi manca?",
-    "askCoachPromptDay": "Guardiamo insieme il mio diario alimentare di {{day}} ({{date}}): com’è andata con proteine, carboidrati, zuccheri e grassi rispetto alla mia dieta, e cosa è mancato?"
+    "askCoachPromptDay": "Guardiamo insieme il mio diario alimentare di {{day}} ({{date}}): com’è andata con proteine, carboidrati, zuccheri e grassi rispetto alla mia dieta, e cosa è mancato?",
+    "water": {
+      "open": "Aggiungi acqua",
+      "title": "Acqua",
+      "total": "Oggi {{value}}",
+      "added": "+{{value}}",
+      "undo": "Annulla l'ultima",
+      "other": "Altra quantità (ml)",
+      "add": "Aggiungi",
+      "close": "Chiudi",
+      "presets": {
+        "glass": "Bicchiere",
+        "cup": "Tazza",
+        "can": "Lattina",
+        "half": "Mezzo litro",
+        "bottle": "Bottiglia",
+        "liter": "1 litro"
+      }
+    }
   },
   "citations": {
     "title": "Fonti scientifiche",
