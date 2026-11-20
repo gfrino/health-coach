@@ -217,3 +217,24 @@ export async function loadProfileContext(db: Db): Promise<ProfileContext> {
   ]);
   return { ...profile, conditions, medications, allergies };
 }
+
+// ── Foto del profilo ─────────────────────────────────────────────────────────
+
+/** Foto del profilo (JPEG), null se non c'è. */
+export async function getPhoto(db: Db): Promise<Uint8Array | null> {
+  const row = await db.getFirstAsync<{ photo: Uint8Array | null }>(
+    'SELECT photo FROM profile WHERE id = 1',
+    [],
+  );
+  return row?.photo ?? null;
+}
+
+/** Salva (o toglie, con null) la foto; crea la riga del profilo se non c'è ancora. */
+export async function setPhoto(db: Db, photo: Uint8Array | null): Promise<void> {
+  const now = Date.now();
+  await db.runAsync(
+    `INSERT INTO profile (id, photo, updated_at) VALUES (1, ?, ?)
+     ON CONFLICT (id) DO UPDATE SET photo = excluded.photo, updated_at = excluded.updated_at`,
+    [photo, now],
+  );
+}

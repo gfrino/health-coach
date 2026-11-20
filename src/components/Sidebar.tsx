@@ -11,8 +11,9 @@ import { useTheme } from '@/theme';
 
 import { AppText } from './AppText';
 import { Icon, type AppIconName } from './Icon';
+import { ProfileAvatar } from '@/profile/ProfileAvatar';
 
-/** Menu laterale (in alto a sinistra): Oggi, Cartella clinica, Integrazioni, Provider AI, Opzioni. */
+/** Menu laterale (in alto a sinistra): Il mio profilo (con la foto), Oggi, Cartella clinica, Integrazioni, Provider AI, Opzioni. */
 export const useSidebar = create<{ open: boolean }>(() => ({ open: false }));
 export const openSidebar = () => {
   haptic.tap();
@@ -22,11 +23,12 @@ const closeSidebar = () => useSidebar.setState({ open: false });
 
 /** Oggi e Cartella clinica sono la stessa schermata (/me) con una sezione diversa. */
 const ITEMS: {
-  route: '/me' | '/integrations' | '/ai' | '/settings';
+  route: '/profile' | '/me' | '/integrations' | '/ai' | '/settings';
   section?: 'today' | 'records';
   icon: AppIconName;
   key: string;
 }[] = [
+  { route: '/profile', icon: 'me', key: 'profileSettings.title' },
   { route: '/me', section: 'today', icon: 'today', key: 'tabs.today' },
   { route: '/me', section: 'records', icon: 'records', key: 'tabs.records' },
   { route: '/integrations', icon: 'integrations', key: 'tabsShort.integrations' },
@@ -146,7 +148,11 @@ export function Sidebar() {
                   backgroundColor: active || pressed ? colors.primarySoft : 'transparent',
                 })}
               >
-                <Icon name={it.icon} color={active ? colors.primary : colors.text} />
+                {it.route === '/profile' ? (
+                  <ProfileAvatar size={26} />
+                ) : (
+                  <Icon name={it.icon} color={active ? colors.primary : colors.text} />
+                )}
                 <AppText
                   variant="headline"
                   style={{ color: active ? colors.primary : colors.text }}

@@ -832,7 +832,11 @@
     "title": "Il mio profilo",
     "subtitle": "Dati personali, obiettivi, condizioni, farmaci e allergie",
     "saved": "Salvato",
-    "healthTitle": "La tua salute"
+    "healthTitle": "La tua salute",
+    "photoTitle": "Foto del profilo",
+    "photoAdd": "Aggiungi una foto",
+    "photoChange": "Cambia foto",
+    "photoRemove": "Rimuovi la foto"
   },
   "programs": {
     "new": "Nuovo programma",

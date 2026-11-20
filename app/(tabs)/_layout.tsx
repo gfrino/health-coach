@@ -21,7 +21,7 @@ const TABS: {
 ];
 
 /** Raggiungibili dal menu laterale: restano nel navigatore (link e notifiche funzionano) ma senza tab. */
-const MENU_SCREENS = ['me', 'integrations', 'ai', 'settings'] as const;
+const MENU_SCREENS = ['profile', 'me', 'integrations', 'ai', 'settings'] as const;
 
 export default function TabLayout() {
   const { t } = useTranslation();

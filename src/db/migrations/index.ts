@@ -9,6 +9,7 @@ import { migration008 } from './008_food_details';
 import { migration009 } from './009_program_schedule';
 import { migration010 } from './010_weight_goal';
 import { migration011 } from './011_food_extras';
+import { migration012 } from './012_profile_photo';
 import type { Migration } from './types';
 
 /**
@@ -28,6 +29,7 @@ export const migrations: readonly Migration[] = [
   migration009,
   migration010,
   migration011,
+  migration012,
 ];
 
 export type { Migration } from './types';

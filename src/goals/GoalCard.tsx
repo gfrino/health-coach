@@ -50,7 +50,7 @@ export function GoalCard() {
 
   const openProfile = () => {
     haptic.tap();
-    router.push('/settings/profile');
+    router.navigate('/profile');
   };
   if (!state || (!state.goal && !state.wantsWeight)) return null;
 
