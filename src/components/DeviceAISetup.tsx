@@ -18,6 +18,7 @@ import { BrandLogo } from './BrandLogo';
 import { Button } from './Button';
 import { Card } from './Card';
 import { Icon } from './Icon';
+import { SwitchRow } from './SwitchRow';
 
 interface Props {
   onAvailability?: (a: OnDeviceAvailability) => void;
@@ -51,6 +52,10 @@ export function DeviceAISetup({ onAvailability }: Props) {
 
   const inUse = ai.provider === 'device';
   const engine = deviceEngineName();
+  // Private Cloud Compute: solo iPhone con iOS 27 e build 1.41.0+ (altrimenti `pcc` manca).
+  const pcc = availability?.pcc;
+  const pccSupported = pcc === 'available' || pcc === 'quota' || pcc === 'systemNotReady';
+  const pccOn = ai.pcc !== false;
 
   const use = async () => {
     await update({ ai: { provider: 'device', model: DEVICE_MODEL_ID } });
@@ -80,7 +85,9 @@ export function DeviceAISetup({ onAvailability }: Props) {
           >
             <Icon name="checkCircle" color={colors.success} />
             <AppText tone="success" style={{ flex: 1 }}>
-              {t('ai.device.inUse', { engine })}
+              {pccSupported && pccOn
+                ? t('ai.device.inUsePcc', { engine })
+                : t('ai.device.inUse', { engine })}
             </AppText>
           </View>
         ) : (
@@ -141,8 +148,25 @@ export function DeviceAISetup({ onAvailability }: Props) {
           </AppText>
         ) : null}
       </View>
-      <AppText variant="callout">{t('ai.device.pitch')}</AppText>
+      <AppText variant="callout">
+        {pccSupported ? t('ai.device.pitchPcc') : t('ai.device.pitch')}
+      </AppText>
       {body()}
+      {pccSupported && availability?.status === 'available' ? (
+        <>
+          <SwitchRow
+            label={t('ai.device.pccToggle')}
+            description={t('ai.device.pccToggleHint')}
+            value={pccOn}
+            onChange={(v) => void update({ ai: { ...ai, pcc: v } })}
+          />
+          {pccOn && pcc === 'quota' ? (
+            <AppText variant="caption" tone="textMuted">
+              {t('ai.device.pccQuota')}
+            </AppText>
+          ) : null}
+        </>
+      ) : null}
       {error ? (
         <AppText variant="caption" tone="danger">
           {error}

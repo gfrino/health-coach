@@ -55,6 +55,11 @@ export interface CoachContext {
   /** System prompt già composto dal livello coach. */
   system: string;
   tools?: ToolDefinition[];
+  /**
+   * AI di Apple: prompt ridotto per il modello sul telefono, usato se Private Cloud Compute non
+   * risponde e si ripiega sul telefono (il prompt completo non ci starebbe in 4K token).
+   */
+  fallbackSystem?: () => Promise<string>;
 }
 
 export interface SendOptions {

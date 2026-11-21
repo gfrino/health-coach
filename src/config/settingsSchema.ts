@@ -45,6 +45,8 @@ export const COACH_TONES = ['empathetic', 'direct', 'motivational', 'scientific'
 export const aiConfigSchema = z.object({
   provider: z.enum(AI_PROVIDERS).nullable(),
   model: z.string().nullable(),
+  /** AI di Apple: usa Private Cloud Compute quando disponibile (assente = sì). */
+  pcc: z.boolean().optional(),
 });
 export type AIConfig = z.infer<typeof aiConfigSchema>;
 

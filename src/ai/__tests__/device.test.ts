@@ -1,6 +1,6 @@
 // jest.mock viene spostato in cima da babel: gli import ricevono già il modulo finto.
 import { AIError } from '../errors';
-import { buildDevicePrompt, deviceProvider } from '../providers/device';
+import { buildDevicePrompt, deviceProvider, resetPccPause, usesPcc } from '../providers/device';
 
 jest.mock('on-device-ai', () => {
   const listeners: ((e: { requestId: string; text: string }) => void)[] = [];
@@ -95,5 +95,72 @@ describe('buildDevicePrompt', () => {
     expect(prompt).toContain('User: Domanda precedente');
     expect(prompt).not.toContain(long);
     expect(prompt.endsWith('User: Ultima domanda\nCoach:')).toBe(true);
+  });
+});
+
+describe('deviceProvider con Private Cloud Compute', () => {
+  const pccNative = mockNative as unknown as {
+    generate: jest.Mock;
+    getAvailability: jest.Mock;
+    generateWith?: jest.Mock;
+  };
+  const send = (context: { system: string; fallbackSystem?: () => Promise<string> }) =>
+    deviceProvider.sendMessage(context, [{ role: 'user', content: 'Ciao' }], {
+      apiKey: '',
+      model: 'on-device',
+    });
+
+  beforeEach(() => {
+    resetPccPause();
+    pccNative.generate.mockClear();
+    pccNative.getAvailability.mockResolvedValue({ status: 'available', engine: 'apple', pcc: 'available' });
+    pccNative.generateWith = jest.fn(async () => 'Risposta PCC');
+  });
+
+  afterEach(() => {
+    delete pccNative.generateWith;
+    pccNative.getAvailability.mockResolvedValue({ status: 'available', engine: 'apple' });
+  });
+
+  it('usa PCC quando è disponibile', async () => {
+    const res = await send({ system: 'FULL' });
+    expect(res.text).toBe('Risposta PCC');
+    expect(pccNative.generateWith).toHaveBeenCalledWith(expect.any(String), 'FULL', 'User: Ciao\nCoach:', 'pcc');
+    expect(pccNative.generate).not.toHaveBeenCalled();
+  });
+
+  it('senza PCC (quota esaurita o build vecchia) usa il telefono', async () => {
+    pccNative.getAvailability.mockResolvedValue({ status: 'available', engine: 'apple', pcc: 'quota' });
+    await send({ system: 'FULL' });
+    expect(pccNative.generateWith).not.toHaveBeenCalled();
+    expect(pccNative.generate).toHaveBeenCalled();
+  });
+
+  it('se PCC non risponde ripiega sul telefono con il prompt ridotto, e per un po’ non riprova', async () => {
+    pccNative.generateWith!.mockRejectedValueOnce(Object.assign(new Error('offline'), { code: 'pcc_network' }));
+    const fallbackSystem = jest.fn(async () => 'COMPACT');
+    const res = await send({ system: 'FULL', fallbackSystem });
+    expect(res.text).toBe('Ciao, come stai?');
+    expect(pccNative.generate).toHaveBeenCalledWith(expect.any(String), 'COMPACT', 'User: Ciao\nCoach:');
+    expect(await usesPcc(true)).toBe(false);
+  });
+
+  it('se PCC aveva già iniziato a rispondere non mescola due risposte', async () => {
+    pccNative.generateWith!.mockImplementationOnce(async (requestId: string) => {
+      (mockListeners as ((e: { requestId: string; text: string }) => void)[]).forEach((l) =>
+        l({ requestId, text: 'Inizio' }),
+      );
+      throw Object.assign(new Error('offline'), { code: 'pcc_network' });
+    });
+    await expect(send({ system: 'FULL', fallbackSystem: async () => 'COMPACT' })).rejects.toMatchObject({
+      code: 'network',
+    });
+    expect(pccNative.generate).not.toHaveBeenCalled();
+  });
+
+  it('rispetta la scelta dell’utente di non usare PCC', async () => {
+    expect(await usesPcc(false)).toBe(false);
+    await send({ system: 'FULL' });
+    expect(pccNative.generateWith).not.toHaveBeenCalled();
   });
 });

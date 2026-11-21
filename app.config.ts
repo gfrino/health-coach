@@ -127,7 +127,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: bundleId,
     supportsTablet: false,
     config: { usesNonExemptEncryption: false },
+    // Private Cloud Compute (modello Apple sui server privati, iOS 27): permesso concesso da Apple
+    // il 21/11/2026 solo per l'App ID di produzione. Il nativo lo usa solo se c'è il flag qui sotto.
+    entitlements:
+      variant === 'production' ? { 'com.apple.developer.private-cloud-compute': true } : {},
     infoPlist: {
+      AlbAPrivateCloudCompute: variant === 'production',
       CFBundleDevelopmentRegion: 'it',
       CFBundleAllowMixedLocalizations: true,
       // Nessun dato su iCloud: niente capability iCloud, niente backup del DB (vedi src/db).

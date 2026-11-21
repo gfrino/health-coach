@@ -6,6 +6,13 @@ declare class OnDeviceAiModule extends NativeModule<OnDeviceAiModuleEvents> {
   getAvailability(): Promise<OnDeviceAvailability>;
   download(): Promise<void>;
   generate(requestId: string, instructions: string, prompt: string): Promise<string>;
+  /** Dalla build 1.41.0 (iOS): `engine` "pcc" usa Private Cloud Compute. Assente prima. */
+  generateWith?(
+    requestId: string,
+    instructions: string,
+    prompt: string,
+    engine: 'pcc' | 'device',
+  ): Promise<string>;
   cancel(requestId: string): Promise<void>;
 }
 

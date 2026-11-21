@@ -1,5 +1,6 @@
 import { AIError, toAIError } from '@/ai/errors';
 import { getApiKey } from '@/ai/keyStore';
+import { usesPcc } from '@/ai/providers/device';
 import { getProvider, PROVIDERS } from '@/ai/registry';
 import type { ChatMessage, SendResult, Usage } from '@/ai/types';
 import type { AppSettings } from '@/config/settingsSchema';
@@ -75,7 +76,13 @@ export interface TurnResult {
   usage: Usage;
 }
 
-export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date): Promise<string> {
+export async function buildSystemPrompt(
+  db: Db,
+  settings: AppSettings,
+  now: Date,
+  /** compact: true forza il prompt ridotto (ripiego dell'AI di Apple sul telefono). */
+  options: { compact?: boolean } = {},
+): Promise<string> {
   const [
     profile,
     memoryFacts,
@@ -111,7 +118,10 @@ export async function buildSystemPrompt(db: Db, settings: AppSettings, now: Date
     kind: fileTypeOf(r.mimeType)?.kind ?? 'document',
     summary: r.summary,
   }));
-  const compact = settings.ai.provider === 'device';
+  // AI di Apple sul telefono: poco contesto, prompt ridotto. Con Private Cloud Compute (32K) no.
+  const compact =
+    options.compact ??
+    (settings.ai.provider === 'device' && !(await usesPcc(settings.ai.pcc !== false)));
   // Ultimo valore di ogni esame; sul telefono (poco contesto) solo quelli fuori intervallo.
   const labs = latest
     .filter((l) => !compact || labReportRepository.outOfRange(l))
@@ -220,6 +230,13 @@ export async function resolveAI(settings: AppSettings) {
  * Esegue una richiesta al modello con il ciclo di tool call locale.
  * `onText` riceve il testo cumulativo (anche attraverso più round di tool).
  */
+/** Prompt ridotto per quando l'AI di Apple ripiega da Private Cloud Compute al telefono. */
+function appleFallback(db: Db, settings: AppSettings) {
+  return settings.ai.provider === 'device'
+    ? () => buildSystemPrompt(db, settings, new Date(), { compact: true })
+    : undefined;
+}
+
 async function runWithTools(
   db: Db,
   settings: AppSettings,
@@ -236,15 +253,19 @@ async function runWithTools(
   for (let round = 0; ; round++) {
     const prefix = text ? `${text}\n\n` : '';
     let roundText = '';
-    const result: SendResult = await provider.sendMessage({ system, tools }, messages, {
+    const result: SendResult = await provider.sendMessage(
+      { system, tools, fallbackSystem: appleFallback(db, settings) },
+      messages,
+      {
       apiKey,
       model,
       signal: cb.signal,
-      onToken: (delta) => {
-        roundText += delta;
-        cb.onText?.(prefix + roundText);
+        onToken: (delta) => {
+          roundText += delta;
+          cb.onText?.(prefix + roundText);
+        },
       },
-    });
+    );
     usage.inputTokens += result.usage.inputTokens;
     usage.outputTokens += result.usage.outputTokens;
     if (result.text) text = prefix + result.text;
@@ -495,7 +516,7 @@ export async function completeOnce(
   await refreshHealthData();
   const system = await buildSystemPrompt(db, settings, new Date());
   const result = await provider.sendMessage(
-    { system },
+    { system, fallbackSystem: appleFallback(db, settings) },
     [{ role: 'user', content: instruction + languageLine(settings) }],
     {
       apiKey,

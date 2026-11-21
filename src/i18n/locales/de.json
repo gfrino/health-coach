@@ -412,7 +412,7 @@
       "disclaimer": "Medizinischer Hinweis"
     },
     "aiTitle": "KI-Anbieter",
-    "aiIntro": "Du kannst jederzeit ohne Zusatzkosten wechseln. Mit der KI des Telefons verlassen deine Daten das Gerät nie.",
+    "aiIntro": "Du kannst jederzeit wechseln, ohne Zusatzkosten. Mit der KI des Telefons gehen deine Daten nie über unsere Server.",
     "notConfigured": "Nicht eingerichtet",
     "usageTitle": "Geschätzter Verbrauch (letzte 30 Tage)",
     "usageEmpty": "Noch kein Verbrauch erfasst.",
@@ -536,7 +536,12 @@
       "recheck": "Erneut prüfen",
       "enableAppleIntelligence": "Aktiviere Apple Intelligence: Öffne Einstellungen › Apple Intelligence & Siri, schalte sie ein und kehre hierher zurück.",
       "notSupportedIOS": "Dieses iPhone unterstützt Apple Intelligence nicht (nötig ist ein iPhone 15 Pro oder neuer). Du kannst unten einen Online-KI-Dienst nutzen.",
-      "notSupportedAndroid": "Dieses Telefon unterstützt Gemini Nano nicht. Du kannst unten einen Online-KI-Dienst nutzen."
+      "notSupportedAndroid": "Dieses Telefon unterstützt Gemini Nano nicht. Du kannst unten einen Online-KI-Dienst nutzen.",
+      "pitchPcc": "Kein Konto, keine Kosten. Die Antworten kommen von Apple Intelligence: auf dem Telefon oder, für bessere Antworten, über Private Cloud Compute, Apples private Server, die deine Daten weder speichern noch einsehen.",
+      "inUsePcc": "Der Coach nutzt {{engine}} mit Private Cloud Compute.",
+      "pccToggle": "Private Cloud Compute verwenden",
+      "pccToggleHint": "Vollständigere Antworten. Wenn du es ausschaltest, bleiben deine Daten auf dem Telefon, aber der Coach ist weniger genau.",
+      "pccQuota": "Du hast das heutige Limit von Private Cloud Compute erreicht: Bis morgen nutzt der Coach das Modell auf dem Telefon."
     },
     "cloud": {
       "toggle": "Einen Online-KI-Dienst nutzen (leistungsfähiger)",

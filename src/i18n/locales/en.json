@@ -412,7 +412,7 @@
       "disclaimer": "Medical disclaimer"
     },
     "aiTitle": "AI provider",
-    "aiIntro": "You can change at any time, at no extra cost. With the phone's AI your data never leaves the device.",
+    "aiIntro": "You can change it at any time, at no extra cost. With the phone's AI your data never goes through our servers.",
     "notConfigured": "Not configured",
     "usageTitle": "Estimated usage (last 30 days)",
     "usageEmpty": "No usage recorded yet.",
@@ -536,7 +536,12 @@
       "recheck": "Check again",
       "enableAppleIntelligence": "Turn on Apple Intelligence: open Settings › Apple Intelligence & Siri, switch it on and come back here.",
       "notSupportedIOS": "This iPhone doesn't support Apple Intelligence (it needs an iPhone 15 Pro or newer). You can use an online AI service below.",
-      "notSupportedAndroid": "This phone doesn't support Gemini Nano. You can use an online AI service below."
+      "notSupportedAndroid": "This phone doesn't support Gemini Nano. You can use an online AI service below.",
+      "pitchPcc": "No account to create and no cost. Answers come from Apple Intelligence: on your phone or, for better answers, on Private Cloud Compute, Apple's private servers that don't keep or see your data.",
+      "inUsePcc": "The coach uses {{engine}} with Private Cloud Compute.",
+      "pccToggle": "Use Private Cloud Compute",
+      "pccToggleHint": "More complete answers. If you turn it off, your data stays on your phone but the coach is less accurate.",
+      "pccQuota": "You've reached today's Private Cloud Compute limit: until tomorrow the coach uses the on-device model."
     },
     "cloud": {
       "toggle": "Use an online AI service (more powerful)",
