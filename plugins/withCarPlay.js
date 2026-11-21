@@ -5,7 +5,7 @@
  * - CarPlaySceneDelegate nel target dell'app: collega i template (modulo car-voice) e avvia
  *   React Native senza finestra ("AlbACar", vedi index.ts), così il coach funziona anche con
  *   il telefono bloccato e l'app chiusa.
- * - Audio in background: la conversazione continua con lo schermo del telefono spento.
+ * - Audio in background (solo con CARPLAY_ENTITLED=1): la conversazione continua a telefono spento.
  * - Entitlement com.apple.developer.carplay-voice-based-conversation: lo concede Apple su richiesta.
  *   Finché non è approvato e aggiunto all'App ID, la build fallirebbe la firma: si aggiunge solo
  *   con CARPLAY_ENTITLED=1 (in eas.json quando Apple l'ha concesso, o per il simulatore).
@@ -78,9 +78,12 @@ const withCarPlayScene = (config) =>
     };
     config.modResults.UIApplicationSceneManifest = manifest;
 
-    const modes = new Set(config.modResults.UIBackgroundModes ?? []);
-    modes.add('audio');
-    config.modResults.UIBackgroundModes = [...modes];
+    // Audio in background solo con CarPlay attivo: senza, Apple contesterebbe una modalità non usata.
+    if (process.env.CARPLAY_ENTITLED === '1') {
+      const modes = new Set(config.modResults.UIBackgroundModes ?? []);
+      modes.add('audio');
+      config.modResults.UIBackgroundModes = [...modes];
+    }
     return config;
   });
 
