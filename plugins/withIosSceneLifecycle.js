@@ -26,9 +26,12 @@ class SceneDelegate: ExpoAppSceneDelegate {
 
 const withSceneManifest = (config) =>
   withInfoPlist(config, (config) => {
+    // Si conservano le altre scene (es. CarPlay, plugins/withCarPlay.js), qualunque sia l'ordine dei plugin.
+    const previous = config.modResults.UIApplicationSceneManifest?.UISceneConfigurations ?? {};
     config.modResults.UIApplicationSceneManifest = {
       UIApplicationSupportsMultipleScenes: false,
       UISceneConfigurations: {
+        ...previous,
         UIWindowSceneSessionRoleApplication: [
           {
             UISceneConfigurationName: 'Default Configuration',

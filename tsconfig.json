@@ -10,6 +10,7 @@
       "@/*": ["./src/*"],
       "on-device-ai": ["./modules/on-device-ai"],
       "audio-route": ["./modules/audio-route"],
+      "car-voice": ["./modules/car-voice"],
       "file-preview": ["./modules/file-preview"]
     }
   },

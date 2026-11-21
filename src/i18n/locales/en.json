@@ -1436,5 +1436,12 @@
     "progressNow": "Now {{now}}: {{left}} to go",
     "trendFlat": "Weight about stable ({{trend}} a week): no real progress yet.",
     "trendSlow": "Trend {{trend}} a week: right direction, but at this pace it would take more than a year."
+  },
+  "car": {
+    "talk": "Talk to the coach",
+    "paused": "Paused · tap the mic",
+    "setupNeeded": "Open AlbA on your phone and finish setting it up.",
+    "startError": "AlbA couldn't start. Open it on your phone.",
+    "ok": "OK"
   }
 }

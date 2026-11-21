@@ -1,6 +1,6 @@
 {
   "name": "health-coach",
-  "version": "1.40.0",
+  "version": "1.41.0",
   "main": "index.ts",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.129.0",
@@ -96,6 +96,7 @@
       "^@/(.*)$": "<rootDir>/src/$1",
       "^on-device-ai$": "<rootDir>/modules/on-device-ai",
       "^audio-route$": "<rootDir>/modules/audio-route",
+      "^car-voice$": "<rootDir>/modules/car-voice",
       "^file-preview$": "<rootDir>/modules/file-preview"
     }
   }

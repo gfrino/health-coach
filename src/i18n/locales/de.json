@@ -1436,5 +1436,12 @@
     "progressNow": "Jetzt {{now}}: noch {{left}}",
     "trendFlat": "Gewicht fast stabil ({{trend}} pro Woche): noch kein echter Fortschritt.",
     "trendSlow": "Verlauf {{trend}} pro Woche: die Richtung stimmt, aber in diesem Tempo dauert es über ein Jahr."
+  },
+  "car": {
+    "talk": "Mit dem Coach sprechen",
+    "paused": "Pausiert · Mikrofon antippen",
+    "setupNeeded": "Öffne AlbA auf dem Telefon und schließe die Einrichtung ab.",
+    "startError": "AlbA konnte nicht starten. Öffne die App auf dem Telefon.",
+    "ok": "OK"
   }
 }

@@ -1436,5 +1436,12 @@
     "progressNow": "Maintenant {{now}} : encore {{left}}",
     "trendFlat": "Poids presque stable ({{trend}} par semaine) : pas encore de vrai progrès.",
     "trendSlow": "Tendance {{trend}} par semaine : la direction est bonne, mais à ce rythme il faudrait plus d’un an."
+  },
+  "car": {
+    "talk": "Parler au coach",
+    "paused": "En pause · touchez le micro",
+    "setupNeeded": "Ouvrez AlbA sur votre téléphone et terminez la configuration.",
+    "startError": "AlbA n'a pas pu démarrer. Ouvrez-la sur votre téléphone.",
+    "ok": "OK"
   }
 }

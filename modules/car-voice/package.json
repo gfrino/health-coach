@@ -1,0 +1,7 @@
+{
+  "name": "car-voice",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "description": "CarPlay voice coach (voice-based conversational app) for AlbA"
+}

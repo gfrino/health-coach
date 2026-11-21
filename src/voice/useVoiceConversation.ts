@@ -31,7 +31,10 @@ const HISTORY_TURNS = 12;
 export function useVoiceConversation(
   conversationId: string | null,
   onConversationCreated: (id: string) => void,
+  /** CarPlay: l'app è sempre "in background" per il telefono, la conversazione non va sospesa. */
+  options: { background?: boolean } = {},
 ) {
+  const background = options.background === true;
   const settings = useSettingsStore((s) => s.settings);
   const language = resolveLanguage(settings.language, deviceLanguageCodes());
   const locale = speechLocale(language);
@@ -166,14 +169,14 @@ export function useVoiceConversation(
         // Con l'app in background (schermo spento, altra app) iOS taglia l'audio: non è un
         // problema di rete. La conversazione si riprende al ritorno.
         onError: (e) => {
-          if (AppState.currentState !== 'active') pausedRef.current = true;
+          if (!background && AppState.currentState !== 'active') pausedRef.current = true;
           else setError(e);
         },
       },
     );
     session.current = s;
     await s.start();
-  }, [engine, settings, language, save]);
+  }, [engine, settings, language, save, background]);
 
   const stop = useCallback(() => {
     active.current = false;
@@ -191,7 +194,7 @@ export function useVoiceConversation(
     startRef.current = start;
   }, [start]);
   useEffect(() => {
-    if (engine !== 'realtime') return;
+    if (engine !== 'realtime' || background) return;
     const sub = AppState.addEventListener('change', (next) => {
       if (next === 'background' && active.current && session.current) {
         pausedRef.current = true;
@@ -203,7 +206,7 @@ export function useVoiceConversation(
       }
     });
     return () => sub.remove();
-  }, [engine]);
+  }, [engine, background]);
 
   /** Tocco sull'orb: interrompe il coach (loop), riprende ad ascoltare o riprova dopo un errore. */
   const tap = useCallback(() => {

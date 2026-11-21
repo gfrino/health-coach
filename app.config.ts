@@ -247,6 +247,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'react-native-health-connect',
     // Ciclo di vita UIScene richiesto dall'SDK iOS 27 (rimuovere con SDK 58).
     './plugins/withIosSceneLifecycle',
+    // Coach vocale su CarPlay (app di conversazione vocale, iOS 26.4+).
+    './plugins/withCarPlay',
     ['./plugins/withShareExtensionFixes', { targetName: 'HealthCoachShare', displayName: 'AlbA' }],
   ],
   experiments: {
