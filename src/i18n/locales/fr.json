@@ -525,7 +525,7 @@
     "device": {
       "title": "IA du téléphone · {{engine}}",
       "recommended": "RECOMMANDÉE",
-      "pitch": "Fonctionne directement sur votre téléphone : aucun compte à créer, aucun coût, et vos données ne quittent jamais l'appareil.",
+      "pitch": "Gratuit, sans compte. Vos données restent sur le téléphone.",
       "checking": "Je vérifie si votre téléphone la prend en charge…",
       "use": "Utiliser {{engine}}",
       "inUse": "Votre coach utilise {{engine}} sur votre téléphone.",
@@ -537,15 +537,15 @@
       "enableAppleIntelligence": "Activez Apple Intelligence : ouvrez Réglages › Apple Intelligence et Siri, activez-la puis revenez ici.",
       "notSupportedIOS": "Cet iPhone ne prend pas en charge Apple Intelligence (il faut un iPhone 15 Pro ou plus récent). Vous pouvez utiliser un service d'IA en ligne ci-dessous.",
       "notSupportedAndroid": "Ce téléphone ne prend pas en charge Gemini Nano. Vous pouvez utiliser un service d'IA en ligne ci-dessous.",
-      "pitchPcc": "Aucun compte à créer, aucun coût. Les réponses viennent d'Apple Intelligence : sur votre téléphone ou, pour de meilleures réponses, sur Private Cloud Compute, les serveurs privés d'Apple qui ne conservent ni ne voient vos données.",
+      "pitchPcc": "Gratuit, sans compte. Les réponses viennent du téléphone ou des serveurs privés d'Apple, qui ne voient pas vos données.",
       "inUsePcc": "Le coach utilise {{engine}} avec Private Cloud Compute.",
       "pccToggle": "Utiliser Private Cloud Compute",
-      "pccToggleHint": "Des réponses plus complètes. Si vous le désactivez, vos données restent sur le téléphone mais le coach est moins précis.",
+      "pccToggleHint": "De meilleures réponses. Si vous le désactivez, tout reste sur le téléphone.",
       "pccQuota": "Vous avez atteint la limite de Private Cloud Compute pour aujourd'hui : jusqu'à demain, le coach utilise le modèle du téléphone."
     },
     "cloud": {
-      "toggle": "Utiliser un service d'IA en ligne (plus puissant)",
-      "toggleHint": "Gemini, Claude ou ChatGPT avec votre propre compte : il faut une clé API."
+      "toggle": "Ou utilisez ChatGPT, Claude ou Gemini",
+      "toggleHint": "Plus puissants, avec votre propre compte : le guide vous aide à créer la clé."
     },
     "paste": "Coller la clé copiée",
     "pasted": "Clé trouvée dans le presse-papiers : vérification…",

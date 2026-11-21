@@ -52,6 +52,8 @@ export function CloudAISetup({
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [model, setModel] = useState<string | null>(ai.provider === provider ? ai.model : null);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
+  /** La guida e la chiave compaiono solo dopo aver scelto un servizio (o se è già in uso). */
+  const [chosen, setChosen] = useState(!!ai.provider && ai.provider !== 'device');
 
   const info = PROVIDERS[provider];
   const connected = ai.provider === provider && !!ai.model && !!savedKey && status.kind !== 'error';
@@ -72,6 +74,7 @@ export function CloudAISetup({
   }, [provider]);
 
   const selectProvider = (id: CloudAIProviderId) => {
+    setChosen(true);
     if (id === provider) return;
     setProvider(id);
     setSavedKey(null);
@@ -161,7 +164,8 @@ export function CloudAISetup({
     <View style={{ gap: spacing.lg }}>
       <ChipGroup
         label={t('ai.chooseProvider')}
-        value={provider}
+        // Nessuna scelta evidenziata finché l'utente non tocca un servizio.
+        value={(chosen ? provider : '') as CloudAIProviderId}
         onChange={selectProvider}
         options={CLOUD_AI_PROVIDERS.map((id) => ({
           value: id,
@@ -171,6 +175,8 @@ export function CloudAISetup({
         }))}
       />
 
+      {chosen ? (
+        <>
       <Card tone="soft">
         <AppText variant="headline">{t('ai.guideTitle', { provider: info.name })}</AppText>
         {Array.from({ length: info.guideSteps }, (_, i) => (
@@ -272,6 +278,8 @@ export function CloudAISetup({
             ...models.filter((m) => m.id !== model).slice(0, MAX_MODELS_SHOWN - 1),
           ].map((m) => ({ value: m.id, label: m.displayName }))}
         />
+      ) : null}
+        </>
       ) : null}
     </View>
   );

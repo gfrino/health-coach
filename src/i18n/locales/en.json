@@ -525,7 +525,7 @@
     "device": {
       "title": "Phone AI · {{engine}}",
       "recommended": "RECOMMENDED",
-      "pitch": "Runs directly on your phone: no account to create, no cost, and your data never leaves the device.",
+      "pitch": "Free, no account. Your data stays on your phone.",
       "checking": "Checking whether your phone supports it…",
       "use": "Use {{engine}}",
       "inUse": "Your coach uses {{engine}} on your phone.",
@@ -537,15 +537,15 @@
       "enableAppleIntelligence": "Turn on Apple Intelligence: open Settings › Apple Intelligence & Siri, switch it on and come back here.",
       "notSupportedIOS": "This iPhone doesn't support Apple Intelligence (it needs an iPhone 15 Pro or newer). You can use an online AI service below.",
       "notSupportedAndroid": "This phone doesn't support Gemini Nano. You can use an online AI service below.",
-      "pitchPcc": "No account to create and no cost. Answers come from Apple Intelligence: on your phone or, for better answers, on Private Cloud Compute, Apple's private servers that don't keep or see your data.",
+      "pitchPcc": "Free, no account. Answers come from your phone or Apple's private servers, which can't see your data.",
       "inUsePcc": "The coach uses {{engine}} with Private Cloud Compute.",
       "pccToggle": "Use Private Cloud Compute",
-      "pccToggleHint": "More complete answers. If you turn it off, your data stays on your phone but the coach is less accurate.",
+      "pccToggleHint": "Better answers. If you turn it off, everything stays on your phone.",
       "pccQuota": "You've reached today's Private Cloud Compute limit: until tomorrow the coach uses the on-device model."
     },
     "cloud": {
-      "toggle": "Use an online AI service (more powerful)",
-      "toggleHint": "Gemini, Claude or ChatGPT with your own account: you'll need an API key."
+      "toggle": "Or use ChatGPT, Claude or Gemini",
+      "toggleHint": "More powerful, with your own account: the guide helps you create the key."
     },
     "paste": "Paste the copied key",
     "pasted": "Key found in the clipboard: verifying it…",
