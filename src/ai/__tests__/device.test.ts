@@ -1,6 +1,12 @@
 // jest.mock viene spostato in cima da babel: gli import ricevono già il modulo finto.
 import { AIError } from '../errors';
-import { buildDevicePrompt, deviceProvider, resetPccPause, usesPcc } from '../providers/device';
+import {
+  buildDevicePrompt,
+  deviceProvider,
+  isDeviceUnsupported,
+  resetPccPause,
+  usesPcc,
+} from '../providers/device';
 
 jest.mock('on-device-ai', () => {
   const listeners: ((e: { requestId: string; text: string }) => void)[] = [];
@@ -113,7 +119,11 @@ describe('deviceProvider con Private Cloud Compute', () => {
   beforeEach(() => {
     resetPccPause();
     pccNative.generate.mockClear();
-    pccNative.getAvailability.mockResolvedValue({ status: 'available', engine: 'apple', pcc: 'available' });
+    pccNative.getAvailability.mockResolvedValue({
+      status: 'available',
+      engine: 'apple',
+      pcc: 'available',
+    });
     pccNative.generateWith = jest.fn(async () => 'Risposta PCC');
   });
 
@@ -125,23 +135,38 @@ describe('deviceProvider con Private Cloud Compute', () => {
   it('usa PCC quando è disponibile', async () => {
     const res = await send({ system: 'FULL' });
     expect(res.text).toBe('Risposta PCC');
-    expect(pccNative.generateWith).toHaveBeenCalledWith(expect.any(String), 'FULL', 'User: Ciao\nCoach:', 'pcc');
+    expect(pccNative.generateWith).toHaveBeenCalledWith(
+      expect.any(String),
+      'FULL',
+      'User: Ciao\nCoach:',
+      'pcc',
+    );
     expect(pccNative.generate).not.toHaveBeenCalled();
   });
 
   it('senza PCC (quota esaurita o build vecchia) usa il telefono', async () => {
-    pccNative.getAvailability.mockResolvedValue({ status: 'available', engine: 'apple', pcc: 'quota' });
+    pccNative.getAvailability.mockResolvedValue({
+      status: 'available',
+      engine: 'apple',
+      pcc: 'quota',
+    });
     await send({ system: 'FULL' });
     expect(pccNative.generateWith).not.toHaveBeenCalled();
     expect(pccNative.generate).toHaveBeenCalled();
   });
 
   it('se PCC non risponde ripiega sul telefono con il prompt ridotto, e per un po’ non riprova', async () => {
-    pccNative.generateWith!.mockRejectedValueOnce(Object.assign(new Error('offline'), { code: 'pcc_network' }));
+    pccNative.generateWith!.mockRejectedValueOnce(
+      Object.assign(new Error('offline'), { code: 'pcc_network' }),
+    );
     const fallbackSystem = jest.fn(async () => 'COMPACT');
     const res = await send({ system: 'FULL', fallbackSystem });
     expect(res.text).toBe('Ciao, come stai?');
-    expect(pccNative.generate).toHaveBeenCalledWith(expect.any(String), 'COMPACT', 'User: Ciao\nCoach:');
+    expect(pccNative.generate).toHaveBeenCalledWith(
+      expect.any(String),
+      'COMPACT',
+      'User: Ciao\nCoach:',
+    );
     expect(await usesPcc(true)).toBe(false);
   });
 
@@ -152,7 +177,9 @@ describe('deviceProvider con Private Cloud Compute', () => {
       );
       throw Object.assign(new Error('offline'), { code: 'pcc_network' });
     });
-    await expect(send({ system: 'FULL', fallbackSystem: async () => 'COMPACT' })).rejects.toMatchObject({
+    await expect(
+      send({ system: 'FULL', fallbackSystem: async () => 'COMPACT' }),
+    ).rejects.toMatchObject({
       code: 'network',
     });
     expect(pccNative.generate).not.toHaveBeenCalled();
@@ -162,5 +189,38 @@ describe('deviceProvider con Private Cloud Compute', () => {
     expect(await usesPcc(false)).toBe(false);
     await send({ system: 'FULL' });
     expect(pccNative.generateWith).not.toHaveBeenCalled();
+  });
+});
+
+describe('isDeviceUnsupported', () => {
+  it("vero solo se il telefono non ha l'AI integrata", () => {
+    expect(
+      isDeviceUnsupported({
+        engine: 'gemini-nano',
+        status: 'unavailable',
+        reason: 'deviceNotEligible',
+      }),
+    ).toBe(true);
+    expect(
+      isDeviceUnsupported({
+        engine: 'gemini-nano',
+        status: 'unavailable',
+        reason: 'unsupportedOS',
+      }),
+    ).toBe(true);
+    expect(isDeviceUnsupported({ engine: 'gemini-nano', status: 'unavailable' })).toBe(true);
+    expect(
+      isDeviceUnsupported({ engine: 'gemini-nano', status: 'unavailable', reason: 'notEnabled' }),
+    ).toBe(false);
+    expect(
+      isDeviceUnsupported({
+        engine: 'gemini-nano',
+        status: 'unavailable',
+        reason: 'modelNotReady',
+      }),
+    ).toBe(false);
+    expect(isDeviceUnsupported({ engine: 'gemini-nano', status: 'downloadable' })).toBe(false);
+    expect(isDeviceUnsupported({ engine: 'gemini-nano', status: 'available' })).toBe(false);
+    expect(isDeviceUnsupported(null)).toBe(false);
   });
 });

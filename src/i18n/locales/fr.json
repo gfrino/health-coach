@@ -545,7 +545,9 @@
     },
     "cloud": {
       "toggle": "Ou utilisez ChatGPT, Claude ou Gemini",
-      "toggleHint": "Plus puissants, avec votre propre compte : le guide vous aide à créer la clé."
+      "toggleHint": "Plus puissants, avec votre propre compte : le guide vous aide à créer la clé.",
+      "unsupportedTitle": "Ce téléphone ne prend pas en charge {{engine}}",
+      "unsupportedHint": "Pour utiliser le coach, connectez l'un de ces services : touchez-en un et suivez le guide pour créer votre clé."
     },
     "paste": "Coller la clé copiée",
     "pasted": "Clé trouvée dans le presse-papiers : vérification…",

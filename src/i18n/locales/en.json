@@ -545,7 +545,9 @@
     },
     "cloud": {
       "toggle": "Or use ChatGPT, Claude or Gemini",
-      "toggleHint": "More powerful, with your own account: the guide helps you create the key."
+      "toggleHint": "More powerful, with your own account: the guide helps you create the key.",
+      "unsupportedTitle": "This phone doesn't support {{engine}}",
+      "unsupportedHint": "To use the coach, connect one of these services: tap one and follow the guide to create your key."
     },
     "paste": "Paste the copied key",
     "pasted": "Key found in the clipboard: verifying it…",

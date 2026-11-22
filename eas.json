@@ -44,7 +44,8 @@
       "channel": "production",
       "autoIncrement": true,
       "env": {
-        "APP_VARIANT": "production"
+        "APP_VARIANT": "production",
+        "CARPLAY_ENTITLED": "1"
       },
       "ios": {
         "image": "macos-tahoe-26.6-xcode-27.2"

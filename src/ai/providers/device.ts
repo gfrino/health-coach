@@ -179,7 +179,11 @@ export const deviceProvider: AIProvider = {
     let system = context.system;
     if (await usesPcc(pccPreferred)) {
       try {
-        const r = await generate('pcc', system, buildDevicePrompt(messages, PCC_TRANSCRIPT_CHAR_BUDGET));
+        const r = await generate(
+          'pcc',
+          system,
+          buildDevicePrompt(messages, PCC_TRANSCRIPT_CHAR_BUDGET),
+        );
         return done(r.text);
       } catch (e) {
         const code = (e as { code?: string }).code ?? '';
@@ -214,3 +218,13 @@ export const deviceProvider: AIProvider = {
   supportsVision: () => false,
   supportsTools: () => false,
 };
+
+/**
+ * Il telefono non ha l'AI integrata (modello o sistema non supportato): non vale per
+ * "da attivare" (Apple Intelligence spenta) né per il modello ancora in preparazione.
+ */
+export function isDeviceUnsupported(a: OnDeviceAvailability | null | undefined): boolean {
+  return (
+    !!a && a.status === 'unavailable' && a.reason !== 'notEnabled' && a.reason !== 'modelNotReady'
+  );
+}

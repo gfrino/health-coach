@@ -545,7 +545,9 @@
     },
     "cloud": {
       "toggle": "Oder nutze ChatGPT, Claude oder Gemini",
-      "toggleHint": "Leistungsstärker, mit deinem eigenen Konto: Die Anleitung hilft dir, den Schlüssel zu erstellen."
+      "toggleHint": "Leistungsstärker, mit deinem eigenen Konto: Die Anleitung hilft dir, den Schlüssel zu erstellen.",
+      "unsupportedTitle": "Dieses Telefon unterstützt {{engine}} nicht",
+      "unsupportedHint": "Um den Coach zu nutzen, verbinde einen dieser Dienste: Tippe auf einen und folge der Anleitung, um den Schlüssel zu erstellen."
     },
     "paste": "Kopierten Schlüssel einfügen",
     "pasted": "Schlüssel in der Zwischenablage gefunden: wird geprüft…",
