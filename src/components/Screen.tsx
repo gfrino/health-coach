@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from 'react';
+import { useCallback, useRef, type ReactElement, type ReactNode } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -11,6 +11,7 @@ import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme';
 
 import { AppText } from './AppText';
+import { ScrollIntoViewContext, type ScrollIntoView } from './ScrollIntoView';
 import { MenuButton } from './Sidebar';
 
 interface Props {
@@ -40,6 +41,23 @@ export function Screen({
   menu,
 }: Props) {
   const { colors, spacing } = useTheme();
+  const scrollRef = useRef<ScrollView>(null);
+  const offsetY = useRef(0);
+  // Posizione nel contenuto = scorrimento attuale + distanza sullo schermo dall'inizio dello ScrollView.
+  const scrollIntoView = useCallback<ScrollIntoView>(
+    (target, options) => {
+      const scroller = scrollRef.current;
+      const node = target.current;
+      if (!scroller || !node) return;
+      (scroller as unknown as View).measureInWindow((_sx, sy) => {
+        node.measureInWindow((_x, y) => {
+          const top = offsetY.current + (y - sy) - (options?.offset ?? spacing.md);
+          scroller.scrollTo({ y: Math.max(0, top), animated: true });
+        });
+      });
+    },
+    [spacing.md],
+  );
   const padding = { padding: spacing.lg, gap: spacing.lg };
   const safeEdges: Edge[] = title && !edges.includes('top') ? [...edges, 'top'] : edges;
   const heading = title ? (
@@ -65,15 +83,22 @@ export function Screen({
   return (
     <SafeAreaView edges={safeEdges} style={[styles.flex, { backgroundColor: colors.background }]}>
       {scroll ? (
-        <ScrollView
-          contentContainerStyle={[padding, styles.grow, contentStyle]}
-          contentInsetAdjustmentBehavior="automatic"
-          keyboardShouldPersistTaps="handled"
-          refreshControl={refreshControl}
-        >
-          {heading}
-          {children}
-        </ScrollView>
+        <ScrollIntoViewContext.Provider value={scrollIntoView}>
+          <ScrollView
+            ref={scrollRef}
+            onScroll={(e) => {
+              offsetY.current = e.nativeEvent.contentOffset.y;
+            }}
+            scrollEventThrottle={32}
+            contentContainerStyle={[padding, styles.grow, contentStyle]}
+            contentInsetAdjustmentBehavior="automatic"
+            keyboardShouldPersistTaps="handled"
+            refreshControl={refreshControl}
+          >
+            {heading}
+            {children}
+          </ScrollView>
+        </ScrollIntoViewContext.Provider>
       ) : (
         <View style={[styles.flex, padding, contentStyle]}>
           {heading}

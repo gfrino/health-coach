@@ -484,7 +484,7 @@
       },
       "openai": {
         "1": "Apri la piattaforma OpenAI e accedi o crea un account.",
-        "2": "In Billing aggiungi del credito: l'abbonamento a ChatGPT non vale per le API.",
+        "2": "In Billing aggiungi del credito (minimo 5 $): l'abbonamento a ChatGPT, anche gratuito, non vale per le API. Se la pagina delle chiavi dà errore, di solito manca questo passo: ricarica il credito e riprova (oppure scegli Gemini o Claude).",
         "3": "Vai su API keys e premi \"Create new secret key\".",
         "4": "Premi \"Copy\" accanto alla chiave e chiudi la pagina: la chiave verrà inserita e verificata da sola."
       },

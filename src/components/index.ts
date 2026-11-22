@@ -15,6 +15,7 @@ export { NavRow } from './NavRow';
 export { OptionGroup, type Option } from './OptionGroup';
 export { ProgressBar } from './ProgressBar';
 export { Screen } from './Screen';
+export { useScrollIntoView } from './ScrollIntoView';
 export { MenuButton, Sidebar, openSidebar } from './Sidebar';
 export { SegmentedControl } from './SegmentedControl';
 export { SourcesLink } from './SourcesLink';

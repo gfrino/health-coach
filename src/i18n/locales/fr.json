@@ -484,7 +484,7 @@
       },
       "openai": {
         "1": "Ouvrez la plateforme OpenAI et connectez-vous ou créez un compte.",
-        "2": "Dans Billing, ajoutez du crédit : l'abonnement ChatGPT ne couvre pas l'API.",
+        "2": "Dans Billing, ajoutez du crédit (au moins 5 $) : un abonnement ChatGPT, gratuit ou payant, ne couvre pas l'API. Si la page des clés affiche une erreur, c'est généralement que cette étape manque : ajoutez du crédit et réessayez (ou choisissez Gemini ou Claude).",
         "3": "Allez dans API keys et touchez « Create new secret key ».",
         "4": "Touchez « Copy » à côté de la clé et fermez la page : la clé sera saisie et vérifiée automatiquement."
       },

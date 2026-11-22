@@ -484,7 +484,7 @@
       },
       "openai": {
         "1": "Öffne die OpenAI-Plattform und melde dich an oder erstelle ein Konto.",
-        "2": "Füge unter Billing Guthaben hinzu: Ein ChatGPT-Abo gilt nicht für die API.",
+        "2": "Unter Billing Guthaben aufladen (mindestens 5 $): Ein ChatGPT-Abo, ob kostenlos oder bezahlt, gilt nicht für die API. Zeigt die Seite mit den Schlüsseln einen Fehler, fehlt meist dieser Schritt: Guthaben aufladen und erneut versuchen (oder Gemini bzw. Claude wählen).",
         "3": "Gehe zu API keys und tippe auf „Create new secret key“.",
         "4": "Tippe neben dem Schlüssel auf „Copy“ und schließe die Seite: Der Schlüssel wird automatisch eingefügt und geprüft."
       },

@@ -484,7 +484,7 @@
       },
       "openai": {
         "1": "Open the OpenAI platform and sign in or create an account.",
-        "2": "Under Billing, add credit: a ChatGPT subscription does not cover the API.",
+        "2": "In Billing, add credit (at least $5): a ChatGPT plan, free or paid, doesn't cover the API. If the API keys page shows an error, this step is usually missing: add credit and try again (or choose Gemini or Claude).",
         "3": "Go to API keys and tap \"Create new secret key\".",
         "4": "Tap \"Copy\" next to the key and close the page: the key will be filled in and verified automatically."
       },
