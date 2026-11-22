@@ -14,6 +14,9 @@ import { AppText } from './AppText';
 import { ScrollIntoViewContext, type ScrollIntoView } from './ScrollIntoView';
 import { MenuButton } from './Sidebar';
 
+/** Larghezza massima del contenuto: oltre, le righe di testo diventano troppo lunghe da leggere. */
+const MAX_CONTENT_WIDTH = 720;
+
 interface Props {
   children: ReactNode;
   scroll?: boolean;
@@ -59,7 +62,11 @@ export function Screen({
     [spacing.md],
   );
   const padding = { padding: spacing.lg, gap: spacing.lg };
-  const safeEdges: Edge[] = title && !edges.includes('top') ? [...edges, 'top'] : edges;
+  // Sempre anche sinistra e destra: alcuni schermi (es. lo schermo esterno di iPhone Duo) hanno
+  // una barra verticale su un lato. Su un iPhone normale in verticale questi margini valgono 0.
+  const safeEdges: Edge[] = [
+    ...new Set<Edge>([...edges, ...(title ? (['top'] as Edge[]) : []), 'left', 'right']),
+  ];
   const heading = title ? (
     <View
       style={{
@@ -90,7 +97,7 @@ export function Screen({
               offsetY.current = e.nativeEvent.contentOffset.y;
             }}
             scrollEventThrottle={32}
-            contentContainerStyle={[padding, styles.grow, contentStyle]}
+            contentContainerStyle={[padding, styles.grow, styles.readable, contentStyle]}
             contentInsetAdjustmentBehavior="automatic"
             keyboardShouldPersistTaps="handled"
             refreshControl={refreshControl}
@@ -100,12 +107,14 @@ export function Screen({
           </ScrollView>
         </ScrollIntoViewContext.Provider>
       ) : (
-        <View style={[styles.flex, padding, contentStyle]}>
+        <View style={[styles.flex, padding, styles.readable, contentStyle]}>
           {heading}
           {children}
         </View>
       )}
-      {footer ? <View style={{ padding: spacing.lg, paddingTop: 0 }}>{footer}</View> : null}
+      {footer ? (
+        <View style={[{ padding: spacing.lg, paddingTop: 0 }, styles.readable]}>{footer}</View>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -113,4 +122,6 @@ export function Screen({
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   grow: { flexGrow: 1 },
+  // Schermi larghi (iPhone Duo aperto): righe leggibili, contenuto centrato.
+  readable: { width: '100%', maxWidth: MAX_CONTENT_WIDTH, alignSelf: 'center' },
 });

@@ -72,18 +72,19 @@ export default function VoiceScreen() {
             ? t('chat.savingRecipe')
             : v.tool === 'log_food' || v.tool === 'delete_food_entry'
               ? t('chat.savingFood')
-            : v.tool
-              ? t('chat.readingData')
-              : v.state === 'idle' && v.voiceError
-                ? t(`voice.errors.${v.voiceError}`)
-                : t(`voiceMode.state.${v.state}`);
+              : v.tool
+                ? t('chat.readingData')
+                : v.state === 'idle' && v.voiceError
+                  ? t(`voice.errors.${v.voiceError}`)
+                  : t(`voiceMode.state.${v.state}`);
 
   const canTap = v.engine === 'loop' ? !v.error : !!v.error;
 
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background, padding: spacing.lg }}
-      edges={['top', 'bottom']}
+      // Anche i lati: sullo schermo esterno di iPhone Duo la barra di stato è verticale.
+      edges={['top', 'bottom', 'left', 'right']}
     >
       <View style={{ alignItems: 'center', gap: spacing.xs }}>
         <AppText variant="headline">{coachName}</AppText>

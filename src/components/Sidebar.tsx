@@ -107,7 +107,9 @@ export function Sidebar() {
             backgroundColor: colors.background,
             paddingTop: insets.top + spacing.lg,
             paddingBottom: insets.bottom + spacing.lg,
-            paddingHorizontal: spacing.md,
+            // Il pannello sta sul bordo sinistro: rispetta l'eventuale margine di quel lato.
+            paddingLeft: insets.left + spacing.md,
+            paddingRight: spacing.md,
             gap: spacing.xs,
             transform: [{ translateX: x }],
           }}
