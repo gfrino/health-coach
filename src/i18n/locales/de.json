@@ -463,7 +463,12 @@
     "earlier": "{{minutes}} Minuten früher",
     "later": "{{minutes}} Minuten später",
     "decrease": "Verringern",
-    "increase": "Erhöhen"
+    "increase": "Erhöhen",
+    "timeInvalid": "Ungültige Uhrzeit (z. B. 13:30).",
+    "hh": "hh",
+    "min": "mm",
+    "hours": "Stunden",
+    "minutes": "Minuten"
   },
   "ai": {
     "title": "Wähle die Intelligenz deines Coachs",
@@ -1392,7 +1397,48 @@
       "reached": "Ziel erreicht"
     },
     "writeHealthAndroid": "Auch in Health Connect speichern",
-    "writeHealthNotConnectedAndroid": "Verbinde Health Connect unter Integrationen, um das zu nutzen."
+    "writeHealthNotConnectedAndroid": "Verbinde Health Connect unter Integrationen, um das zu nutzen.",
+    "time": "Uhrzeit",
+    "timeHint": "Mit der genauen Uhrzeit der Mahlzeit sieht die App, wie dein Puls reagiert.",
+    "heart": {
+      "title": "Puls nach der Mahlzeit",
+      "samples": "Messwerte",
+      "meal": "Mahlzeit",
+      "noData": "Keine Pulsdaten rund um diese Mahlzeit. Du brauchst eine Uhr oder einen Sensor, der den Puls aufzeichnet (z. B. Apple Watch), und die Leseberechtigung für die Herzfrequenz.",
+      "tooOld": "Bei Mahlzeiten, die mehr als 30 Tage zurückliegen, wird der Puls nicht im Detail gespeichert.",
+      "beforeAfter": "Vorher {{before}} bpm · nachher {{after}} bpm ({{delta}})",
+      "peak": "Spitze {{value}} bpm",
+      "hrv": "HRV vorher {{before}} ms · nachher {{after}} ms ({{delta}})",
+      "skip": {
+        "otherMealNear": "Innerhalb von 2 Stunden gibt es eine weitere Mahlzeit: Diese Mahlzeit fließt nicht in die Gesamtauswertung ein.",
+        "activity": "Dein Puls ist stark gestiegen, vielleicht warst du aktiv. Diese Mahlzeit fließt nicht in die Gesamtauswertung ein."
+      },
+      "note": "Vorher = Mittelwert von 1 Stunde bis 5 Minuten davor; nachher = Mittelwert von 30 Minuten bis 2 Stunden danach. Nur auf dem Telefon berechnet.",
+      "summaryTitle": "Mahlzeiten und Puls (letzte 30 Tage)",
+      "summaryNoData": "Noch keine Mahlzeiten mit Pulsdaten. Erfasse Mahlzeiten zur richtigen Uhrzeit und trage deine Uhr: Der Vergleich erscheint dann hier.",
+      "summaryAvg_one": "{{count}} Mahlzeit ausgewertet: Nach dem Essen ändert sich dein Puls im Schnitt um {{delta}} bpm.",
+      "summaryAvg_other": "{{count}} Mahlzeiten ausgewertet: Nach dem Essen ändert sich dein Puls im Schnitt um {{delta}} bpm.",
+      "summaryHrv": "HRV nach den Mahlzeiten: im Schnitt {{delta}} ms.",
+      "needMore": "Um zu sehen, ob Kohlenhydrate, Zucker oder Kalorien einen Unterschied machen, braucht es mindestens {{min}} ausgewertete Mahlzeiten (jetzt {{count}}).",
+      "nutrients": {
+        "carbs": "Kohlenhydrate",
+        "sugar": "Zucker",
+        "calories": "Kalorien"
+      },
+      "corr": {
+        "hr": {
+          "up": "Mehr {{nutrient}}, stärkerer Pulsanstieg nach der Mahlzeit (r = {{r}}, klarer Zusammenhang).",
+          "down": "Mehr {{nutrient}}, schwächerer Pulsanstieg nach der Mahlzeit (r = {{r}}, klarer Zusammenhang)."
+        },
+        "hrv": {
+          "up": "Mehr {{nutrient}}, höhere HRV nach der Mahlzeit (r = {{r}}, klarer Zusammenhang).",
+          "down": "Mehr {{nutrient}}, niedrigere HRV nach der Mahlzeit (r = {{r}}, klarer Zusammenhang)."
+        },
+        "unclear": "{{nutrient}}: kein klarer Zusammenhang mit dem Puls (r = {{r}})."
+      },
+      "summaryNote": "Ein Zusammenhang beweist keine Ursache: Auch Schlaf, Kaffee, Stress und Bewegung spielen mit. Keine medizinische Beurteilung. Alles wird auf dem Telefon berechnet; der Export erstellt eine Datei, die du selbst teilst.",
+      "export": "Daten exportieren (CSV)"
+    }
   },
   "citations": {
     "title": "Wissenschaftliche Quellen",

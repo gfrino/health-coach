@@ -463,7 +463,12 @@
     "earlier": "{{minutes}} minuti prima",
     "later": "{{minutes}} minuti dopo",
     "decrease": "Diminuisci",
-    "increase": "Aumenta"
+    "increase": "Aumenta",
+    "timeInvalid": "Ora non valida (es. 13:30).",
+    "hh": "hh",
+    "min": "mm",
+    "hours": "ore",
+    "minutes": "minuti"
   },
   "ai": {
     "title": "Scegli l'intelligenza del coach",
@@ -1392,7 +1397,48 @@
       "reached": "obiettivo raggiunto"
     },
     "writeHealthAndroid": "Salva anche in Health Connect",
-    "writeHealthNotConnectedAndroid": "Collega Health Connect in Integrazioni per usarlo."
+    "writeHealthNotConnectedAndroid": "Collega Health Connect in Integrazioni per usarlo.",
+    "time": "Ora",
+    "timeHint": "L'ora esatta del pasto serve a vedere come risponde il battito.",
+    "heart": {
+      "title": "Battito dopo il pasto",
+      "samples": "campioni",
+      "meal": "pasto",
+      "noData": "Nessun dato di frequenza cardiaca intorno a questo pasto. Serve un orologio o un sensore che registri il battito (es. Apple Watch) e il permesso di lettura della frequenza cardiaca.",
+      "tooOld": "Per i pasti di più di 30 giorni fa il battito non è conservato in dettaglio.",
+      "beforeAfter": "Prima {{before}} bpm · dopo {{after}} bpm ({{delta}})",
+      "peak": "picco {{value}} bpm",
+      "hrv": "HRV prima {{before}} ms · dopo {{after}} ms ({{delta}})",
+      "skip": {
+        "otherMealNear": "C'è un altro pasto entro 2 ore: questo pasto non entra nell'analisi complessiva.",
+        "activity": "Il battito è salito molto: forse c'è stata attività fisica. Questo pasto non entra nell'analisi complessiva."
+      },
+      "note": "Prima = media da 1 ora a 5 minuti prima; dopo = media da 30 minuti a 2 ore dopo. Calcolato solo sul telefono.",
+      "summaryTitle": "Pasti e battito (ultimi 30 giorni)",
+      "summaryNoData": "Nessun pasto con dati sul battito ancora. Registra i pasti all'ora giusta e indossa l'orologio: il confronto comparirà qui.",
+      "summaryAvg_one": "{{count}} pasto analizzato: dopo mangiato il battito cambia in media di {{delta}} bpm.",
+      "summaryAvg_other": "{{count}} pasti analizzati: dopo mangiato il battito cambia in media di {{delta}} bpm.",
+      "summaryHrv": "HRV dopo i pasti: in media {{delta}} ms.",
+      "needMore": "Per capire se carboidrati, zuccheri o calorie fanno la differenza servono almeno {{min}} pasti analizzati (ora {{count}}).",
+      "nutrients": {
+        "carbs": "carboidrati",
+        "sugar": "zuccheri",
+        "calories": "calorie"
+      },
+      "corr": {
+        "hr": {
+          "up": "Più {{nutrient}}, più sale il battito dopo il pasto (r = {{r}}, legame chiaro).",
+          "down": "Più {{nutrient}}, meno sale il battito dopo il pasto (r = {{r}}, legame chiaro)."
+        },
+        "hrv": {
+          "up": "Più {{nutrient}}, più alta l'HRV dopo il pasto (r = {{r}}, legame chiaro).",
+          "down": "Più {{nutrient}}, più bassa l'HRV dopo il pasto (r = {{r}}, legame chiaro)."
+        },
+        "unclear": "{{nutrient}}: nessun legame chiaro con il battito (r = {{r}})."
+      },
+      "summaryNote": "Un legame non dimostra una causa: contano anche sonno, caffè, stress e movimento. Non è una valutazione medica. Tutto è calcolato sul telefono; l'esportazione crea un file che condividi tu.",
+      "export": "Esporta i dati (CSV)"
+    }
   },
   "citations": {
     "title": "Fonti scientifiche",

@@ -463,7 +463,12 @@
     "earlier": "{{minutes}} minutes plus tôt",
     "later": "{{minutes}} minutes plus tard",
     "decrease": "Diminuer",
-    "increase": "Augmenter"
+    "increase": "Augmenter",
+    "timeInvalid": "Heure non valide (ex. 13:30).",
+    "hh": "hh",
+    "min": "mm",
+    "hours": "heures",
+    "minutes": "minutes"
   },
   "ai": {
     "title": "Choisissez l'intelligence de votre coach",
@@ -1392,7 +1397,48 @@
       "reached": "objectif atteint"
     },
     "writeHealthAndroid": "Enregistrer aussi dans Health Connect",
-    "writeHealthNotConnectedAndroid": "Connecte Health Connect dans Intégrations pour l'utiliser."
+    "writeHealthNotConnectedAndroid": "Connecte Health Connect dans Intégrations pour l'utiliser.",
+    "time": "Heure",
+    "timeHint": "L'heure exacte du repas permet de voir comment réagit votre rythme cardiaque.",
+    "heart": {
+      "title": "Rythme cardiaque après le repas",
+      "samples": "mesures",
+      "meal": "repas",
+      "noData": "Aucune donnée de fréquence cardiaque autour de ce repas. Il faut une montre ou un capteur qui enregistre le rythme cardiaque (ex. Apple Watch) et l'autorisation de lire la fréquence cardiaque.",
+      "tooOld": "Pour les repas de plus de 30 jours, le rythme cardiaque n'est pas conservé en détail.",
+      "beforeAfter": "Avant {{before}} bpm · après {{after}} bpm ({{delta}})",
+      "peak": "pic {{value}} bpm",
+      "hrv": "VFC avant {{before}} ms · après {{after}} ms ({{delta}})",
+      "skip": {
+        "otherMealNear": "Un autre repas a lieu dans les 2 heures : ce repas n'entre pas dans l'analyse globale.",
+        "activity": "Votre rythme cardiaque a beaucoup augmenté : peut-être une activité physique. Ce repas n'entre pas dans l'analyse globale."
+      },
+      "note": "Avant = moyenne de 1 heure à 5 minutes avant ; après = moyenne de 30 minutes à 2 heures après. Calculé uniquement sur le téléphone.",
+      "summaryTitle": "Repas et rythme cardiaque (30 derniers jours)",
+      "summaryNoData": "Pas encore de repas avec des données cardiaques. Enregistrez vos repas à la bonne heure et portez votre montre : la comparaison apparaîtra ici.",
+      "summaryAvg_one": "{{count}} repas analysé : après avoir mangé, votre rythme cardiaque varie en moyenne de {{delta}} bpm.",
+      "summaryAvg_other": "{{count}} repas analysés : après avoir mangé, votre rythme cardiaque varie en moyenne de {{delta}} bpm.",
+      "summaryHrv": "VFC après les repas : {{delta}} ms en moyenne.",
+      "needMore": "Pour savoir si les glucides, les sucres ou les calories font une différence, il faut au moins {{min}} repas analysés (actuellement {{count}}).",
+      "nutrients": {
+        "carbs": "glucides",
+        "sugar": "sucres",
+        "calories": "calories"
+      },
+      "corr": {
+        "hr": {
+          "up": "Plus de {{nutrient}}, plus le rythme cardiaque monte après le repas (r = {{r}}, lien net).",
+          "down": "Plus de {{nutrient}}, moins le rythme cardiaque monte après le repas (r = {{r}}, lien net)."
+        },
+        "hrv": {
+          "up": "Plus de {{nutrient}}, VFC plus élevée après le repas (r = {{r}}, lien net).",
+          "down": "Plus de {{nutrient}}, VFC plus basse après le repas (r = {{r}}, lien net)."
+        },
+        "unclear": "{{nutrient}} : pas de lien net avec le rythme cardiaque (r = {{r}})."
+      },
+      "summaryNote": "Un lien ne prouve pas une cause : le sommeil, le café, le stress et le mouvement comptent aussi. Ce n'est pas une évaluation médicale. Tout est calculé sur le téléphone ; l'export crée un fichier que vous partagez vous-même.",
+      "export": "Exporter les données (CSV)"
+    }
   },
   "citations": {
     "title": "Sources scientifiques",

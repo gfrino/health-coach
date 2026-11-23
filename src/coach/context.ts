@@ -319,6 +319,28 @@ export interface FoodContext {
   protein?: { grams: number; perKg: number } | null;
   /** Medie dei nutrienti rispetto ai valori di riferimento (ieri, 7, 30, 365 giorni). */
   nutrients?: NutrientReport | null;
+  /** Battito prima e dopo i pasti, ultimi 30 giorni (solo aggregati calcolati dall'app). */
+  heart?: {
+    meals: number;
+    avgHrDelta: number | null;
+    avgHrvDelta: number | null;
+    /** Legami chiari, es. "carbs→hr +0.62". */
+    links: { nutrient: string; target: 'hr' | 'hrv'; r: number }[];
+  } | null;
+}
+
+/** Riga per il prompt: la risposta del cuore ai pasti, con le cautele del caso. */
+export function heartMealLine(heart: FoodContext['heart']): string | null {
+  if (!heart || heart.meals < 1) return null;
+  const links = heart.links.length
+    ? ` Clear links: ${heart.links
+        .map(
+          (l) =>
+            `more ${l.nutrient} → ${l.target === 'hr' ? 'heart rate' : 'HRV'} ${l.r > 0 ? 'higher' : 'lower'} after the meal (r ${l.r})`,
+        )
+        .join('; ')}.`
+    : ' No clear link with carbs, sugar or calories yet.';
+  return `HEART AFTER MEALS (last 30 days, ${heart.meals} meals analyzed by the app: heart rate 30–120 min after vs 60–5 min before)${heart.avgHrDelta != null ? `: average change ${heart.avgHrDelta > 0 ? '+' : ''}${heart.avgHrDelta} bpm` : ''}${heart.avgHrvDelta != null ? `, HRV ${heart.avgHrvDelta > 0 ? '+' : ''}${heart.avgHrvDelta} ms` : ''}.${links} A correlation, not a cause (sleep, coffee, stress, movement matter); never a medical judgment. Details and chart: Food tab.`;
 }
 
 const FOOD_RULE = `FOOD DIARY
@@ -353,7 +375,11 @@ export function foodSection(
         )
         .join(', ')}.`
     : null;
-  const check = food.nutrients ? nutrientLines(food.nutrients, compact) : null;
+  const heartLine = heartMealLine(food.heart);
+  const check =
+    [food.nutrients ? nutrientLines(food.nutrients, compact) : null, heartLine]
+      .filter(Boolean)
+      .join('\n') || null;
   if (compact)
     return `FOOD DIARY\n${head}.${tracked ? `\n${tracked}` : ''}${check ? `\n${check}` : ''}`;
   const lines = food.today.map(

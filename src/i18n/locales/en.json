@@ -463,7 +463,12 @@
     "earlier": "{{minutes}} minutes earlier",
     "later": "{{minutes}} minutes later",
     "decrease": "Decrease",
-    "increase": "Increase"
+    "increase": "Increase",
+    "timeInvalid": "Invalid time (e.g. 13:30).",
+    "hh": "hh",
+    "min": "mm",
+    "hours": "hours",
+    "minutes": "minutes"
   },
   "ai": {
     "title": "Choose your coach's intelligence",
@@ -1392,7 +1397,48 @@
       "reached": "goal reached"
     },
     "writeHealthAndroid": "Also save to Health Connect",
-    "writeHealthNotConnectedAndroid": "Connect Health Connect in Integrations to use this."
+    "writeHealthNotConnectedAndroid": "Connect Health Connect in Integrations to use this.",
+    "time": "Time",
+    "timeHint": "The exact meal time lets the app see how your heart rate responds.",
+    "heart": {
+      "title": "Heart rate after the meal",
+      "samples": "samples",
+      "meal": "meal",
+      "noData": "No heart rate data around this meal. You need a watch or sensor that records your heart rate (e.g. Apple Watch) and permission to read heart rate.",
+      "tooOld": "For meals more than 30 days ago, heart rate isn't kept in detail.",
+      "beforeAfter": "Before {{before}} bpm · after {{after}} bpm ({{delta}})",
+      "peak": "peak {{value}} bpm",
+      "hrv": "HRV before {{before}} ms · after {{after}} ms ({{delta}})",
+      "skip": {
+        "otherMealNear": "There's another meal within 2 hours: this meal is left out of the overall analysis.",
+        "activity": "Your heart rate rose a lot: maybe you were active. This meal is left out of the overall analysis."
+      },
+      "note": "Before = average from 1 hour to 5 minutes before; after = average from 30 minutes to 2 hours after. Calculated on your phone only.",
+      "summaryTitle": "Meals and heart rate (last 30 days)",
+      "summaryNoData": "No meals with heart rate data yet. Log meals at the right time and wear your watch: the comparison will show up here.",
+      "summaryAvg_one": "{{count}} meal analyzed: after eating, your heart rate changes by {{delta}} bpm on average.",
+      "summaryAvg_other": "{{count}} meals analyzed: after eating, your heart rate changes by {{delta}} bpm on average.",
+      "summaryHrv": "HRV after meals: {{delta}} ms on average.",
+      "needMore": "To see whether carbs, sugar or calories make a difference, at least {{min}} analyzed meals are needed (now {{count}}).",
+      "nutrients": {
+        "carbs": "carbs",
+        "sugar": "sugar",
+        "calories": "calories"
+      },
+      "corr": {
+        "hr": {
+          "up": "More {{nutrient}}, bigger heart rate rise after the meal (r = {{r}}, clear link).",
+          "down": "More {{nutrient}}, smaller heart rate rise after the meal (r = {{r}}, clear link)."
+        },
+        "hrv": {
+          "up": "More {{nutrient}}, higher HRV after the meal (r = {{r}}, clear link).",
+          "down": "More {{nutrient}}, lower HRV after the meal (r = {{r}}, clear link)."
+        },
+        "unclear": "{{nutrient}}: no clear link with heart rate (r = {{r}})."
+      },
+      "summaryNote": "A link doesn't prove a cause: sleep, coffee, stress and movement matter too. This is not a medical assessment. Everything is calculated on your phone; export creates a file that you share yourself.",
+      "export": "Export data (CSV)"
+    }
   },
   "citations": {
     "title": "Scientific sources",

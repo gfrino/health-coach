@@ -5,9 +5,12 @@ import { Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Button, ChipGroup, Screen } from '@/components';
+import { TimeField } from '@/components/TimeField';
 import { foodRepository, getDb } from '@/db';
 import { FOOD_MEALS, type FoodEntry, type FoodMeal } from '@/db/repositories/foodRepository';
+import { atTime, timeOf } from '@/food/days';
 import { FoodItemFields, fromDraft, toDraft, type FoodDraft } from '@/food/FoodItemFields';
+import { HeartMealCard } from '@/food/HeartMealCard';
 import { removeFoodEntryFromHealth, syncFoodEntryToHealth } from '@/food/healthWrite';
 import { haptic } from '@/lib/haptics';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -20,6 +23,7 @@ export default function FoodEntryScreen() {
   const [entry, setEntry] = useState<FoodEntry | null>(null);
   const [draft, setDraft] = useState<FoodDraft | null>(null);
   const [meal, setMeal] = useState<FoodMeal>('snack');
+  const [time, setTime] = useState('12:00');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -29,6 +33,7 @@ export default function FoodEntryScreen() {
       if (e) {
         setDraft(toDraft(e));
         setMeal(e.meal);
+        setTime(timeOf(e.eatenAt));
       }
     })();
   }, [id]);
@@ -39,7 +44,11 @@ export default function FoodEntryScreen() {
     const v = fromDraft(draft);
     if (!v.name) return;
     setBusy(true);
-    await foodRepository.updateEntry(await getDb(), entry.id, { ...v, meal });
+    await foodRepository.updateEntry(await getDb(), entry.id, {
+      ...v,
+      meal,
+      eatenAt: atTime(entry.day, time),
+    });
     haptic.success();
     void syncFoodEntryToHealth(entry.id);
     router.back();
@@ -93,6 +102,13 @@ export default function FoodEntryScreen() {
           onChange={setMeal}
           options={FOOD_MEALS.map((m) => ({ value: m, label: t(`food.meals.${m}`) }))}
         />
+        <TimeField
+          label={t('food.time')}
+          value={time}
+          onChange={setTime}
+          hint={t('food.timeHint')}
+        />
+        <HeartMealCard eatenAt={atTime(entry.day, time)} />
         <FoodItemFields value={draft} onChange={setDraft} />
         <Button label={t('food.delete')} variant="ghost" onPress={remove} />
       </Screen>

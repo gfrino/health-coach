@@ -23,6 +23,7 @@ import { macroGuide } from '@/food/macroGuide';
 import { loadFoodTargets, type CalorieTarget, type ProteinTarget } from '@/food/target';
 import { NutrientList } from '@/food/NutrientList';
 import { ageFrom, effectiveReference, nutrientReference, type RefProfile } from '@/food/references';
+import { HeartMealsSummary } from '@/food/HeartMealsSummary';
 import { TrackerSettings } from '@/food/TrackerSettings';
 import { canWriteToHealthHere } from '@/food/healthWrite';
 import { WaterBar, WaterQuickAdd } from '@/food/WaterQuickAdd';
@@ -584,6 +585,9 @@ export default function FoodScreen() {
             </Card>
           );
         })}
+
+        {/* Battito prima e dopo i pasti (ultimi 30 giorni, calcolato sul telefono) */}
+        <HeartMealsSummary />
 
         {/* Obiettivo e Apple Salute */}
         <Card tone="soft">

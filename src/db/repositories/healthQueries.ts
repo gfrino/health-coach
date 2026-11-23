@@ -30,6 +30,24 @@ export async function dailyMetric(
   };
 }
 
+/**
+ * Campioni grezzi di un tipo in un intervallo (es. frequenza cardiaca intorno a un pasto).
+ * Esclude i riassunti giornalieri: la frequenza cardiaca resta grezza solo per 30 giorni.
+ */
+export async function metricSamples(
+  db: Db,
+  type: string,
+  fromMs: number,
+  toMs: number,
+): Promise<{ at: number; value: number }[]> {
+  return db.getAllAsync<{ at: number; value: number }>(
+    `SELECT start_at AS at, value FROM metrics
+     WHERE type = ? AND start_at >= ? AND start_at <= ? AND source != 'daily_summary'
+     ORDER BY start_at`,
+    [type, fromMs, toMs],
+  );
+}
+
 export async function labResultsByName(db: Db, name: string, limit = 20) {
   const q = `%${name.trim().toLowerCase()}%`;
   return db.getAllAsync<{

@@ -33,3 +33,12 @@ export function trendOf(
   if (delta < -0.05) return 'down';
   return 'stable';
 }
+
+/** "HH:MM" valido o null. */
+export function parseTime(h: string, m: string): string | null {
+  if (!/^\d{1,2}$/.test(h) || !/^\d{1,2}$/.test(m)) return null;
+  const hh = Number(h);
+  const mm = Number(m);
+  if (hh > 23 || mm > 59) return null;
+  return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+}

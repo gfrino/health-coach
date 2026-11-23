@@ -19,3 +19,17 @@ export function eatenAtFor(day: string, meal: FoodMeal, now = new Date()): numbe
   d.setHours(MEAL_HOURS[meal], 0, 0, 0);
   return d.getTime();
 }
+
+/** Ora locale "HH:MM" di un istante. */
+export function timeOf(ms: number): string {
+  const d = new Date(ms);
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+/** Istante del giorno `day` (YYYY-MM-DD) all'ora locale "HH:MM". */
+export function atTime(day: string, time: string): number {
+  const [h = 0, m = 0] = time.split(':').map(Number);
+  const d = new Date(`${day}T12:00:00`);
+  d.setHours(h, m, 0, 0);
+  return d.getTime();
+}

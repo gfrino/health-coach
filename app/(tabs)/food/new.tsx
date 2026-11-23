@@ -5,6 +5,7 @@ import { Image, Keyboard, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, Button, Card, ChipGroup, Icon, Screen, TextField } from '@/components';
+import { TimeField } from '@/components/TimeField';
 import { toAIError } from '@/ai/errors';
 import { foodRepository, getDb } from '@/db';
 import {
@@ -14,7 +15,7 @@ import {
   type FoodEntry,
   type FoodMeal,
 } from '@/db/repositories/foodRepository';
-import { eatenAtFor } from '@/food/days';
+import { atTime, eatenAtFor, timeOf } from '@/food/days';
 import { canReadFoodPhotos, estimateFood } from '@/food/estimate';
 import { pickFoodPhoto } from '@/food/photo';
 import {
@@ -46,6 +47,13 @@ export default function NewFoodScreen() {
   const [meal, setMeal] = useState<FoodMeal>(
     params.meal ? asFoodMeal(params.meal) : mealForTime(new Date()),
   );
+  // Ora del pasto: adesso se è oggi, altrimenti l'ora tipica; l'utente può correggerla.
+  const [time, setTime] = useState(() => timeOf(eatenAtFor(day, meal)));
+  const [timeEdited, setTimeEdited] = useState(false);
+  const chooseMeal = (m: FoodMeal) => {
+    setMeal(m);
+    if (!timeEdited) setTime(timeOf(eatenAtFor(day, m)));
+  };
   const [text, setText] = useState('');
   const [items, setItems] = useState<FoodDraft[]>([]);
   /** Alimento aperto per la modifica (gli altri restano una riga semplice). */
@@ -109,7 +117,7 @@ export default function NewFoodScreen() {
     if (!valid.length) return;
     setBusy('save');
     const db = await getDb();
-    const eatenAt = eatenAtFor(day, meal);
+    const eatenAt = atTime(day, time);
     const ids: string[] = [];
     for (const d of valid)
       ids.push(await foodRepository.createEntry(db, { ...fromDraft(d), meal, eatenAt }));
@@ -135,8 +143,17 @@ export default function NewFoodScreen() {
         <ChipGroup
           label={t('food.meal')}
           value={meal}
-          onChange={setMeal}
+          onChange={chooseMeal}
           options={FOOD_MEALS.map((m) => ({ value: m, label: t(`food.meals.${m}`) }))}
+        />
+        <TimeField
+          label={t('food.time')}
+          value={time}
+          onChange={(v) => {
+            setTime(v);
+            setTimeEdited(true);
+          }}
+          hint={t('food.timeHint')}
         />
 
         {hasAI ? (

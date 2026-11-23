@@ -20,6 +20,7 @@ import { loadAttachmentContent } from '@/records/attachmentContent';
 import { fileTypeOf } from '@/records/fileMeta';
 import { resolveLanguage, deviceLanguageCodes } from '@/i18n';
 import { DAY_MS, localIsoDate } from '@/lib/dates';
+import { analyzeHeartMeals } from '@/food/heartResponse';
 import { loadFoodTargets } from '@/food/target';
 import { addDays, buildNutrientReport } from '@/food/nutrientReport';
 import { ageFrom } from '@/food/references';
@@ -164,17 +165,40 @@ export async function buildSystemPrompt(
 }
 
 /** Diario alimentare per il coach: voci di oggi, media degli ultimi giorni, obiettivo dell'app. */
+/** Battito e pasti negli ultimi 30 giorni: al modello vanno solo medie e legami chiari. */
+async function loadHeartMeals(db: Db, now: Date): Promise<FoodContext['heart']> {
+  const to = now.getTime();
+  const from = to - 30 * 24 * 60 * 60_000;
+  const [meals, hr, hrv] = await Promise.all([
+    foodRepository.listBetween(db, from, to),
+    healthQueries.metricSamples(db, 'heartRate', from - 3 * 60 * 60_000, to),
+    healthQueries.metricSamples(db, 'hrv', from - 3 * 60 * 60_000, to),
+  ]);
+  if (!meals.length || !hr.length) return null;
+  const a = analyzeHeartMeals(meals, hr, hrv);
+  if (!a.used) return null;
+  return {
+    meals: a.used,
+    avgHrDelta: a.avgHrDelta,
+    avgHrvDelta: a.avgHrvDelta,
+    links: a.correlations
+      .filter((c) => c.confidence === 'clear' && c.r != null)
+      .map((c) => ({ nutrient: c.nutrient, target: c.target, r: c.r! })),
+  };
+}
+
 async function loadFoodContext(
   db: Db,
   settings: AppSettings,
   now: Date,
 ): Promise<FoodContext | null> {
   const today = localIsoDate(now);
-  const [entries, year, targets, profile] = await Promise.all([
+  const [entries, year, targets, profile, heart] = await Promise.all([
     foodRepository.listDay(db, today),
     foodRepository.dailyTotals(db, addDays(today, -365), today),
     loadFoodTargets(db, now).catch(() => ({ calories: null, protein: null })),
     profileRepository.getProfile(db),
+    loadHeartMeals(db, now).catch(() => null),
   ]);
   const weekAgo = addDays(today, -7);
   const past = year.filter((d) => d.day < today && d.day >= weekAgo);
@@ -192,6 +216,7 @@ async function loadFoodContext(
   );
   return {
     nutrients: nutrients.trends.length ? nutrients : null,
+    heart,
     trackers: trackers.map((tr) => ({ id: tr.id, name: trackerPromptName(tr), unit: tr.unit })),
     today: entries.map((e) => ({
       id: e.id,
@@ -212,7 +237,9 @@ async function loadFoodContext(
       : estimated
         ? { kcal: estimated.kcal, custom: false, paceKgWeek: estimated.paceKgWeek }
         : null,
-    protein: targets.protein ? { grams: targets.protein.grams, perKg: targets.protein.perKg } : null,
+    protein: targets.protein
+      ? { grams: targets.protein.grams, perKg: targets.protein.perKg }
+      : null,
   };
 }
 
@@ -257,9 +284,9 @@ async function runWithTools(
       { system, tools, fallbackSystem: appleFallback(db, settings) },
       messages,
       {
-      apiKey,
-      model,
-      signal: cb.signal,
+        apiKey,
+        model,
+        signal: cb.signal,
         onToken: (delta) => {
           roundText += delta;
           cb.onText?.(prefix + roundText);

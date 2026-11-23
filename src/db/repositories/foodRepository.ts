@@ -276,6 +276,15 @@ export async function listDay(db: Db, day: string): Promise<FoodEntry[]> {
   return rows.map(toEntry);
 }
 
+/** Voci mangiate in un intervallo di tempo (epoch ms), in ordine di orario. */
+export async function listBetween(db: Db, fromMs: number, toMs: number): Promise<FoodEntry[]> {
+  const rows = await db.getAllAsync<Row>(
+    'SELECT * FROM food_entries WHERE eaten_at >= ? AND eaten_at <= ? ORDER BY eaten_at, created_at',
+    [fromMs, toMs],
+  );
+  return rows.map(toEntry);
+}
+
 type NutrientKey =
   'calories' | 'protein' | 'carbs' | 'fat' | 'fiber' | 'sugar' | 'saturatedFat' | 'sodium';
 
