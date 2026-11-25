@@ -47,3 +47,11 @@ export function commandFor(
       return 'none';
   }
 }
+
+/**
+ * La conversazione in auto gira solo con l'auto collegata E AlbA in primo piano sullo schermo
+ * dell'auto: uscendo da AlbA su CarPlay l'auto resta collegata, ma il coach deve smettere di ascoltare.
+ */
+export function carSessionActive(car: { connected: boolean; visible: boolean }): boolean {
+  return car.connected && car.visible;
+}

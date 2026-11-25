@@ -12,6 +12,7 @@ public final class CarVoiceBridge: NSObject {
   public private(set) var interfaceController: CPInterfaceController?
   var onAction: ((String) -> Void)?
   var onConnection: ((Bool) -> Void)?
+  var onVisibility: ((Bool) -> Void)?
 
   /// Testi tradotti mandati da JS; finché non arrivano si usano questi (italiano).
   var texts = CarVoiceTexts.fallback
@@ -21,6 +22,9 @@ public final class CarVoiceBridge: NSObject {
   private var pendingState: String?
 
   public var isConnected: Bool { interfaceController != nil }
+  /// AlbA è in primo piano sullo schermo dell'auto. Uscendo da AlbA (schermata Home di CarPlay o
+  /// un'altra app) l'auto resta collegata: senza questo la conversazione continuava ad ascoltare.
+  public private(set) var isVisible = false
 
   // MARK: - Ciclo di vita della scena
 
@@ -30,7 +34,16 @@ public final class CarVoiceBridge: NSObject {
     onConnection?(true)
   }
 
+  /// Chiamato dal delegate della scena quando AlbA entra o esce dal primo piano su CarPlay.
+  public func setVisible(_ visible: Bool) {
+    guard visible != isVisible else { return }
+    isVisible = visible
+    if !visible { close() }
+    onVisibility?(visible)
+  }
+
   public func disconnect() {
+    setVisible(false)
     interfaceController = nil
     voiceTemplate = nil
     voicePresented = false

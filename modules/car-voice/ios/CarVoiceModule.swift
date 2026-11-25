@@ -12,7 +12,7 @@ public class CarVoiceModule: Module {
   public func definition() -> ModuleDefinition {
     Name("CarVoice")
 
-    Events("onAction", "onConnection")
+    Events("onAction", "onConnection", "onVisibility")
 
     OnStartObserving {
       let bridge = CarVoiceBridge.shared
@@ -20,16 +20,25 @@ public class CarVoiceModule: Module {
       bridge.onConnection = { [weak self] connected in
         self?.sendEvent("onConnection", ["connected": connected])
       }
+      bridge.onVisibility = { [weak self] visible in
+        self?.sendEvent("onVisibility", ["visible": visible])
+      }
     }
 
     OnStopObserving {
       CarVoiceBridge.shared.onAction = nil
       CarVoiceBridge.shared.onConnection = nil
+      CarVoiceBridge.shared.onVisibility = nil
     }
 
     // Lettura semplice: aggiornata sul main thread da connect/disconnect.
     Function("isConnected") { () -> Bool in
       return CarVoiceBridge.shared.isConnected
+    }
+
+    /// AlbA in primo piano sullo schermo dell'auto.
+    Function("isVisible") { () -> Bool in
+      return CarVoiceBridge.shared.isVisible
     }
 
     AsyncFunction("setTexts") { (texts: CarVoiceTextsRecord) in

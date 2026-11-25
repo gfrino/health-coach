@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useVoiceConversation } from '@/voice/useVoiceConversation';
 
-import { carStateOf, commandFor } from './carState';
+import { carSessionActive, carStateOf, commandFor } from './carState';
 
 const noop = () => undefined;
 
@@ -19,6 +19,9 @@ export function CarVoiceController() {
   const onboarded = useSettingsStore((s) => s.settings.onboardingCompleted);
   const coachName = useSettingsStore((s) => s.settings.coach.name);
   const [connected, setConnected] = useState(() => CarVoice?.isConnected() ?? false);
+  /** AlbA in primo piano sullo schermo dell'auto (l'auto può restare collegata anche fuori da AlbA). */
+  const [visible, setVisible] = useState(() => CarVoice?.isVisible?.() ?? true);
+  const active = carSessionActive({ connected, visible });
   /** Template vocale aperto (dopo "Parla", fino a "Fine" o a un avviso). */
   const open = useRef(false);
   const v = useVoiceConversation(null, noop, { background: true });
@@ -97,33 +100,36 @@ export function CarVoiceController() {
     if (!CarVoice) return;
     const actions = CarVoice.addListener('onAction', ({ action }) => handle(action));
     const connection = CarVoice.addListener('onConnection', (e) => setConnected(e.connected));
+    const visibility = CarVoice.addListener('onVisibility', (e) => setVisible(e.visible));
     return () => {
       actions.remove();
       connection.remove();
+      visibility.remove();
     };
   }, [handle]);
 
-  // Voice-first: all'apertura su CarPlay si parte subito; scollegando l'auto ci si ferma.
+  // Voice-first: aprendo AlbA su CarPlay si parte subito; uscendo da AlbA (Home di CarPlay,
+  // un'altra app) o scollegando l'auto ci si ferma e il microfono si chiude.
   useEffect(() => {
-    if (connected) {
+    if (active) {
       handle('start');
       return;
     }
     latest.current.v.stop();
     open.current = false;
-  }, [connected, handle]);
+  }, [active, handle]);
 
   useEffect(() => {
-    if (open.current && connected) void CarVoice?.setState(carState, v.muted);
-  }, [connected, carState, v.muted]);
+    if (open.current && active) void CarVoice?.setState(carState, v.muted);
+  }, [active, carState, v.muted]);
 
   // Errori (AI non configurata, rete…): avviso sullo schermo dell'auto, come sul telefono.
   const errorCode = v.error?.code;
   useEffect(() => {
-    if (!errorCode || !connected) return;
+    if (!errorCode || !active) return;
     open.current = false;
     void CarVoice?.showMessage(t(`ai.errors.${errorCode}` as 'ai.errors.unknown'));
-  }, [errorCode, connected, t]);
+  }, [errorCode, active, t]);
 
   return null;
 }

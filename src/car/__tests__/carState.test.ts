@@ -1,4 +1,4 @@
-import { carStateOf, commandFor } from '../carState';
+import { carSessionActive, carStateOf, commandFor } from '../carState';
 
 const base = {
   onboarded: true,
@@ -47,5 +47,14 @@ describe('commandFor', () => {
     expect(commandFor('mute', { ...base, muted: true })).toBe('unmute');
     expect(commandFor('mute', { ...base, engine: 'loop', state: 'listening' })).toBe('pause');
     expect(commandFor('mute', { ...base, engine: 'loop', state: 'ended' })).toBe('none');
+  });
+});
+
+describe('sessione in auto', () => {
+  it("ascolta solo con auto collegata e AlbA sullo schermo dell'auto", () => {
+    expect(carSessionActive({ connected: true, visible: true })).toBe(true);
+    // Uscendo da AlbA su CarPlay l'auto resta collegata: il coach deve fermarsi.
+    expect(carSessionActive({ connected: true, visible: false })).toBe(false);
+    expect(carSessionActive({ connected: false, visible: true })).toBe(false);
   });
 });

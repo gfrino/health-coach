@@ -39,7 +39,21 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     didConnect interfaceController: CPInterfaceController
   ) {
     CarVoiceBridge.shared.connect(interfaceController)
+    // Aperta dallo schermo dell'auto: già in primo piano (i callback di foreground possono
+    // arrivare prima che il bridge sia collegato).
+    let state = templateApplicationScene.activationState
+    CarVoiceBridge.shared.setVisible(state == .foregroundActive || state == .foregroundInactive)
     Self.startJavaScript()
+  }
+
+  // AlbA torna sullo schermo dell'auto o lo lascia (Home di CarPlay, un'altra app): l'auto resta
+  // collegata, quindi serve questo per fermare l'ascolto quando l'utente esce da AlbA.
+  func sceneWillEnterForeground(_ scene: UIScene) {
+    CarVoiceBridge.shared.setVisible(true)
+  }
+
+  func sceneDidEnterBackground(_ scene: UIScene) {
+    CarVoiceBridge.shared.setVisible(false)
   }
 
   func templateApplicationScene(

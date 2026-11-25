@@ -17,10 +17,14 @@ export interface CarVoiceTexts {
 type Events = {
   onAction: (e: { action: CarAction }) => void;
   onConnection: (e: { connected: boolean }) => void;
+  /** AlbA entra o esce dal primo piano sullo schermo dell'auto (l'auto resta collegata). */
+  onVisibility: (e: { visible: boolean }) => void;
 };
 
 declare class CarVoiceModule extends NativeModule<Events> {
   isConnected(): boolean;
+  /** AlbA in primo piano su CarPlay. Assente nelle build precedenti alla 1.44.2. */
+  isVisible?(): boolean;
   setTexts(texts: CarVoiceTexts): Promise<void>;
   /** Mostra il template vocale (se non è già visibile) e attiva lo stato. */
   setState(state: CarVoiceState, muted: boolean): Promise<void>;
