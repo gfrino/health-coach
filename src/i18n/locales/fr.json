@@ -525,7 +525,8 @@
       "unsupported_language": "L'IA du téléphone ne prend pas en charge cette langue. Changez de langue ou utilisez un service en ligne.",
       "org_verification": "OpenAI exige la vérification de ton organisation pour ce modèle. Vérifie-la sur platform.openai.com (Paramètres → Organisation) ou choisis un autre modèle.",
       "app_update_required": "Cette fonction nécessite la dernière version de l'app. Installe la dernière mise à jour et réessaie.",
-      "billing_required": "Google exige que la facturation soit activée pour utiliser Gemini depuis ta région (Suisse, UE, Royaume-Uni). Dans Google AI Studio, ouvre « Billing », ajoute un moyen de paiement au projet de la clé et réessaie."
+      "billing_required": "Google exige que la facturation soit activée pour utiliser Gemini depuis ta région (Suisse, UE, Royaume-Uni). Dans Google AI Studio, ouvre « Billing », ajoute un moyen de paiement au projet de la clé et réessaie.",
+      "insufficient_credit_openai": "Votre compte API OpenAI n'a pas de crédit. Attention : un abonnement ChatGPT (Go, Plus ou Pro) ne couvre pas l'API, facturée à part. Ajoutez du crédit sur platform.openai.com (Billing, au moins 5 $) ou choisissez une autre IA."
     },
     "device": {
       "title": "IA du téléphone · {{engine}}",
@@ -557,7 +558,8 @@
     "paste": "Coller la clé copiée",
     "pasted": "Clé trouvée dans le presse-papiers : vérification…",
     "pasteNothing": "Le presse-papiers ne contient pas de clé {{provider}}. Sur la page du fournisseur, touchez « Copy » à côté de la clé, puis revenez ici.",
-    "errorDetail": "Détails : {{detail}}"
+    "errorDetail": "Détails : {{detail}}",
+    "unverified": "Clé enregistrée, mais {{provider}} n'a pas répondu au test : elle n'est pas encore confirmée. Réessayez dans un instant avec « Vérifier à nouveau »."
   },
   "sources": {
     "title": "Connectez vos données",

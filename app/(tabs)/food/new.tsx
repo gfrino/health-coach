@@ -3,6 +3,7 @@ import { Stack } from 'expo-router/stack';
 import { useEffect, useState } from 'react';
 import { Image, Keyboard, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useAIErrorText } from '@/ai/errorText';
 
 import { AppText, Button, Card, ChipGroup, Icon, Screen, TextField } from '@/components';
 import { TimeField } from '@/components/TimeField';
@@ -38,6 +39,7 @@ import { useTheme } from '@/theme';
  */
 export default function NewFoodScreen() {
   const { t, i18n } = useTranslation();
+  const aiErrorText = useAIErrorText();
   const { colors, spacing, radius } = useTheme();
   const locale = i18n.language;
   const params = useLocalSearchParams<{ day?: string; meal?: string }>();
@@ -101,11 +103,7 @@ export default function NewFoodScreen() {
         return;
       }
       const err = toAIError(e);
-      setNotice(
-        err.code !== 'unknown'
-          ? t(`ai.errors.${err.code}` as 'ai.errors.unknown')
-          : t('food.estimateFailed'),
-      );
+      setNotice(err.code !== 'unknown' ? aiErrorText(err.code) : t('food.estimateFailed'));
     } finally {
       setBusy(null);
     }

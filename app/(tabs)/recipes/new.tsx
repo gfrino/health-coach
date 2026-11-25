@@ -3,6 +3,7 @@ import { Stack } from 'expo-router/stack';
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useAIErrorText } from '@/ai/errorText';
 
 import { AppText, Button, Card, ChipGroup, Screen, TextField } from '@/components';
 import { toAIError } from '@/ai/errors';
@@ -20,6 +21,7 @@ const SERVINGS = ['1', '2', '4'] as const;
 /** Nuova ricetta: la crea il coach (con l'AI scelta) oppure la si scrive da sé. */
 export default function NewRecipeScreen() {
   const { t } = useTranslation();
+  const aiErrorText = useAIErrorText();
   const { spacing } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const hasAI = !!settings.ai.provider && !!settings.ai.model;
@@ -79,11 +81,7 @@ export default function NewRecipeScreen() {
     } catch (e) {
       haptic.error();
       const err = e instanceof Error && e.message === 'parse' ? null : toAIError(e);
-      setError(
-        err && err.code !== 'unknown'
-          ? t(`ai.errors.${err.code}` as 'ai.errors.unknown')
-          : t('recipes.generateFailed'),
-      );
+      setError(err && err.code !== 'unknown' ? aiErrorText(err.code) : t('recipes.generateFailed'));
     } finally {
       setBusy(null);
     }

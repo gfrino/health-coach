@@ -3,6 +3,7 @@ import { Stack } from 'expo-router/stack';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useAIErrorText } from '@/ai/errorText';
 
 import { AppText, Button, Card, ChipGroup, Screen, TextField } from '@/components';
 import { toAIError } from '@/ai/errors';
@@ -21,6 +22,7 @@ type Duration = (typeof DURATIONS)[number];
 /** Nuovo programma: lo prepara il coach (con l'AI scelta) oppure lo si scrive da sé. */
 export default function NewProgramScreen() {
   const { t } = useTranslation();
+  const aiErrorText = useAIErrorText();
   const { spacing } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const hasAI = !!settings.ai.provider && !!settings.ai.model;
@@ -60,9 +62,7 @@ export default function NewProgramScreen() {
       haptic.error();
       const err = e instanceof Error && e.message === 'parse' ? null : toAIError(e);
       setError(
-        err && err.code !== 'unknown'
-          ? t(`ai.errors.${err.code}` as 'ai.errors.unknown')
-          : t('programs.generateFailed'),
+        err && err.code !== 'unknown' ? aiErrorText(err.code) : t('programs.generateFailed'),
       );
     } finally {
       setBusy(null);

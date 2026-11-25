@@ -2,6 +2,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useAIErrorText } from '@/ai/errorText';
 
 import type { MessageAttachment } from '@/db/repositories/conversationRepository';
 import { haptic } from '@/lib/haptics';
@@ -36,6 +37,7 @@ export function MessageBubble({
   onOpenAttachment,
 }: Props) {
   const { t } = useTranslation();
+  const aiErrorText = useAIErrorText();
   const { colors, spacing, radius } = useTheme();
   const isUser = role === 'user';
   const [copied, setCopied] = useState(false);
@@ -62,7 +64,7 @@ export function MessageBubble({
         }}
         accessibilityLiveRegion="assertive"
       >
-        <AppText variant="callout">{t(`ai.errors.${error.code}` as 'ai.errors.unknown')}</AppText>
+        <AppText variant="callout">{aiErrorText(error.code)}</AppText>
         <Button label={t('common.retry')} variant="secondary" onPress={error.onRetry} />
       </View>
     );

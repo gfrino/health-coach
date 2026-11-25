@@ -525,7 +525,8 @@
       "unsupported_language": "Die KI des Telefons unterstützt diese Sprache nicht. Ändere die Sprache oder nutze einen Online-Dienst.",
       "org_verification": "OpenAI verlangt für dieses Modell eine Verifizierung deiner Organisation. Verifiziere sie auf platform.openai.com (Einstellungen → Organisation) oder wähle ein anderes Modell.",
       "app_update_required": "Diese Funktion erfordert die neueste Version der App. Installiere das letzte Update und versuche es erneut.",
-      "billing_required": "Google verlangt eine aktive Abrechnung, um Gemini in deiner Region (Schweiz, EU, Vereinigtes Königreich) zu nutzen. Öffne in Google AI Studio \"Billing\", hinterlege eine Zahlungsmethode für das Projekt des Schlüssels und versuche es erneut."
+      "billing_required": "Google verlangt eine aktive Abrechnung, um Gemini in deiner Region (Schweiz, EU, Vereinigtes Königreich) zu nutzen. Öffne in Google AI Studio \"Billing\", hinterlege eine Zahlungsmethode für das Projekt des Schlüssels und versuche es erneut.",
+      "insufficient_credit_openai": "Dein OpenAI-API-Konto hat kein Guthaben. Achtung: Ein ChatGPT-Abo (Go, Plus oder Pro) gilt nicht für die API, sie wird separat abgerechnet. Lade Guthaben auf platform.openai.com auf (Billing, mindestens 5 $) oder wähle eine andere KI."
     },
     "device": {
       "title": "KI auf dem Telefon · {{engine}}",
@@ -557,7 +558,8 @@
     "paste": "Kopierten Schlüssel einfügen",
     "pasted": "Schlüssel in der Zwischenablage gefunden: wird geprüft…",
     "pasteNothing": "In der Zwischenablage ist kein {{provider}}-Schlüssel. Tippe auf der Seite des Anbieters neben dem Schlüssel auf „Copy“ und kehre hierher zurück.",
-    "errorDetail": "Details: {{detail}}"
+    "errorDetail": "Details: {{detail}}",
+    "unverified": "Schlüssel gespeichert, aber {{provider}} hat auf den Test nicht geantwortet: Er ist noch nicht bestätigt. Versuche es gleich mit «Erneut prüfen»."
   },
   "sources": {
     "title": "Deine Daten verbinden",

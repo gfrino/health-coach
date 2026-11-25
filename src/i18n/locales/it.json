@@ -525,7 +525,8 @@
       "unsupported_language": "L'AI del telefono non supporta questa lingua. Cambia lingua o usa un servizio online.",
       "org_verification": "OpenAI richiede la verifica della tua organizzazione per questo modello. Verificala su platform.openai.com (Impostazioni → Organizzazione) oppure scegli un altro modello.",
       "app_update_required": "Questa funzione richiede la versione più recente dell'app. Installa l'ultimo aggiornamento e riprova.",
-      "billing_required": "Google richiede la fatturazione attiva per usare Gemini dalla tua zona (Svizzera, UE, Regno Unito). Su Google AI Studio apri \"Billing\", collega un metodo di pagamento al progetto della chiave e riprova."
+      "billing_required": "Google richiede la fatturazione attiva per usare Gemini dalla tua zona (Svizzera, UE, Regno Unito). Su Google AI Studio apri \"Billing\", collega un metodo di pagamento al progetto della chiave e riprova.",
+      "insufficient_credit_openai": "Il tuo account API OpenAI non ha credito. Attenzione: l'abbonamento a ChatGPT (Go, Plus o Pro) non vale per le API, che si pagano a parte. Aggiungi credito su platform.openai.com (Billing, minimo 5 $) oppure scegli un'altra AI."
     },
     "device": {
       "title": "AI del telefono · {{engine}}",
@@ -557,7 +558,8 @@
     "paste": "Incolla la chiave copiata",
     "pasted": "Chiave trovata negli appunti: la verifico…",
     "pasteNothing": "Negli appunti non c'è una chiave {{provider}}. Sulla pagina del provider premi \"Copy\" accanto alla chiave, poi torna qui.",
-    "errorDetail": "Dettagli: {{detail}}"
+    "errorDetail": "Dettagli: {{detail}}",
+    "unverified": "Chiave salvata, ma {{provider}} non ha risposto alla prova: non è ancora confermato che funzioni. Riprova tra poco con «Verifica di nuovo»."
   },
   "sources": {
     "title": "Collega i tuoi dati",

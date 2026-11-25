@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AppState, Platform, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { useAIErrorText } from '@/ai/errorText';
 import { AIError, providerMessage, toAIError, type AIErrorCode } from '@/ai/errors';
 import { getApiKey, maskKey, saveApiKey } from '@/ai/keyStore';
 import { extractKey, getProvider, PROVIDERS } from '@/ai/registry';
@@ -25,8 +26,12 @@ import { TextField } from './TextField';
 
 const MAX_MODELS_SHOWN = 12;
 const TEST_TIMEOUT_MS = 15_000;
-/** Errori della prova finale che non indicano una chiave sbagliata. */
-const SOFT_TEST_ERRORS = new Set<AIErrorCode>(['network', 'server', 'rate_limited', 'unknown']);
+/**
+ * Errori della prova finale che non indicano una chiave sbagliata (rete, sovraccarico).
+ * Gli errori sconosciuti no: una chiave senza credito passava come "collegata".
+ */
+const SOFT_TEST_ERRORS = new Set<AIErrorCode>(['network', 'server', 'rate_limited']);
+const RETRY_DELAY_MS = 2_000;
 
 /**
  * Android: il browser si apre e la promessa si risolve subito. Aspettiamo che l'utente torni
@@ -52,6 +57,8 @@ type Status =
   | { kind: 'idle' }
   | { kind: 'working'; what: 'models' | 'test' }
   | { kind: 'ok' }
+  /** Chiave salvata, ma la prova di risposta non è riuscita per un problema temporaneo. */
+  | { kind: 'unverified'; code: AIErrorCode; detail: string | null }
   | { kind: 'error'; code: AIErrorCode; detail: string | null };
 
 /** Servizi AI online (BYOK): provider → guida → chiave → modello → test. */
@@ -61,6 +68,7 @@ export function CloudAISetup({
   onConnectedChange?: (connected: boolean) => void;
 }) {
   const { t } = useTranslation();
+  const aiErrorText = useAIErrorText();
   const { colors, spacing } = useTheme();
   const ai = useSettingsStore((s) => s.settings.ai);
   const update = useSettingsStore((s) => s.update);
@@ -146,22 +154,37 @@ export function CloudAISetup({
       setStatus({ kind: 'working', what: 'test' });
       // La chiave è già confermata dall'elenco dei modelli: la prova di risposta non deve bloccare.
       // Con limite di tempo; problemi di rete o lentezza del modello non impediscono il collegamento.
-      try {
-        await Promise.race([
-          adapter.testConnection(key, target),
+      const test = (m: string) =>
+        Promise.race([
+          adapter.testConnection(key, m),
           new Promise((_, reject) =>
             setTimeout(() => reject(new AIError('network', 'timeout')), TEST_TIMEOUT_MS),
           ),
         ]);
-      } catch (e) {
-        const code = toAIError(e).code;
-        if (!SOFT_TEST_ERRORS.has(code)) throw e;
+      // Un problema temporaneo (rete, sovraccarico) si riprova una volta; se resta, la chiave
+      // si salva ma si dice chiaramente che non è stata confermata.
+      let unverified: AIError | null = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          await test(target);
+          unverified = null;
+          break;
+        } catch (e) {
+          const err = toAIError(e);
+          if (!SOFT_TEST_ERRORS.has(err.code)) throw e;
+          unverified = err;
+          if (attempt === 0) await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+        }
       }
       await saveApiKey(provider, key);
       setSavedKey(key.trim());
       setKeyInput('');
       await update({ ai: { provider, model: target } });
-      setStatus({ kind: 'ok' });
+      setStatus(
+        unverified
+          ? { kind: 'unverified', code: unverified.code, detail: providerMessage(unverified) }
+          : { kind: 'ok' },
+      );
     } catch (e) {
       const err = toAIError(e);
       setStatus({ kind: 'error', code: err.code, detail: providerMessage(err) });
@@ -269,7 +292,7 @@ export function CloudAISetup({
               error={
                 status.kind === 'error'
                   ? [
-                      t(`ai.errors.${status.code}`),
+                      aiErrorText(status.code, provider),
                       // Messaggio originale del provider: aiuta a capire il problema (anche da uno screenshot).
                       status.detail ? t('ai.errorDetail', { detail: status.detail }) : null,
                     ]
@@ -309,7 +332,23 @@ export function CloudAISetup({
             </AppText>
           ) : null}
 
-          {status.kind === 'ok' || connected ? (
+          {status.kind === 'unverified' ? (
+            <View
+              style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' }}
+              accessibilityLiveRegion="polite"
+            >
+              <Icon name="warning" color={colors.warning} />
+              <AppText variant="callout" style={{ flex: 1 }}>
+                {[
+                  t('ai.unverified', { provider: info.name }),
+                  aiErrorText(status.code, provider),
+                  status.detail ? t('ai.errorDetail', { detail: status.detail }) : null,
+                ]
+                  .filter(Boolean)
+                  .join('\n')}
+              </AppText>
+            </View>
+          ) : status.kind === 'ok' || connected ? (
             <View
               style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'center' }}
               accessibilityLiveRegion="polite"

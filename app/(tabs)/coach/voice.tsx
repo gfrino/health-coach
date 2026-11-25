@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAIErrorText } from '@/ai/errorText';
 
 import { AppText, Icon } from '@/components';
 import { haptic } from '@/lib/haptics';
@@ -14,6 +15,7 @@ import { useVoiceConversation } from '@/voice/useVoiceConversation';
 /** Conversazione a voce a schermo intero, come la modalità vocale di ChatGPT. */
 export default function VoiceScreen() {
   const { t } = useTranslation();
+  const aiErrorText = useAIErrorText();
   const { colors, spacing, radius } = useTheme();
   const coachName = useSettingsStore((s) => s.settings.coach.name);
   const { c } = useLocalSearchParams<{ c: string }>();
@@ -61,7 +63,7 @@ export default function VoiceScreen() {
   }, [v.state, scale]);
 
   const status = v.error
-    ? `${t(`ai.errors.${v.error.code}` as 'ai.errors.unknown')}${v.engine === 'realtime' ? ` ${t('voiceMode.retry')}` : ''}`
+    ? `${aiErrorText(v.error.code)}${v.engine === 'realtime' ? ` ${t('voiceMode.retry')}` : ''}`
     : v.tool === 'save_journal_entry'
       ? t('chat.savingJournal')
       : v.tool === 'create_program' || v.tool === 'update_program'
