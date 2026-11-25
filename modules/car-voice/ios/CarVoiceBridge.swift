@@ -134,20 +134,29 @@ public final class CarVoiceBridge: NSObject {
     return template
   }
 
+  /// Onde animate per stato (vedi CarWaveforms), calcolate una volta sola.
+  private lazy var waveImages: [String: UIImage] = {
+    var images: [String: UIImage] = [:]
+    for kind in CarWaveformKind.allCases {
+      let frames = CarWaveforms.frames(kind).map {
+        UIImage(cgImage: $0, scale: CarWaveforms.scale, orientation: .up)
+      }
+      let duration = CarWaveforms.timing(kind).duration
+      images[kind.rawValue] =
+        frames.count > 1
+        ? UIImage.animatedImage(with: frames, duration: duration) ?? frames[0]
+        : frames.first
+    }
+    return images
+  }()
+
   private func makeVoiceTemplate() -> CPVoiceControlTemplate {
-    let symbols: [(String, String)] = [
-      ("idle", "mic.circle"),
-      ("connecting", "antenna.radiowaves.left.and.right"),
-      ("listening", "waveform"),
-      ("thinking", "ellipsis.circle"),
-      ("speaking", "person.wave.2"),
-    ]
-    let config = UIImage.SymbolConfiguration(pointSize: 90, weight: .regular)
-    let states = symbols.map { id, symbol -> CPVoiceControlState in
+    let states = CarWaveformKind.allCases.map { kind -> CPVoiceControlState in
+      let id = kind.rawValue
       let state = CPVoiceControlState(
         identifier: id,
         titleVariants: [texts.states[id] ?? id],
-        image: UIImage(systemName: symbol, withConfiguration: config),
+        image: waveImages[id],
         repeats: true)
       if #available(iOS 26.4, *) {
         state.actionButtons = actionButtons()
